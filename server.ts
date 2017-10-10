@@ -6,6 +6,7 @@ import { graphiqlExpress, graphqlExpress } from 'apollo-server-express'
 import * as next from 'next'
 import clientRoutes from './routes'
 import { createGraphQLSchema } from './graphql'
+import createConnectors, { GQConnectors } from './connectors'
 
 declare global {
   interface ApplicationLogger {
@@ -18,7 +19,9 @@ declare global {
   }
 
   interface GQResolverContext extends SVContext, express.Request {
-    models: GQApplicationModels
+    models: GQApplicationModels,
+    connectors: GQConnectors,
+    token: string
   }
 }
 
@@ -35,7 +38,9 @@ export default async function init(context: SVContext) {
     context: {
       ...req,
       ...context,
-      models
+      token: 'mock',
+      models,
+      connectors: createConnectors({ napEndpoint: context.config.NAP_URI })
     }
   })))
 
