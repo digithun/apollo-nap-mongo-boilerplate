@@ -8,8 +8,9 @@ export function createThreadWrapResolver(next) {
       context.logger.log('Thread: Create new thread...')
       try {
         await context.models.Thread.create({
-          appId: rp.args.appId,
-          contentId: rp.args.contentId
+          appId: rp.args.filter.appId,
+          contentPrefix: rp.args.filter.contentPrefix,
+          contentId: rp.args.filter.contentId
         })
       } catch (e) {
         context.logger.log(e)

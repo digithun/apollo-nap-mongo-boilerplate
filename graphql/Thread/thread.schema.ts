@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose'
 declare global {
   type GBThreadType = {
     appId: string
-    contentId: mongoose.Types.ObjectId
+    contentId: string
     contentPrefix: string
   }
   interface GQThreadDocument extends mongoose.Document, GBThreadType { }
@@ -18,7 +18,7 @@ const threadSchema = new mongoose.Schema({
     type: String
   },
   contentId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     unique: true,
     required: true
   },

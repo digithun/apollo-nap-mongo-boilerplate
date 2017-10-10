@@ -21,6 +21,15 @@ declare global {
     Thread: mongoose.Model<GQThreadDocument>
     Comment: mongoose.Model<GQCommentDocument>
   }
+
+  interface GQCreateOneArgs<Schema> {
+    record: Schema
+  }
+
+  interface GQCreateOneResult<Document> {
+    record: Document
+    recordId: mongoose.Types.ObjectId
+  }
 }
 
 export default function createSchema(connection: mongoose.Connection) {
@@ -39,7 +48,8 @@ export default function createSchema(connection: mongoose.Connection) {
   })
   GQC.rootMutation().addFields({
     createThread: typeComposers.Thread.getResolver('createOne'),
-    updateCommentById: typeComposers.Comment.getResolver('updateById')
+    updateCommentById: typeComposers.Comment.getResolver('updateById'),
+    reply: typeComposers.Comment.getResolver('reply')
   })
   return {
     schema: GQC.buildSchema() ,
