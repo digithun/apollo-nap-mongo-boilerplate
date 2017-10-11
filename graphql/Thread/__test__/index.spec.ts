@@ -23,8 +23,11 @@ describe('Thread resolver test', () => {
     const rp = {
       source: undefined,
       args: {
-        appId: 'mock-app',
-        contentId: threadId
+        filter: {
+          appId: 'mock-app',
+          contentPrefix: 'prefix',
+          contentId: threadId
+        }
       },
       context: {
         logger: console,
@@ -37,13 +40,12 @@ describe('Thread resolver test', () => {
 
     const thread = await models.Thread.findOne({
       appId: 'mock-app',
+      contentPrefix: 'prefix',
       contentId: threadId
     })
 
     expect(thread).toEqual(expect.anything())
-    await models.Thread.remove({
-      appId: 'mock-app'
-    })
+    await thread.remove()
   })
 
 })

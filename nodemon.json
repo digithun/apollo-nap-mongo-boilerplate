@@ -2,6 +2,7 @@
   "watch": [
     "graphql/",
     "server/",
+    "connectors/",
     "models/",
     "lib/"
   ],

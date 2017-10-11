@@ -5,6 +5,9 @@ export const guardWrapResolver: ResolverNextRpCb<GQCommentDocument, GQResolverCo
   return async (rp) => {
     const args: GQCreateOneArgs<GBCommentType> = rp.args as any
     const thread = await rp.context.models.Thread.findById(args.record.threadId)
+    if (!rp.context.user) {
+      throw new Error('unauthorized')
+    }
     if (!thread) {
       throw new Error('thread not exists')
     }
@@ -12,6 +15,9 @@ export const guardWrapResolver: ResolverNextRpCb<GQCommentDocument, GQResolverCo
       const comment = await rp.context.models.Comment.findById(args.record.replyToId)
       if (!comment) {
         throw new Error('comment not exists')
+      }
+      if (comment.threadId.toString() !== thread._id.toString()) {
+        throw new Error('comment wrong thread id')
       }
     }
     return next(rp)
@@ -21,11 +27,7 @@ export const guardWrapResolver: ResolverNextRpCb<GQCommentDocument, GQResolverCo
 export const assignUserResolver: ResolverNextRpCb<GQCommentDocument, GQResolverContext> = (next) => {
   return async (rp) => {
     const args: GQCreateOneArgs<GBCommentType> = rp.args as any
-    const userId = await rp.context.connectors.nap.getUserIdFromToken(rp.context.token)
-    if (!userId) {
-      throw new Error('unauthorized')
-    }
-    args.record.userId = userId
+    args.record.userId = rp.context.user._id
     return next(rp)
   }
 }

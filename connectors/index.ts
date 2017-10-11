@@ -1,11 +1,13 @@
-import createNapConnector, { GQNapConnector } from './nap'
+import createUserConnector, { GQUserConnector } from './user'
 
 export type GQConnectors = {
-  nap: GQNapConnector
+  User: GQUserConnector
 }
 
 export default (config: {
-  napEndpoint: string
+  napEndpoint: string,
+  models: GQApplicationModels,
+  logger: ApplicationLogger
 }): GQConnectors => ({
-  nap: createNapConnector({ endpoint: config.napEndpoint })
+  User: createUserConnector({ endpoint: config.napEndpoint, userModel: config.models.User, logger: config.logger })
 })

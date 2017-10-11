@@ -21,7 +21,7 @@ declare global {
   interface GQResolverContext extends SVContext, express.Request {
     models: GQApplicationModels,
     connectors: GQConnectors,
-    token: string
+    user: GBUserType
   }
 }
 
@@ -29,19 +29,20 @@ export default async function init(context: SVContext) {
   const server = express()
   const clientApp = next({ dev: context.config.dev })
   const clientRoutesHandler = clientRoutes.getRequestHandler(clientApp)
+  const { schema, models }  = createGraphQLSchema(context)
+  const connectors = createConnectors({ napEndpoint: context.config.NAP_URI, models, logger: context.logger })
+
   server.use(bodyParser.json())
 
   server.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
-
-  const { schema, models }  = createGraphQLSchema(context)
-  server.use('/graphql', graphqlExpress( (req) => ({
+  server.use('/graphql', graphqlExpress( async (req) => ({
     schema,
     context: {
       ...req,
       ...context,
-      token: 'mock',
+      user: await connectors.User.resolveUserInfo(await connectors.User.getUserIdFromToken('xxx')),
       models,
-      connectors: createConnectors({ napEndpoint: context.config.NAP_URI })
+      connectors
     }
   })))
 

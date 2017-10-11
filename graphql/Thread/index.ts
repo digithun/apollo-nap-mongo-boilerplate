@@ -13,6 +13,11 @@ export default {
     return typeComposer
   },
   createGraphQLRelation: (typeComposers) => {
-    // implement Relation
+    typeComposers.Thread.addRelation('comments', {
+      resolver: typeComposers.Comment.getResolver('findMany'),
+      prepareArgs: {
+        filter: (source) => ({ threadId: source._id.toString(), replyToId: null })
+      }
+    })
   }
 } as GQTypeComposerStrategy<GQThreadDocument>

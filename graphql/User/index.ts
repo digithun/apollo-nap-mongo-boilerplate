@@ -1,9 +1,15 @@
-import * as mongoose from 'mongoose'
+import { Model } from 'mongoose'
+import { TypeComposer } from 'graphql-compose'
+import composeWithMongoose from 'graphql-compose-mongoose'
 
-declare global {
-  interface GBUserType {
-    name: string
-    thumbnailImageURL: string
-    _id: any
+import enhanceGetUserInfo from './getUserInfo.resolver'
+import schema from './user.schema'
+
+export default {
+  schema,
+  createTypeComposer: (UserModel): TypeComposer => {
+    const typeComposer = composeWithMongoose(UserModel) as TypeComposer
+    enhanceGetUserInfo(typeComposer)
+    return typeComposer
   }
-}
+} as GQTypeComposerStrategy<GQUserDocument>
