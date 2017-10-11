@@ -2,7 +2,6 @@ import ApolloClient from 'apollo-client'
 import { Store } from 'redux'
 import { all } from 'redux-saga/effects'
 
-import initialFormSaga from '../components/Form.sagas'
 declare global {
   interface ApplicationSagaContext {
     apolloClient: ApolloClient<any>
@@ -20,7 +19,6 @@ export default (context: ApplicationSagaContext) => function * rootSagas() {
   console.log('Sagas start !!')
   yield all([
     // add your sagas here
-    initialFormSaga(context)
   ])
 
 }

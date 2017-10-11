@@ -1,4 +1,7 @@
 declare global {
+  interface UIStyledComponentPropTypes {
+    theme?: UITheme
+  }
   interface UITheme {
     pumpkin: string,
     dimOrange: string,

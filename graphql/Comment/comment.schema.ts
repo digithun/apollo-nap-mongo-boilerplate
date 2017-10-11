@@ -6,12 +6,15 @@ declare global {
     userId: string
   }
   type GBCommentType = {
-    threadId: mongoose.Types.ObjectId
-    replyToId: mongoose.Types.ObjectId
-    userId: string
-    GBCommentType: string
+    threadId: any
+    replyToId: any
+    userId?: string
+    commentType: string
     message: string
     reactions: GBReactionType[]
+
+    // relation field
+    user?: GBUserType
   }
   interface GQCommentDocument extends mongoose.Document, GBCommentType {
   }

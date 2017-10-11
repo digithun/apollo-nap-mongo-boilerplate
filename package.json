@@ -9,6 +9,7 @@
     "storybook": "start-storybook -p 9001 -s ./ -c storybook",
     "test": "npm run build && jest --forceExit||true",
     "watch": "npm run clean && tsc --watch||true",
+    "babel-node": "BABEL_ENV=development babel-node",
     "dev": "NODE_ENV=development nodemon index.js",
     "up-dev": "NODE_ENV=development docker-compose up -d"
   },
@@ -47,6 +48,7 @@
     "mongoose": "^4.12.0",
     "next": "^4.0.1",
     "next-routes": "^1.0.40",
+    "query-string": "^5.0.0",
     "react": "^16.0.0",
     "react-apollo": "^2.0.0-beta.0",
     "react-dom": "^16.0.0",
@@ -62,6 +64,8 @@
   "devDependencies": {
     "@storybook/react": "^3.2.12",
     "@types/async": "^2.0.31",
+    "babel": "^6.23.0",
+    "babel-cli": "^6.26.0",
     "babel-plugin-react-autorequire": "^1.1.1",
     "babel-plugin-styled-components": "^1.1.5",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",

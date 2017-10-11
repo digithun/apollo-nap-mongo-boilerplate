@@ -1,7 +1,19 @@
 import * as React from 'react'
 import { compose, withProps } from 'recompose'
-const styled = require('styled-components').default
+
+import * as styledComponent from 'styled-components'
+const styled = styledComponent.default
 
 export const InputTextMultiline = styled.textarea`
-  width: 100px;
+  width: 400px;
+  height: 100px;
+  background: ${(props: { theme?: UITheme }) => props.theme.matteWhite};
+  resize: none;
+  border-radius: 3px;
+  border: 1px solid ${(props: { theme?: UITheme }) => props.theme.grey};
+  font-size: 1em;
+  padding: 9px 13px;
+  &:focus {
+    outline: none;
+  }
 `

@@ -6,7 +6,6 @@
       ],
       "plugins": [
         "transform-decorators-legacy",
-
         ["styled-components", { "ssr": true }],
         "transform-function-bind"
       ]

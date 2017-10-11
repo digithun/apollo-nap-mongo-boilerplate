@@ -4,7 +4,9 @@
       "tslint:recommended",
       "tslint-react"
   ],
-  "jsRules": {},
+  "jsRules": {
+    "no-unused-expression": true
+  },
   "rules": {
       "no-require-imports": [false],
       "no-var-requires": false,
@@ -16,7 +18,11 @@
       "semicolon": [false],
       "trailing-comma": [false],
       "ordered-imports": false,
+      "jsx-no-multiline-js": false,
       "no-empty-interface": false,
+      "jsx-boolean-value": false,
+      "no-unused-variable": [true, 1],
+      "no-unused-expression": true,
       "member-ordering": [true, { "order": "fields-first" }],
       "variable-name": false,
       "interface-name": ["never-prefix"],
