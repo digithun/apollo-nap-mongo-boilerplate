@@ -7,9 +7,9 @@ declare global {
   }
   type GBCommentType = {
     threadId: any
-    replyToId: any
+    replyToId?: any
     userId?: string
-    commentType: string
+    commentType: | 'text'
     message: string
     reactions: GBReactionType[]
 

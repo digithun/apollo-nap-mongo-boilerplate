@@ -39,7 +39,7 @@ class UICommentInput extends React.Component<UICommentInputPropTypes & enchanceP
       <CommentInputContainer>
         {props.userList.length > 0 ? <UIUserSelector onChange={this.onUserChange} users={props.userList} value={props.currentSelectedUserIndex} /> : null}
         <InputTextMultiline onChange={this.onInputTextChange} value={props.value.message} placeholder={props.t('comment-input-placeholder')} />
-        <ConfirmButton text={props.t('confirm')} onMouseDown={props.onConfirm} />
+        <ConfirmButton text={props.t('confirm')} onClick={props.onConfirm} />
       </CommentInputContainer>
     )
   }
@@ -49,7 +49,10 @@ class UICommentInput extends React.Component<UICommentInputPropTypes & enchanceP
     this.props.onChange(data)
   }
   private onInputTextChange = (e) => this.onChange('message', e.target.value)
-  private onUserChange = (userIndex) => this.onChange('user', this.props.userList[userIndex])
+  private onUserChange = (userIndex) => {
+    this.onChange('user', this.props.userList[userIndex])
+    this.props.setCurrentSelectedUserIndex(userIndex)
+  }
 }
 
 export default compose<UICommentInputPropTypes & enchanceProps, UICommentInputPropTypes>(
