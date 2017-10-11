@@ -4,6 +4,8 @@ import Link from 'apollo-link-http'
 import Cache from 'apollo-cache-inmemory'
 import gql from 'graphql-tag'
 
+type Config = { logger: ApplicationLogger, endpoint: string, userModel: mongoose.Model<GQUserDocument> }
+
 const UserInfoResolver = gql`
   query UserInfoResolver($userId: String!){
     resolveUserInfo(_id: $userId) {
@@ -25,7 +27,7 @@ export type GQUserConnector = {
   getUserIdFromToken: (token: string) => Promise<string>
 }
 
-export default (config: { logger: ApplicationLogger, endpoint: string, userModel: mongoose.Model<GQUserDocument> }): GQUserConnector => {
+const napConnector = (config: Config) => {
   const nap = new ApolloClient(({
     link: new Link({
       uri: config.endpoint
@@ -77,4 +79,33 @@ export default (config: { logger: ApplicationLogger, endpoint: string, userModel
         })
     }
   }
+}
+
+const casualConnector = () => {
+  const casual = require('casual')
+  const ctoi = (s: string): number => s.split('').reduce<number>((acc, c) => acc + c.charCodeAt(0), 0)
+  return {
+    async resolveUserInfo(userId) {
+      if (!userId) {
+        return null
+      }
+      casual.seed(ctoi(userId))
+      return {
+        _id: userId,
+        name: casual.full_name,
+        profilePictureURL: null
+      }
+    },
+    async getUserIdFromToken(token) {
+      casual.seed(ctoi(token))
+      return casual.email
+    }
+  }
+}
+
+export default (config: Config): GQUserConnector => {
+  if (config.endpoint === 'CASUAL') {
+    return casualConnector()
+  }
+  return napConnector(config)
 }
