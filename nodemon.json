@@ -1,5 +1,8 @@
 {
   "watch": [
+    ".env",
+    "config.js",
+    "server.js",
     "graphql/",
     "server/",
     "connectors/",
