@@ -1,4 +1,5 @@
 import * as express from 'express'
+import * as bearerToken from 'express-bearer-token'
 import * as bodyParser from 'body-parser'
 import * as chalk from 'chalk'
 import { Connection, Model } from 'mongoose'
@@ -33,14 +34,20 @@ export default async function init(context: SVContext) {
   const connectors = createConnectors({ napEndpoint: context.config.NAP_URI, models, logger: context.logger })
 
   server.use(bodyParser.json())
-
+  server.use(bearerToken())
+  server.use(async (req: any, res, cb) => {
+    if (req.token) {
+      const userId = await connectors.User.getUserIdFromToken(req.token)
+      req.user = await connectors.User.resolveUserInfo(userId)
+    }
+    cb()
+  })
   server.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
   server.use('/graphql', graphqlExpress( async (req) => ({
     schema,
     context: {
       ...req,
       ...context,
-      user: await connectors.User.resolveUserInfo(await connectors.User.getUserIdFromToken('xxx')),
       models,
       connectors
     }
