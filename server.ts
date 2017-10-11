@@ -30,6 +30,7 @@ export default async function init(context: SVContext) {
   const clientApp = next({ dev: context.config.dev })
   const clientRoutesHandler = clientRoutes.getRequestHandler(clientApp)
   server.use(bodyParser.json())
+
   server.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
 
   const { schema, models }  = createGraphQLSchema(context)

@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose'
 import { TypeComposer, ResolverNextRpCb } from 'graphql-compose'
 
-export const guardWrapResolver: ResolverNextRpCb<GQCommentDocument,GQResolverContext> = (next) => {
+export const guardWrapResolver: ResolverNextRpCb<GQCommentDocument, GQResolverContext> = (next) => {
   return async (rp) => {
     const args: GQCreateOneArgs<GBCommentType> = rp.args as any
     const thread = await rp.context.models.Thread.findById(args.record.threadId)
@@ -18,7 +18,7 @@ export const guardWrapResolver: ResolverNextRpCb<GQCommentDocument,GQResolverCon
   }
 }
 
-export const assignUserResolver: ResolverNextRpCb<GQCommentDocument,GQResolverContext> = next => {
+export const assignUserResolver: ResolverNextRpCb<GQCommentDocument, GQResolverContext> = (next) => {
   return async (rp) => {
     const args: GQCreateOneArgs<GBCommentType> = rp.args as any
     const userId = await rp.context.connectors.nap.getUserIdFromToken(rp.context.token)

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Form from '../components/Form.container'
-import styledComponent from 'styled-components'
-const styled = styledComponent
+
+const styled = require('styled-components').default
 
 const Input = styled.input`
   width: 100px;

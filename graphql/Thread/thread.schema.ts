@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose'
 declare global {
   type GBThreadType = {
+    _id: any
     appId: string
     contentId: string
     contentPrefix: string
