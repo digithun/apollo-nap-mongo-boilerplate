@@ -22,12 +22,19 @@ const getUserIdFromTokenQuery = gql`
   }
 `
 
+const verifyAvailableCommentUserIdQuery = gql`
+  query verifyAvailableCommentUserId($token: String!, $userId: String!){
+    verifyAvailableCommentUserId(token: $token, userId: $userId)
+  }
+`
+
 export type GQUserConnector = {
   resolveUserInfo: (userId: string) => Promise<GBUserType>
   getUserIdFromToken: (token: string) => Promise<string>
+  verifyAvailableUserId: (token: string, userId: string) => Promise<boolean>
 }
 
-const napConnector = (config: Config) => {
+const napConnector = (config: Config): GQUserConnector => {
   const nap = new ApolloClient(({
     link: new Link({
       uri: config.endpoint
@@ -77,11 +84,22 @@ const napConnector = (config: Config) => {
           config.logger.log(`nap error: ${error.message}`)
           return null
         })
+    },
+    async verifyAvailableUserId(token, userId) {
+      return nap.query<{verifyAvailableCommentUserId: boolean}>({
+        query: verifyAvailableCommentUserIdQuery,
+        variables: { token, userId }
+      })
+        .then((result) => result.data.verifyAvailableCommentUserId)
+        .catch((error) => {
+          config.logger.log(`nap error: ${error.message}`)
+          throw new Error('nap error')
+        })
     }
   }
 }
 
-const casualConnector = () => {
+const casualConnector = (): GQUserConnector => {
   const casual = require('casual')
   const ctoi = (s: string): number => s.split('').reduce<number>((acc, c) => acc + c.charCodeAt(0), 0)
   return {
@@ -99,6 +117,9 @@ const casualConnector = () => {
     async getUserIdFromToken(token) {
       casual.seed(ctoi(token))
       return casual.email
+    },
+    async verifyAvailableUserId(token, userId) {
+      return true
     }
   }
 }

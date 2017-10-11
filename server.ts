@@ -20,9 +20,10 @@ declare global {
   }
 
   interface GQResolverContext extends SVContext, express.Request {
-    models: GQApplicationModels,
-    connectors: GQConnectors,
-    user: GBUserType
+    models: GQApplicationModels
+    connectors: GQConnectors
+    token: string
+    // user: GBUserType
   }
 }
 
@@ -35,13 +36,13 @@ export default async function init(context: SVContext) {
 
   server.use(bodyParser.json())
   server.use(bearerToken())
-  server.use(async (req: any, res, cb) => {
-    if (req.token) {
-      const userId = await connectors.User.getUserIdFromToken(req.token)
-      req.user = await connectors.User.resolveUserInfo(userId)
-    }
-    cb()
-  })
+  // server.use(async (req: any, res, cb) => {
+  //   if (req.token) {
+  //     const userId = await connectors.User.getUserIdFromToken(req.token)
+  //     req.user = await connectors.User.resolveUserInfo(userId)
+  //   }
+  //   cb()
+  // })
   server.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
   server.use('/graphql', graphqlExpress( async (req) => ({
     schema,
