@@ -39,7 +39,8 @@ export default (config: { logger: ApplicationLogger, endpoint: string, userModel
       }
       const user = await nap.query<{resolveUserInfo: GBUserType}>({
         query: UserInfoResolver,
-        variables: { userId }
+        variables: { userId },
+        fetchPolicy: 'network-only'
       })
         .then((result) => result.data ? result.data.resolveUserInfo : null)
         .catch((error) => {
@@ -66,7 +67,8 @@ export default (config: { logger: ApplicationLogger, endpoint: string, userModel
     getUserIdFromToken(token) {
       return nap.query<{getUserIdFromToken: string}>({
         query: getUserIdFromTokenQuery,
-        variables: { token }
+        variables: { token },
+        fetchPolicy: 'network-only'
       })
         .then((result) => result.data ? result.data.getUserIdFromToken : null)
         .catch((error) => {
