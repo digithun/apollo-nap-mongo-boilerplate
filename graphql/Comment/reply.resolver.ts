@@ -1,9 +1,20 @@
 import * as mongoose from 'mongoose'
 import { TypeComposer, ResolverNextRpCb } from 'graphql-compose'
 
+declare global {
+  type GQReplyArgs = {
+    record: {
+      threadId: mongoose.Types.ObjectId
+      userId: string
+      message: string
+      replyToId?: string
+    }
+  }
+}
+
 export const guardWrapResolver: ResolverNextRpCb<GQCommentDocument, GQResolverContext> = (next) => {
   return async (rp) => {
-    const args: GQCreateOneArgs<GBCommentType> = rp.args as any
+    const args: GQReplyArgs = rp.args as any
     const thread = await rp.context.models.Thread.findById(args.record.threadId)
     // if (!rp.context.user) {
     //   throw new Error('unauthorized')
