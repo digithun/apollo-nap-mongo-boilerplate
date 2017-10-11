@@ -3,12 +3,14 @@ import { TypeComposer } from 'graphql-compose'
 import composeWithMongoose from 'graphql-compose-mongoose'
 import schema from './comment.schema'
 import addReplyResolver from './reply.resolver'
+import addConnectionResolver from './connection.resolver'
 
 export default {
   schema,
   createTypeComposer: (CommentModel): TypeComposer => {
     const typeComposer = composeWithMongoose(CommentModel) as TypeComposer
     addReplyResolver(typeComposer)
+    addConnectionResolver(typeComposer)
     return typeComposer
   },
   createGraphQLRelation: (typeComposers) => {
@@ -21,6 +23,15 @@ export default {
 
     typeComposers.Comment.addRelation('comments', {
       resolver: typeComposers.Comment.getResolver('findMany'),
+      prepareArgs: {
+        filter: (source) => ({
+          replyToId: source._id.toString()
+        })
+      }
+    })
+
+    typeComposers.Comment.addRelation('commentConnection', {
+      resolver: typeComposers.Comment.getResolver('connection'),
       prepareArgs: {
         filter: (source) => ({
           replyToId: source._id.toString()

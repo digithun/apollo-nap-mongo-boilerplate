@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose'
 declare global {
   interface GBUserType {
     name: string
-    profileImageURL: string
+    profilePictureURL: string
     _id: any
   }
   interface GQUserDocument extends mongoose.Document, GBUserType { }
@@ -10,7 +10,7 @@ declare global {
 const threadSchema = new mongoose.Schema({
   _id: { type: String, required: true, unique: true },
   name: { type: String, required: true },
-  profileImageURL: { type: String }
+  profilePictureURL: { type: String }
 })
 
 export default threadSchema

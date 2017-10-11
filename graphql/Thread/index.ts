@@ -19,5 +19,12 @@ export default {
         filter: (source) => ({ threadId: source._id.toString(), replyToId: null })
       }
     })
+
+    typeComposers.Thread.addRelation('commentConnection', {
+      resolver: typeComposers.Comment.getResolver('connection'),
+      prepareArgs: {
+        filter: (source) => ({ threadId: source._id.toString(), replyToId: null })
+      }
+    })
   }
 } as GQTypeComposerStrategy<GQThreadDocument>
