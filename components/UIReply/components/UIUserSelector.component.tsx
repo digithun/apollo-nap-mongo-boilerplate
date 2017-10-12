@@ -1,5 +1,4 @@
-import * as styledComponent from 'styled-components'
-const styled = styledComponent.default
+import styled from 'styled-components'
 import * as React from 'react'
 import { UIPopoverContainer } from '../../common/Popover'
 import UIUserItem, { UIUserImageThumbnailCircle, UIUserSelectorButton } from './UIUserItem.component'

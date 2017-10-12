@@ -1,8 +1,6 @@
 import * as React from 'react'
 
-import * as styledComponent from 'styled-components'
-const styled = styledComponent.default
-const css = styledComponent.css
+import styled, { css } from 'styled-components'
 
 interface UIPopoverContainerPropTypes extends React.HTMLAttributes<HTMLElement> {
   direction?: 'up' | 'down'

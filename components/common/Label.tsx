@@ -1,6 +1,5 @@
 
-import * as styledComponent from 'styled-components'
-const styled = styledComponent.default
+import styled from 'styled-components'
 
 export const UILabel = styled.label`
   font-size: 1em;

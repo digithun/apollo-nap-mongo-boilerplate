@@ -2,7 +2,6 @@ import * as React from 'react'
 import styled, { ThemeProvider } from 'styled-components'
 import theme from './theme'
 
-import 'react'
 // Augmentation of React
 import 'react';
 

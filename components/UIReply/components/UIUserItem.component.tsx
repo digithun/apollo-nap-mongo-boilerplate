@@ -1,7 +1,5 @@
 
-import * as styledComponent from 'styled-components'
-const styled = styledComponent.default
-const css = styledComponent.css
+import styled from 'styled-components'
 import * as React from 'react'
 import { UILabel } from '../../common/Label'
 
