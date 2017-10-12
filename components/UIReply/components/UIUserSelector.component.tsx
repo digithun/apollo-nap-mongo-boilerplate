@@ -46,7 +46,7 @@ export default compose<enchancePropType & UIUserSelectorPropTypes, {}>(
   return (
     <Container>
       <UIUserSelectorButton onMouseDown={toggleUserList}>
-        <UIUserImageThumbnailCircle src={props.users[props.value].thumbnailImageURL} />
+        <UIUserImageThumbnailCircle src={props.users[props.value].profilePictureURL} />
       </UIUserSelectorButton>
       <UIPopoverContainer onClose={onCloseUserList} visible={props.isToggleUserList} direction='down'>
         <UserListWrap>

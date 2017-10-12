@@ -1,6 +1,7 @@
 import * as React from 'react'
-import * as styledComponent from 'styled-components'
-const styled = styledComponent.default
+
+import styled from 'styled-components'
+// const styled = require('styled-components').default
 import { PrimaryButton } from '../../common/Button'
 import { compose, withState } from 'recompose'
 import { InputTextMultiline } from '../../common/Input'

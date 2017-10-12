@@ -1,9 +1,6 @@
 {
   "env": {
     "development": {
-      "presets": [
-        "next/babel"
-      ],
       "plugins": [
         "transform-decorators-legacy",
         ["styled-components", { "ssr": true }],
@@ -11,9 +8,6 @@
       ]
     },
     "production": {
-      "presets": [
-        "next/babel"
-      ],
       "plugins": [
         "transform-decorators-legacy",
         ["styled-components", { "ssr": true }],

@@ -74,7 +74,7 @@ interface UIUserItemPropTypes extends GBUserType {
 export default (props: UIUserItemPropTypes) => (
   <Container onMouseDown={props.onMouseDown} >
     <UserSelectButtonItem>
-      <UIUserImageThumbnailCircle src={props.thumbnailImageURL} />
+      <UIUserImageThumbnailCircle src={props.profilePictureURL} />
     </UserSelectButtonItem>
     <NameLabel>{props.name}</NameLabel>
   </Container>
