@@ -1,8 +1,7 @@
 
 import * as React from 'react'
 import { compose, withProps } from 'recompose'
-import * as styledComponent from 'styled-components'
-const styled = styledComponent.default
+import styled from 'styled-components'
 
 const PrimaryButtonRoot = styled.button`
   font-size: 1em;
