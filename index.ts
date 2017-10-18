@@ -2,7 +2,7 @@ require('dotenv').config({})
 import config from './config'
 import initApp from './server'
 import { Connection, Model } from 'mongoose'
-import * as chalk from 'chalk'
+import chalk from 'chalk'
 import * as DBConnection from './lib/db.connection'
 
 const logger = {

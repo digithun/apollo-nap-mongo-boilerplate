@@ -5,19 +5,19 @@ import Layout from '../Layout'
 import { InputTextMultiline } from '../common/Input'
 import { PrimaryButton } from '../common/Button'
 import theme from '../theme'
-import CommentInput from '../UIReply/components/UICommentInput.component'
+import CommentInput from '../UIThread/components/UIReplyInput/components/UICommentInput.component'
 import { compose, withState, withProps } from 'recompose'
-import UIUserSelector from '../UIReply/components/UIUserSelector.component'
+import UIUserSelector from '../UIThread/components/UIReplyInput/components/UIUserSelector.component'
 const mockUsers = [
     {
       // tslint:disable-next-line:max-line-length
-      profilePictureURL: 'https://avatars2.githubusercontent.com/u/7989797?v=4&s=88',
+      profilePicture: 'https://avatars2.githubusercontent.com/u/7989797?v=4&s=88',
       _id: 'user.mon921049uiasjfoion;ba',
       name: 'Adam'
     },
     {
       // tslint:disable-next-line:max-line-length
-      profilePictureURL: 'https://scontent.fbkk1-2.fna.fbcdn.net/v/t1.0-1/p320x320/21430120_1653576068006258_318321706779528767_n.jpg?oh=12a99727e41c19b4ab10a50151fd86f7&oe=5A837299',
+      profilePicture: 'https://scontent.fbkk1-2.fna.fbcdn.net/v/t1.0-1/p320x320/21430120_1653576068006258_318321706779528767_n.jpg?oh=12a99727e41c19b4ab10a50151fd86f7&oe=5A837299',
       _id: 'author.93ur9ru923jiowfe909u3',
       name: 'Rungsikorn'
     }]

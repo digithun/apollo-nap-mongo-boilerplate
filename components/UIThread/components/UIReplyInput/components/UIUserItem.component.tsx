@@ -1,7 +1,7 @@
 
 import styled from 'styled-components'
 import * as React from 'react'
-import { UILabel } from '../../common/Label'
+import { UILabel } from '../../../../common/Label'
 
 export const UIUserSelectorButton = styled.button`
   width: 40px;
@@ -72,7 +72,7 @@ interface UIUserItemPropTypes extends GBUserType {
 export default (props: UIUserItemPropTypes) => (
   <Container onMouseDown={props.onMouseDown} >
     <UserSelectButtonItem>
-      <UIUserImageThumbnailCircle src={props.profilePictureURL} />
+      <UIUserImageThumbnailCircle src={props.profilePicture} />
     </UserSelectButtonItem>
     <NameLabel>{props.name}</NameLabel>
   </Container>

@@ -1,19 +1,20 @@
 import * as React from 'react'
 import ApolloClient from 'apollo-client'
-import Link from 'apollo-link-http'
-import Cache from 'apollo-cache-inmemory'
+import { HttpLink } from 'apollo-link-http'
+import { InMemoryCache } from 'apollo-cache-inmemory'
 import { Provider } from 'react-redux'
 import { ApolloProvider } from 'react-apollo'
 const hoistNonReactStatic = require('hoist-non-react-statics')
 import passthrough from 'react-passthrough'
-
+import 'isomorphic-fetch'
 import initStore from './store.factory'
 declare global {
   interface ApplicationApolloClient extends ApolloClient<Cache> { }
 }
+
 export default function withReduxApollo(WrappedComponent: React.ComponentClass) {
 
-  class ConnectWithReduxAndApollo extends React.Component<{ client: ApolloClient<Cache>}, {}> {
+  class ConnectWithReduxAndApollo extends React.Component<{ url: any }, {}> {
     private client: ApolloClient<Cache>
     constructor(props) {
       super(props)
@@ -44,10 +45,17 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
       // you can keep tracking this render method
       // by console.log to maintain performance
 
-      const cache =  new Cache({
+      const cache = new InMemoryCache({
         dataIdFromObject: (value: any) => value._id
       }).restore({})
-      const link: any = new Link({ uri: '/graphql' })
+
+      const link: any = new HttpLink({
+        uri: '/graphql',
+        headers: {
+          authorization: `Bearer ${this.props.url.query.sessionToken}`
+        }
+      })
+
       let client;
       let store;
       if (typeof window !== 'undefined') {

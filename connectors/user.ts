@@ -1,8 +1,9 @@
 import * as mongoose from 'mongoose'
 import ApolloClient from 'apollo-client'
-import Link from 'apollo-link-http'
-import Cache from 'apollo-cache-inmemory'
+import { HttpLink } from 'apollo-link-http'
+import { InMemoryCache } from 'apollo-cache-inmemory'
 import gql from 'graphql-tag'
+import 'isomorphic-fetch'
 
 type Config = { logger: ApplicationLogger, endpoint: string, userModel: mongoose.Model<GQUserDocument> }
 
@@ -11,7 +12,7 @@ const UserInfoResolver = gql`
     resolveUserInfo(_id: $userId) {
       _id
       name
-      profilePictureURL
+      profilePicture
     }
   }
 `
@@ -36,10 +37,10 @@ export type GQUserConnector = {
 
 const napConnector = (config: Config): GQUserConnector => {
   const nap = new ApolloClient(({
-    link: new Link({
+    link: new HttpLink({
       uri: config.endpoint
     }),
-    cache: new Cache({})
+    cache: new InMemoryCache({})
   }) as any)
   return {
     async resolveUserInfo(userId) {
@@ -61,7 +62,7 @@ const napConnector = (config: Config): GQUserConnector => {
           _id: userId
         }, {
           name: user.name,
-          profilePictureURL: user.profilePictureURL
+          profilePicture: user.profilePicture
         }, {
           upsert: true
         }).exec().catch((error) => {
@@ -111,7 +112,7 @@ const casualConnector = (): GQUserConnector => {
       return {
         _id: userId,
         name: casual.full_name,
-        profilePictureURL: null
+        profilePicture: null
       }
     },
     async getUserIdFromToken(token) {

@@ -1,7 +1,7 @@
 import * as express from 'express'
 import * as bearerToken from 'express-bearer-token'
 import * as bodyParser from 'body-parser'
-import * as chalk from 'chalk'
+import chalk from 'chalk'
 import { Connection, Model } from 'mongoose'
 import { graphiqlExpress, graphqlExpress } from 'apollo-server-express'
 import * as next from 'next'

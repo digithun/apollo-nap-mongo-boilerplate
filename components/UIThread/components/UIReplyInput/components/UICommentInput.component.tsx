@@ -2,11 +2,11 @@ import * as React from 'react'
 
 import styled from 'styled-components'
 // const styled = require('styled-components').default
-import { PrimaryButton } from '../../common/Button'
+import { PrimaryButton } from '../../../../common/Button'
 import { compose, withState } from 'recompose'
-import { InputTextMultiline } from '../../common/Input'
+import { InputTextMultiline } from '../../../../common/Input'
 import UIUserSelector from './UIUserSelector.component'
-import withDict from '../../../lib/with-dict'
+import withDict from '../../../../../lib/with-dict'
 
 interface UICommentInputPropTypes {
 
@@ -34,7 +34,7 @@ type enchanceProps = {
 
 class UICommentInput extends React.Component<UICommentInputPropTypes & enchanceProps, {}> {
 
-  public componentDidMount(){
+  public componentDidMount() {
     console.log(this.props.userList)
   }
   public render() {
@@ -58,8 +58,12 @@ class UICommentInput extends React.Component<UICommentInputPropTypes & enchanceP
     this.props.setCurrentSelectedUserIndex(userIndex)
   }
 }
+interface UICommentInputComponent extends React.ComponentClass<UICommentInputPropTypes> {
+  fragments: {
 
+  }
+}
 export default compose<UICommentInputPropTypes & enchanceProps, UICommentInputPropTypes>(
   withDict,
   withState('currentSelectedUserIndex', 'setCurrentSelectedUserIndex', 0)
-)(UICommentInput)
+)(UICommentInput) as UICommentInputComponent

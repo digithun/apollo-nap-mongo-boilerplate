@@ -1,9 +1,9 @@
 import styled from 'styled-components'
 import * as React from 'react'
-import { UIPopoverContainer } from '../../common/Popover'
+import { UIPopoverContainer } from '../../../../common/Popover'
 import UIUserItem, { UIUserImageThumbnailCircle, UIUserSelectorButton } from './UIUserItem.component'
-import { UILabel } from '../../common/Label'
-import withDict from '../../../lib/with-dict'
+import { UILabel } from '../../../../common/Label'
+import withDict from '../../../../../lib/with-dict'
 import { compose, withState } from 'recompose'
 
 interface UIUserSelectorPropTypes {
@@ -45,7 +45,7 @@ export default compose<enchancePropType & UIUserSelectorPropTypes, {}>(
   return (
     <Container>
       <UIUserSelectorButton onMouseDown={toggleUserList}>
-        <UIUserImageThumbnailCircle src={props.users[props.value].profilePictureURL} />
+        <UIUserImageThumbnailCircle src={props.users[props.value].profilePicture} />
       </UIUserSelectorButton>
       <UIPopoverContainer onClose={onCloseUserList} visible={props.isToggleUserList} direction='down'>
         <UserListWrap>

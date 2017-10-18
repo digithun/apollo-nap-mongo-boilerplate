@@ -14,6 +14,7 @@ export default {
     return typeComposer
   },
   createGraphQLRelation: (typeComposers) => {
+
     typeComposers.Comment.addRelation('thread', {
       resolver: typeComposers.Thread.getResolver('findById'),
       prepareArgs: {
