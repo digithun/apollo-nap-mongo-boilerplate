@@ -3,16 +3,30 @@ import * as React from 'react'
 import Reply from './UIReplyInput'
 import Layout from '../../Layout'
 
-export default class UIThread extends React.Component<{ url: any, userList: GBUserType[], threadId: string }, {}> {
+interface ThreadPropTypes {
+  url: any
+  userList: GBUserType[]
+  threadId: string
+  comments: GBCommentType[]
+}
+export default class UIThread extends React.Component<ThreadPropTypes, {}> {
   constructor(props) {
     super(props)
   }
   public render() {
-    console.log(this.props)
     return (
-    <Layout>
-      <Reply userList={this.props.userList} threadId={this.props.threadId} />
-    </Layout>
+      <Layout>
+        <div>
+          <Reply userList={this.props.userList} threadId={this.props.threadId} />
+          {this.props.comments.map((comment) => {
+            return (
+              <div key={comment._id}>
+                {comment.message}
+              </div>
+            )
+          })}
+        </div>
+      </Layout>
     )
   }
 }

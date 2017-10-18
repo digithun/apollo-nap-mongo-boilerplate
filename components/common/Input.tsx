@@ -4,7 +4,7 @@ import { compose, withProps } from 'recompose'
 import styled from 'styled-components'
 
 export const InputTextMultiline = styled.textarea`
-  width: 400px;
+  flex: 1;
   height: 100px;
   background: ${(props: { theme?: UITheme }) => props.theme.matteWhite};
   resize: none;

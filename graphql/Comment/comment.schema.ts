@@ -6,6 +6,7 @@ declare global {
     userId: string
   }
   type GBCommentType = {
+    _id: any
     threadId: any
     replyToId?: any
     userId?: string

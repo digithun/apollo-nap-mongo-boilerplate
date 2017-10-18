@@ -7,6 +7,7 @@ import { compose, withProps, withState } from 'recompose'
 export default compose(
   withState<{ threadId: string, userList: GBUserType[] }, GBCommentType, 'value', 'onChange'>('value', 'onChange', (props) => {
     return {
+        _id: 'init',
         threadId: props.threadId,
         user: props.userList[0],
         commentType: 'text',

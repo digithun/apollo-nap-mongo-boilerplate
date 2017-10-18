@@ -8,8 +8,6 @@ import UIThread from './components/UIThread'
 
 export function* replySaga(context: ApplicationSagaContext) {
   yield takeEvery<{ payload: GBCommentType, type: string }>('reply/confirm-create-comment', function*(action) {
-    console.log(action.payload)
-
     try {
       yield context.apolloClient.mutate({
         variables: {
@@ -29,6 +27,13 @@ export function* replySaga(context: ApplicationSagaContext) {
              user {
                name
                profilePicture
+               _id
+             }
+           }
+           thread {
+             _id
+             comments {
+               message
                _id
              }
            }
@@ -56,7 +61,7 @@ export default compose(
         appId
         _id
         contentId
-        comments(skip: $skip, limit: 10) {
+        comments(skip: $skip, limit: 10, sort: _ID_DESC) {
           user {
             name
             profilePicture
@@ -68,8 +73,15 @@ export default compose(
     }
   `, {
       props: ({ data }) => {
+        if (data.loading) {
+          return {
+            threadId: undefined,
+            comments: []
+          }
+        }
         return {
-          threadId: data.loading ? undefined : data.thread._id,
+          threadId: data.thread._id,
+          comments: data.thread.comments
         }
       },
       options: (props) => {

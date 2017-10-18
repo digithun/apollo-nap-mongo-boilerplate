@@ -54,7 +54,6 @@ export default function enchanceCreate(typeComposer: TypeComposer) {
     .getResolver('createOne')
     .clone({ name: 'reply' })
     .wrapResolve(guardWrapResolver)
-
   replyResolver.description = 'Reply thread or comment'
   replyResolver.getArgTC('record').removeOtherFields(['message', 'replyToId', 'threadId', 'userId'])
   replyResolver.makeRequired('record')

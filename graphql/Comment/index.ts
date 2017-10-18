@@ -15,6 +15,18 @@ export default {
   },
   createGraphQLRelation: (typeComposers) => {
 
+    const replyResolverResultType = typeComposers.Comment.getResolver('reply')
+      .getTypeComposer()
+      .addRelation('thread', {
+        resolver: typeComposers.Thread.getResolver('findById'),
+        prepareArgs: {
+          _id: (source) => source.record.threadId
+        },
+        projection: { threadId: 1 }
+      })
+
+    typeComposers.Comment.getResolver('reply').setType(replyResolverResultType)
+
     typeComposers.Comment.addRelation('thread', {
       resolver: typeComposers.Thread.getResolver('findById'),
       prepareArgs: {

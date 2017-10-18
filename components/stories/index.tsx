@@ -48,6 +48,7 @@ storiesOf('Common', module)
   })
 
 const commentData: GBCommentType = {
+  _id: 'mock',
   threadId: 'mockId',
   replyToId: 'some-id-123',
   user: mockUsers[0],

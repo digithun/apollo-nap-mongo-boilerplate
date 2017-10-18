@@ -35,7 +35,7 @@ type enchanceProps = {
 class UICommentInput extends React.Component<UICommentInputPropTypes & enchanceProps, {}> {
 
   public componentDidMount() {
-    console.log(this.props.userList)
+
   }
   public render() {
     const props = this.props
