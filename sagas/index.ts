@@ -1,6 +1,7 @@
 import ApolloClient from 'apollo-client'
 import { Store } from 'redux'
 import { all } from 'redux-saga/effects'
+import { replySaga } from '../components/UIReply'
 
 declare global {
   interface ApplicationSagaContext {
@@ -19,6 +20,7 @@ export default (context: ApplicationSagaContext) => function * rootSagas() {
   console.log('Sagas start !!')
   yield all([
     // add your sagas here
+    replySaga(context)
   ])
 
 }

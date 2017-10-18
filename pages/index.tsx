@@ -7,6 +7,10 @@ import { graphql } from 'react-apollo'
 import { connect } from 'react-redux'
 import gql from 'graphql-tag'
 
+declare global {
+  interface UIReplyInputState extends GBCommentType { }
+}
+
 class CommentServicePage extends React.Component<{ onConfirm: () => void, userList: GBUserType[], setComment: (comment: GBCommentType) => void, comment: GBCommentType }, {}> {
 
   constructor(props) {
