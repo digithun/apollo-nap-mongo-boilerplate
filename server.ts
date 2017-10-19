@@ -34,16 +34,6 @@ export default async function init(context: SVContext) {
   const clientRoutesHandler = clientRoutes.getRequestHandler(clientApp)
   const { schema, models } = createGraphQLSchema(context)
   const connectors = createConnectors({ napEndpoint: context.config.NAP_URI, models, logger: context.logger })
-  const frameguard = require('frameguard')
-
-  server.use(frameguard({
-    action: 'allow-from',
-    domain: 'http://localhost:8080'
-  }))
-  server.use(frameguard({
-    action: 'allow-from',
-    domain: 'http://beta.jamplay.world'
-  }))
 
   server.use(require('express-ping').ping())
   server.use(bodyParser.json())

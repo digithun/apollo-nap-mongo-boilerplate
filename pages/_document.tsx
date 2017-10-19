@@ -19,6 +19,7 @@ export default class PageDocument extends Document {
       <html>
         <Head>
           <meta charSet='utf-8' className='next-head' />
+          <meta name='x-frame-options' content='allowall' />
           <meta id='vp' name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' /> {/* tslint:disable-line */}
           <link rel='stylesheet' href='/static/fonts/DBHeaventRounded/stylesheet.css' />
           <link rel='stylesheet' href='/static/fonts/Lanna/stylesheet.css' />
