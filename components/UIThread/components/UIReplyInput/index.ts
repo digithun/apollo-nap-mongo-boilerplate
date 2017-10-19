@@ -1,29 +1,48 @@
 import CommentInput from './components/UICommentInput.component'
 import { takeEvery } from 'redux-saga/effects'
+import * as React from 'react'
 import { connect } from 'react-redux'
 import gql from 'graphql-tag'
 import { compose, withProps, withState } from 'recompose'
 
-export default compose(
-  withState<{ threadId: string, userList: GBUserType[] }, GBCommentType, 'value', 'onChange'>('value', 'onChange', (props) => {
-    return {
+declare global {
+  interface ApplicationState {
+    reply: GBCommentType
+  }
+}
+export const replyReducer = (state: GBCommentType, action) => {
+
+  switch (action.type) {
+    case 'reply/clear': {
+      return {
         _id: 'init',
-        threadId: props.threadId,
-        user: props.userList[0],
         commentType: 'text',
         message: '',
-        reactions: []
+        user: {
+          ...state.user
+        }
       }
-  }),
-  connect<{}, {}, {value: GBCommentType, threadId: string}>(undefined, (dispatch, ownProps) => {
+    }
+    case 'reply/input-update': {
+      return {
+        ...state,
+        ...action.payload
+      }
+    }
+  }
+  return {
+    ...state
+  }
+}
+export default compose(
+  connect<{}, {}, {value: GBCommentType, threadId: string}>((state: ApplicationState) => ({
+    value: state.reply,
+  }), (dispatch, ownProps) => {
     return {
-      onConfirm: () => dispatch({ type: 'reply/confirm-create-comment', payload: {
-        ...ownProps.value,
-        threadId: ownProps.threadId
-      } })
+      onChange: (payload) => dispatch({ type: 'reply/input-update', payload }),
+      onConfirm: () => dispatch({ type: 'reply/confirm-create-comment' })
     }
   }),
 )(CommentInput) as React.ComponentClass<{
   userList: GBUserType[]
-  threadId: string
 }>

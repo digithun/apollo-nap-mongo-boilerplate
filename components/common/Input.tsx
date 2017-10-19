@@ -5,7 +5,6 @@ import styled from 'styled-components'
 
 export const InputTextMultiline = styled.textarea`
   flex: 1;
-  height: 100px;
   background: ${(props: { theme?: UITheme }) => props.theme.matteWhite};
   resize: none;
   border-radius: 3px;

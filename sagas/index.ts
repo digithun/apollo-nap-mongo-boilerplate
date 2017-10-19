@@ -7,6 +7,9 @@ declare global {
   interface ApplicationSagaContext {
     apolloClient: ApolloClient<any>
     store: Store<ApplicationState>
+    url: {
+      query: any
+    }
   }
 }
 /**

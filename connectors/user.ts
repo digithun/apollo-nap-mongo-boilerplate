@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose'
-import ApolloClient from 'apollo-client'
+import ApolloClient, { ApolloError } from 'apollo-client'
 import { HttpLink } from 'apollo-link-http'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import gql from 'graphql-tag'
@@ -53,7 +53,7 @@ const napConnector = (config: Config): GQUserConnector => {
         fetchPolicy: 'network-only'
       })
         .then((result) => result.data ? result.data.resolveUserInfo : null)
-        .catch((error) => {
+        .catch(async (error: ApolloError) => {
           config.logger.log(`nap error: ${error.message}`)
           return null
         })
@@ -82,7 +82,6 @@ const napConnector = (config: Config): GQUserConnector => {
       })
         .then((result) => result.data ? result.data.getUserIdFromToken : null)
         .catch((error) => {
-          config.logger.log(`nap error: ${error.message}`)
           return null
         })
     },

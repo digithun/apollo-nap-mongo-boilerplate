@@ -17,6 +17,7 @@ declare global {
   interface ApplicationClientStoreConfig {
     apolloClient?: ApolloClient<any>
     initialState?: ApplicationState
+    url: any
   }
 }
 
@@ -29,12 +30,12 @@ export default function(config: ApplicationClientStoreConfig) {
   }
 
   const rootReducer = combineReducers<ApplicationState>(reducers)
-  console.log('Create redux store')
-  console.log(config.initialState)
+  console.log('Create redux store with init state', config.initialState)
   __store = createStore<ApplicationState>(rootReducer, config.initialState, middlewares)
   sagaMiddleware.run(initialSagas({
     apolloClient: config.apolloClient,
     store: __store,
+    url: config.url
   }))
 
   if ((module as any).hot) {

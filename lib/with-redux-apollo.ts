@@ -44,60 +44,67 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
       // it should render only once per reload
       // you can keep tracking this render method
       // by console.log to maintain performance
+      try {
 
-      const cache = new InMemoryCache({
-        dataIdFromObject: (value: any) => value._id
-      }).restore({})
 
-      const link: any = new HttpLink({
-        uri: '/graphql',
-        headers: {
-          authorization: `Bearer ${this.props.url.query.sessionToken}`
-        }
-      })
+        const cache = new InMemoryCache({
+          dataIdFromObject: (value: any) => value._id
+        }).restore({})
 
-      let client;
-      let store;
-      if (typeof window !== 'undefined') {
-        const globalWindow: any = window
-        if (!(window as any).client) {
-          globalWindow.client = new ApolloClient({ link, cache });
-          globalWindow.store = initStore({
-            apolloClient: globalWindow.client,
-            initialState: {
-              global: {
-                loading: true
-              }
-            },
-          })
-        }
-        client = (window as any).client
-        store = (window as any).store
-      } else {
-
-        // server-side apollo and store
-        console.log('render ssr')
-
-        client = new ApolloClient({ link, cache })
-        store = initStore({
-          apolloClient: client,
-          // server-side initial state
-          initialState: {
-            global: {
-              loading: false
-            }
+        const link: any = new HttpLink({
+          uri: '/graphql',
+          headers: {
+            authorization: `Bearer ${this.props.url.query.sessionToken}`
           }
         })
+
+        let client;
+        let store;
+        const userList = JSON.parse(this.props.url.query.users)
+        const initialState = {
+          global: {
+            loading: false
+          },
+          reply: {
+            _id: 'init',
+            user: userList[0],
+            message: '',
+            reactions: []
+          },
+          thread: {
+            users: userList,
+            threadId: ''
+          }
+        }
+        if (typeof window !== 'undefined') {
+          const globalWindow: any = window
+          if (!(window as any).client) {
+            globalWindow.client = new ApolloClient({ link, cache });
+            globalWindow.store = initStore({ apolloClient: globalWindow.client, initialState, url: this.props.url })
+          }
+          client = (window as any).client
+          store = (window as any).store
+        } else {
+
+          // server-side apollo and store
+          console.log('render ssr')
+
+          client = new ApolloClient({ link, cache })
+          store = initStore({ initialState, apolloClient: client, url: this.props.url })
+        }
+        const enhanceElement = React.createElement<any, any, any>(WrappedComponent, {
+          ...this.props
+        })
+        const storeElement = React.createElement(Provider, {
+          store
+        }, enhanceElement)
+        return React.createElement(ApolloProvider, {
+          client,
+        }, storeElement)
+
+      } catch (e) {
+        return React.createElement('div')
       }
-      const enhanceElement = React.createElement<any, any, any>(WrappedComponent, {
-        ...this.props
-      })
-      const storeElement = React.createElement(Provider, {
-        store
-      }, enhanceElement)
-      return React.createElement(ApolloProvider, {
-        client,
-      }, storeElement)
     }
   }
 

@@ -23,10 +23,10 @@ const Container = styled.div`
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 3px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-
   opacity: 0;
   transition: 0.222s ease-out all;
   pointer-events: none;
+  z-index: 99;
   ${(props) => props.visible ? VisibleStyles : ''}
   ${(props: UIPopoverContainerPropTypes) => {
     if (props.direction === 'down') {

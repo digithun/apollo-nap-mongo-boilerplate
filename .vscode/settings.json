@@ -13,6 +13,7 @@
     "**/.db": true,
     "**/.DS_Store": true,
     "**/*.js.map": true,
-    "**/*.js": true
+    "**/*.js": true,
+    "**/.next/**/*.js": false
   }
 }

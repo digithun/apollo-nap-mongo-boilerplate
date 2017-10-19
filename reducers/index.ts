@@ -1,4 +1,6 @@
 import { Reducer } from 'redux'
+import { threadReducer } from '../components/UIThread/reducer'
+import { replyReducer } from '../components/UIThread/components/UIReplyInput'
 
 declare global {
 
@@ -11,7 +13,6 @@ declare global {
 }
 const globalReducer: Reducer<GlobalState> = (prevState, action) => {
   const state = Object.assign({}, prevState)
-  console.log('global state', state)
   switch (action.type) {
     case 'global/loading-start':
       return {
@@ -37,5 +38,7 @@ const globalReducer: Reducer<GlobalState> = (prevState, action) => {
 }
 
 export default {
-  global: globalReducer
+  global: globalReducer,
+  reply: replyReducer,
+  thread: threadReducer
 }

@@ -7,12 +7,14 @@ declare global {
   }
   type GBCommentType = {
     _id: any
-    threadId: any
+    threadId?: any
+    createdAt?: string
+    updatedAt?: string
     replyToId?: any
     userId?: string
-    commentType: | 'text'
+    commentType?: | 'text'
     message: string
-    reactions: GBReactionType[]
+    reactions?: GBReactionType[]
 
     // relation field
     user?: GBUserType
