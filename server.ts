@@ -29,16 +29,27 @@ declare global {
 
 export default async function init(context: SVContext) {
   const server = express()
+  console.log(chalk.greenBright(context.config.dev ? 'Run app in dev mode' : 'Run app in prod mode'))
   const clientApp = next({ dev: context.config.dev })
   const clientRoutesHandler = clientRoutes.getRequestHandler(clientApp)
-  const { schema, models }  = createGraphQLSchema(context)
+  const { schema, models } = createGraphQLSchema(context)
   const connectors = createConnectors({ napEndpoint: context.config.NAP_URI, models, logger: context.logger })
+  const frameguard = require('frameguard')
+
+  server.use(frameguard({
+    action: 'allow-from',
+    domain: 'http://localhost:8080'
+  }))
+  server.use(frameguard({
+    action: 'allow-from',
+    domain: 'http://beta.jamplay.world'
+  }))
 
   server.use(require('express-ping').ping())
   server.use(bodyParser.json())
   server.use(bearerToken())
   server.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
-  server.use('/graphql', graphqlExpress( async (req) => ({
+  server.use('/graphql', graphqlExpress(async (req) => ({
     schema,
     context: {
       ...req,

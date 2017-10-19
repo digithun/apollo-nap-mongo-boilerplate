@@ -7,9 +7,9 @@ declare global {
     PORT: string
   }
 }
-
+console.log(process.env.NODE_ENV)
 const config: ApplicationConfig = {
-  dev: optionalEnvWithDefault('NODE_ENV', 'development'),
+  dev: optionalEnvWithDefault('NODE_ENV', 'development') === 'development',
   MONGODB_URI: requiredEnv('MONGODB_URI'),
   NAP_URI: optionalEnvWithDefault('NAP_URI', 'CASUAL'),
   PORT: optionalEnvWithDefault('PORT', 3000)
