@@ -37,13 +37,6 @@ export default async function init(context: SVContext) {
   server.use(require('express-ping').ping())
   server.use(bodyParser.json())
   server.use(bearerToken())
-  // server.use(async (req: any, res, cb) => {
-  //   if (req.token) {
-  //     const userId = await connectors.User.getUserIdFromToken(req.token)
-  //     req.user = await connectors.User.resolveUserInfo(userId)
-  //   }
-  //   cb()
-  // })
   server.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
   server.use('/graphql', graphqlExpress( async (req) => ({
     schema,
