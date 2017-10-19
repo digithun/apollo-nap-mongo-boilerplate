@@ -34,6 +34,7 @@ export default async function init(context: SVContext) {
   const { schema, models }  = createGraphQLSchema(context)
   const connectors = createConnectors({ napEndpoint: context.config.NAP_URI, models, logger: context.logger })
 
+  server.use(require('express-ping').ping())
   server.use(bodyParser.json())
   server.use(bearerToken())
   // server.use(async (req: any, res, cb) => {
