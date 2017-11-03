@@ -113,7 +113,7 @@ export function* replySaga(context: ApplicationSagaContext) {
 
     }
     try {
-      const result = yield context.apolloClient.mutate({
+      const mutationResult = yield context.apolloClient.mutate({
         variables: {
           record: {
             threadId: queryResult.thread._id,
@@ -122,9 +122,8 @@ export function* replySaga(context: ApplicationSagaContext) {
           }
         },
         mutation: gql`
-        ${UIThread.fragments.thread}
         ${UIThread.fragments.comment}
-        mutation ($record: CreateOneCommentInput!, $first: Int) {
+        mutation ($record: CreateOneCommentInput!) {
          reply (record: $record) {
            record {
              _id
@@ -134,7 +133,7 @@ export function* replySaga(context: ApplicationSagaContext) {
         }
       `
       })
-      const data = context.apolloClient.readQuery<CommentListQueryResult>({ query: ThreadQuery, variables: ThreadQueryVariables})
+      const data = context.apolloClient.readQuery<any>({ query: ThreadQuery, variables: ThreadQueryVariables })
       context.apolloClient.writeQuery({
         query: ThreadQuery,
         variables: ThreadQueryVariables,
@@ -143,7 +142,14 @@ export function* replySaga(context: ApplicationSagaContext) {
             ...data.thread,
             comments: {
               ...data.thread.comments,
-              edges: [...result.data.thread.comments.edges, ...data.thread.comments.edges, ]
+              edges: [
+                {
+                  __typename: 'CommentEdge',
+                  cursor: '',
+                  node: mutationResult.data.reply.record
+                },
+                ...data.thread.comments.edges,
+              ]
             }
           }
         })
