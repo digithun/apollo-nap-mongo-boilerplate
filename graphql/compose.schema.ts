@@ -32,7 +32,18 @@ declare global {
   interface GQCreateOneArgs<Schema> {
     record: Schema
   }
+  interface GQConnectionResult <TResult> {
+    count: number
+    edges: [{
+      node: TResult
+      cursor: string
+    }]
+    pageInfo?: {
+      hasNextPage: boolean
+      hasPreviousPage: boolean
+    }
 
+  }
   interface GQCreateOneResult<Document> {
     record: Document
     recordId: mongoose.Types.ObjectId

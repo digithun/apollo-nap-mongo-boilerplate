@@ -15,9 +15,9 @@ const CommentCreatedAtLabel = styled(UILabel)`
 const CommentContainer = styled.div`
   border-bottom: 1px solid ${(props: { theme?: UITheme }) => props.theme.matteWhite};
   padding: 10px 0;
+  min-height: 90px;
   &:nth-last-child(1){
     border-bottom: none;
-
   }
 `
 const UserInfoWrap = styled.div`
@@ -44,7 +44,7 @@ const TextContainer = styled.div`
 const ProfilePicture = styled(UIUserImageThumbnailCircle) `
 `
 interface UICommentPropTypes extends GBCommentType {
-
+  className?: string
 }
 interface UICommentComponent extends React.ComponentClass<UICommentPropTypes> {
   fragments: {
@@ -53,7 +53,7 @@ interface UICommentComponent extends React.ComponentClass<UICommentPropTypes> {
 }
 const UICommentComponent = compose<UICommentPropTypes, {}>(
 )((props: UICommentPropTypes) => (
-  <CommentContainer>
+  <CommentContainer className={props.className}>
     <CommentHeader>
       <UserInfoWrap>
         <ProfilePictureContainer>

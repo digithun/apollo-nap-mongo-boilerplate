@@ -20,6 +20,7 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
       super(props)
     }
     public static getInitialProps(ctx) {
+      console.log(ctx.query)
       let config: ApplicationConfig;
       if (typeof window === 'undefined') {
         config = require('../config')
@@ -46,10 +47,9 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
       // by console.log to maintain performance
       try {
 
-
         const cache = new InMemoryCache({
           dataIdFromObject: (value: any) => value._id
-        }).restore({})
+        }).restore({}) as any
 
         const link: any = new HttpLink({
           uri: '/graphql',
@@ -60,6 +60,8 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
 
         let client;
         let store;
+
+        console.log(this.props.url.query.users)
         const userList = JSON.parse(this.props.url.query.users)
         const initialState = {
           global: {
@@ -73,9 +75,10 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
           },
           thread: {
             users: userList,
-            threadId: ''
+            threadId: '',
+            hasNextPage: true
           }
-        }
+        } as ApplicationState
         if (typeof window !== 'undefined') {
           const globalWindow: any = window
           if (!(window as any).client) {
@@ -103,6 +106,7 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
         }, storeElement)
 
       } catch (e) {
+        console.log(e)
         return React.createElement('div')
       }
     }

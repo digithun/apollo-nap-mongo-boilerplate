@@ -1,88 +1,14 @@
-import { takeEvery, select, put } from 'redux-saga/effects'
 import withApollo from '../../lib/with-redux-apollo'
 import { connect } from 'react-redux'
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import { compose, withProps, withState } from 'recompose'
+import * as Actions from './actions'
+import { ApolloClient } from 'apollo-client';
+import { ThreadQuery } from './graphql'
 import UIThread from './components/UIThread'
-
-const ThreadQuery = gql`
-${UIThread.fragments.thread}
-query ($filter: FilterFindOneThreadInput, $skip: Int) {
-  thread(filter: $filter) {
-    _id
-    comments(skip: $skip, limit: 10, sort: _ID_DESC) {
-      _id
-      ...UICommentDataFragment
-    }
-    ...UIThreadDataFragment
-  }
-}
-`
-
-export function* replySaga(context: ApplicationSagaContext) {
-  yield takeEvery<{ payload: GBCommentType, type: string }>('reply/confirm-create-comment', function* (action) {
-    yield put({ type: 'global/loading-start' })
-    const commentInputData = yield select<ApplicationState>((state) => state.reply)
-    const variables = {
-      filter: {
-        contentId: context.url.query.contentId,
-        appId: context.url.query.appId
-      },
-      skip: context.url.query.skip || 0
-    }
-    let queryResult = context.apolloClient.readQuery<GBThreadType>({
-      query: ThreadQuery,
-      variables
-    }) as { thread: GBThreadType }
-    if (!queryResult.thread) {
-
-      // check if data is undefined
-      // reload data if data is not available
-
-      queryResult = yield context.apolloClient.query({
-        query: ThreadQuery,
-        variables
-      })
-
-    }
-    try {
-      yield context.apolloClient.mutate({
-        variables: {
-          record: {
-            threadId: queryResult.thread._id,
-            message: commentInputData.message,
-            userId: commentInputData.user._id
-          }
-        },
-        mutation: gql`
-        ${UIThread.fragments.thread}
-        mutation ($record: CreateOneCommentInput!) {
-         reply (record: $record) {
-           record {
-             _id
-             ...UICommentDataFragment
-           }
-           thread {
-             _id
-             ...UIThreadDataFragment
-             comments(skip: 0, limit: 10, sort: _ID_DESC) {
-              _id
-              ...UICommentDataFragment
-             }
-           }
-         }
-        }
-      `
-      })
-      yield put({ type: 'reply/clear' })
-    } catch (e) {
-      console.error(e)
-      alert('ไม่สามารถ Comment ได้ เกิดข้อผิดพลาดบางอย่าง')
-    }
-    yield put({ type: 'global/loading-done' })
-  })
-}
+import {replySaga, getLatestCursorOfConnectionEdges, MAX_COMMENT_PER_REQUEST } from './sagas'
+export  {replySaga}
 
 export default compose(
   withApollo,
@@ -90,29 +16,80 @@ export default compose(
     userList: (props.url.query.users ? JSON.parse(props.url.query.users) : []),
     sessionToken: props.url.query.sessionToken,
   })),
+
+  /**
+   * Read First 5 comment from local cache
+   * by saga init
+   */
   graphql<any, { url: any }>(ThreadQuery, {
     props: ({ data }) => {
-      if (data.loading) {
+      if (data.loading || !data.thread) {
         return {
           threadId: undefined,
           comments: []
         }
       }
+      const commentsLength = data.thread.comments.edges.length
       return {
         threadId: data.thread._id,
-        comments: data.thread.comments
+        comments: data.thread.comments.edges.map((edge) => edge.node),
+        loadMoreCursor: getLatestCursorOfConnectionEdges(data.thread.comments)
       }
     },
     options: (props) => {
       return {
+        fetchPolicy: 'cache-only',
         variables: {
           filter: {
             contentId: props.url.query.contentId,
             appId: props.url.query.appId
           },
-          skip: props.url.query.skip || 0
+          first: MAX_COMMENT_PER_REQUEST
         }
       }
     }
   }),
+
+  /**
+   * Read loadMoreComent from local Cache
+   * for more information read in Saga `UIThread/index.ts`
+   */
+  graphql<any, { url: any, threadId: string, loadMoreCursor: string }>(ThreadQuery, {
+    props: ({ data, ownProps: { loadMoreCursor } }) => {
+      if (!loadMoreCursor) {
+        return {
+          loadMoreComments: []
+        }
+      }
+      try {
+        return {
+          loadMoreComments: data.thread.comments.edges.map((edge) => edge.node)
+        }
+      } catch (e) {
+        return {
+          loadMoreComments: []
+        }
+      }
+    },
+    options: (props) => {
+      const options = ({
+        fetchPolicy: 'cache-only',
+        variables: {
+          filter: {
+            contentId: props.url.query.contentId,
+            appId: props.url.query.appId,
+          },
+          first: MAX_COMMENT_PER_REQUEST,
+          after: props.loadMoreCursor
+        },
+      })
+      return options
+    }
+  }),
+  connect((state: ApplicationState) => ({
+    hasNextPage: state.thread.hasNextPage,
+    loading: state.global.loading
+  }), (dispatch) => ({
+    requestLoadMoreComments: () => dispatch(Actions.loadMoreReplyList())
+  }))
 )(UIThread)

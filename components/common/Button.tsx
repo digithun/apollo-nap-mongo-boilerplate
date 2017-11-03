@@ -24,6 +24,9 @@ const PrimaryButtonRoot = styled.button`
       opacity: 1;
     }
   }
+  &:focus {
+    outline: none;
+  }
 `
 
 interface UIComponentButtonPropTypes extends React.ButtonHTMLAttributes<HTMLButtonElement> {

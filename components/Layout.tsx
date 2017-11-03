@@ -26,8 +26,11 @@ export default class Layout extends React.Component<{}, {}> {
             font-size: 15px;
             font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, sans-serif, -MN-Lanna;
           }
+          body {
+            min-height: 500px;
+          }
           .heavent {
-            font-family: "-DB-HeaventRounded", Helvetica Neue, sans-serif;
+            font-family: -DB-HeaventRounded, Helvetica Neue, sans-serif;
           }
         `}</style>
       </div>

@@ -59,6 +59,7 @@ const UserSelectButtonItem = styled(UIUserSelectorButton) `
   width: 25px;
   height: 25px;
 
+  flex: 0 0 auto;
   background-clip: padding-box;
   border: 1px solid rgba(0,0,0,0.15);
   &:hover {

@@ -32,11 +32,13 @@ export default function(config: ApplicationClientStoreConfig) {
   const rootReducer = combineReducers<ApplicationState>(reducers)
   console.log('Create redux store with init state', config.initialState)
   __store = createStore<ApplicationState>(rootReducer, config.initialState, middlewares)
-  sagaMiddleware.run(initialSagas({
-    apolloClient: config.apolloClient,
-    store: __store,
-    url: config.url
-  }))
+  if (typeof window !== 'undefined') {
+    sagaMiddleware.run(initialSagas({
+      apolloClient: config.apolloClient,
+      store: __store,
+      url: config.url
+    }))
+  }
 
   if ((module as any).hot) {
     console.log('Hot loading enabled !')

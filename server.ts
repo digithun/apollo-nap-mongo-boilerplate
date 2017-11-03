@@ -14,6 +14,7 @@ declare global {
     log: (message: string) => void
   }
   interface SVContext {
+    server?: express.Application
     config: ApplicationConfig
     logger: ApplicationLogger
     __connection: Connection
@@ -28,7 +29,11 @@ declare global {
 }
 
 export default async function init(context: SVContext) {
-  const server = express()
+  let server = context.server
+  if (!server) {
+   server = express()
+  }
+
   console.log(chalk.greenBright(context.config.dev ? 'Run app in dev mode' : 'Run app in prod mode'))
   const clientApp = next({ dev: context.config.dev })
   const clientRoutesHandler = clientRoutes.getRequestHandler(clientApp)
