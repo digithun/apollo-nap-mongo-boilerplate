@@ -65,7 +65,7 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
         const userList = JSON.parse(this.props.url.query.users)
         const initialState = {
           global: {
-            loading: false
+            loading: true
           },
           reply: {
             _id: 'init',
@@ -90,8 +90,6 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
         } else {
 
           // server-side apollo and store
-          console.log('render ssr')
-
           client = new ApolloClient({ link, cache })
           store = initStore({ initialState, apolloClient: client, url: this.props.url })
         }

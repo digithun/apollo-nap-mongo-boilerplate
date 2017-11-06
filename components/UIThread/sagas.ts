@@ -48,9 +48,11 @@ export function* replySaga(context: ApplicationSagaContext) {
   /**
    * Begin fetching first data
    */
+  yield put({type: 'global/loading-start'})
   const commentObservableQuery: ObservableQuery<CommentListQueryResult> = yield initFetchQuery(context, ThreadQueryVariables)
   const result = yield commentObservableQuery.result()
   yield put(Actions.set({ hasNextPage: result.data.thread.comments.pageInfo.hasNextPage }))
+  yield put({type: 'global/loading-done'})
 
   /**
    * Loadmore from latest cursor

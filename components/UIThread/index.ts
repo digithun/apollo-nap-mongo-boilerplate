@@ -21,6 +21,12 @@ export default compose(
    * Read First 5 comment from local cache
    * by saga init
    */
+  connect((state: ApplicationState) => ({
+    hasNextPage: state.thread.hasNextPage,
+    loading: state.global.loading
+  }), (dispatch) => ({
+    requestLoadMoreComments: () => dispatch(Actions.loadMoreReplyList())
+  })),
   graphql<any, { url: any }>(ThreadQuery, {
     props: ({ data }) => {
       if (data.loading || !data.thread) {
@@ -85,11 +91,5 @@ export default compose(
       })
       return options
     }
-  }),
-  connect((state: ApplicationState) => ({
-    hasNextPage: state.thread.hasNextPage,
-    loading: state.global.loading
-  }), (dispatch) => ({
-    requestLoadMoreComments: () => dispatch(Actions.loadMoreReplyList())
-  }))
+  })
 )(UIThread)
