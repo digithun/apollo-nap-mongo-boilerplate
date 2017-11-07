@@ -3,6 +3,7 @@ machine:
     version: 8.9.0
   environment:
     PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
+    DEPLOY_TARGET
 
 dependencies:
   override:
@@ -21,7 +22,6 @@ deployment:
   production:
     branch: master
     commands:
-      - DEPLOY_TARGET=root@188.166.251.184
       - ./.bin/deliver.bash
-      - ssh -t $DEPLOY_TARGET 'cd /opt/jamplay-comment-service&&ls'
+      - ssh -t root@188.166.251.184 'cd /opt/jamplay-comment-service&&ls'
       # sh ./bin/up.sh
