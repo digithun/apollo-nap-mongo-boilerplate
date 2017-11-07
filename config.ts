@@ -8,6 +8,7 @@ declare global {
   }
 }
 console.log(process.env.NODE_ENV)
+
 const config: ApplicationConfig = {
   dev: optionalEnvWithDefault('NODE_ENV', 'development') === 'development',
   MONGODB_URI: requiredEnv('MONGODB_URI'),
