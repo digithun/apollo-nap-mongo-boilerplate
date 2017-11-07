@@ -1,0 +1,8 @@
+{
+  "apps": [{
+    "name": "jamplay-comment",
+    "script": "./index.js",
+    "watch": true,
+    "instances": 1
+  }]
+}
