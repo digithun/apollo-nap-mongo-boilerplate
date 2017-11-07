@@ -23,5 +23,5 @@ deployment:
     commands:
       - rsync -avz ./dist/artifact.tar $STAGING_TARGET:/opt/comment-service-artifact.tar
       - ssh -t $STAGING_TARGET 'cd /opt && ls && mkdir -p jamplay-comment-service && tar -xvf comment-service-artifact.tar -C /opt/jamplay-comment-service'
-      - ssh -t $STAGING_TARGET 'cd /opt/jamplay-comment-service&&ls'
+      - ssh -t $STAGING_TARGET 'cd /opt/jamplay-comment-service&&ls&&yarn install --production'
       - ssh -t $STAGING_TARGET 'sh /opt/jamplay-comment-service/.bin/up.bash'

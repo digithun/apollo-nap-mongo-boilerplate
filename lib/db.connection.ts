@@ -1,6 +1,5 @@
 
 import * as mongoose from 'mongoose'
-const MongoInMemory = require('mongo-in-memory');
 
 declare global {
   interface DBConnectionContext {
@@ -12,6 +11,7 @@ declare global {
 let _inmemoryURI;
 let _mongoServerInstance
 async function createInMemoryMongo(): Promise<any> {
+  const MongoInMemory = require('mongo-in-memory');
   console.log('create inmemory mongo')
   if (_inmemoryURI) {
     console.log('uri exists')
@@ -41,6 +41,7 @@ export async function initConnection(context: DBConnectionContext): Promise<mong
       context.logger.log('DB: use test inmemory mongo')
       context.config.MONGODB_URI = await createInMemoryMongo()
     }
+    (mongoose as any).Promise = global.Promise
 
     context.logger.log('DB: ' + `create connection to ${context.config.MONGODB_URI}`)
     const __connection: any = mongoose.createConnection(context.config.MONGODB_URI, {
@@ -52,7 +53,7 @@ export async function initConnection(context: DBConnectionContext): Promise<mong
 
       // close inmemoery if exists
       if (_mongoServerInstance) {
-      _mongoServerInstance.stop()
+        _mongoServerInstance.stop()
       }
     })
 
