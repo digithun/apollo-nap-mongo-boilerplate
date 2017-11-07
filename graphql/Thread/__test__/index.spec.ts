@@ -40,7 +40,6 @@ describe('Thread resolver test', () => {
 
     const thread = await models.Thread.findOne({
       appId: 'mock-app',
-      contentPrefix: 'prefix',
       contentId: threadId
     })
 

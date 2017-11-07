@@ -12,6 +12,7 @@ export function createThreadWrapResolver(next) {
           contentPrefix: rp.args.filter.contentPrefix,
           contentId: rp.args.filter.contentId
         })
+        context.logger.log('Thread: new thread created !!')
         return newThread
       } catch (e) {
         context.logger.log(e)

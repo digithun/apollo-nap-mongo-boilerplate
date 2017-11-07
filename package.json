@@ -10,8 +10,8 @@
     "run": "bash ./.bin/run.bash",
     "start": "NODE_ENV=production node index.js",
     "storybook": "start-storybook -p 9001 -s ./ -c storybook",
-    "test": "npm run build && jest --forceExit||true",
-    "watch": "npm run clean && tsc --watch||true",
+    "test": "yarn run build && jest --forceExit||true",
+    "watch": "yarn run clean && tsc --watch||true",
     "babel-node": "BABEL_ENV=development babel-node",
     "dev": "NODE_ENV=development nodemon index.js",
     "up-dev": "NODE_ENV=development docker-compose up -d"
