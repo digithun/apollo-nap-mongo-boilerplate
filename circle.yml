@@ -22,6 +22,6 @@ deployment:
     branch: master
     commands:
       - DEPLOY_TARGET=root@188.166.251.184
-      - ./bin/deliver.bash
+      - ./.bin/deliver.bash
       - ssh -t $DEPLOY_TARGET 'cd /opt/jamplay-comment-service&&ls'
       # sh ./bin/up.sh
