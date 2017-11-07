@@ -21,6 +21,7 @@ deployment:
   production:
     branch: master
     commands:
-      - ./bin/deploy_prod.sh
-      - ssh -t $DEPLOY_TARGET 'cd /opt/pixnode-sms-service&&ls'
+      - DEPLOY_TARGET=root@188.166.251.184
+      - ./bin/deliver.bash
+      - ssh -t $DEPLOY_TARGET 'cd /opt/jamplay-comment-service&&ls'
       # sh ./bin/up.sh
