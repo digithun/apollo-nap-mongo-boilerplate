@@ -37,7 +37,7 @@ async function createInMemoryMongo(): Promise<any> {
 
 export async function initConnection(context: DBConnectionContext): Promise<mongoose.Connection> {
   return new Promise<mongoose.Connection>(async (resolve, reject) => {
-    if (process.env.NODE_ENV === 'test') {
+    if (process.env.NODE_ENV === 'test' || (!context.config.MONGODB_URI && process.env.NODE_ENV === 'development')) {
       context.logger.log('DB: use test inmemory mongo')
       context.config.MONGODB_URI = await createInMemoryMongo()
     }
