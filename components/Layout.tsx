@@ -24,10 +24,10 @@ export default class Layout extends React.Component<{}, {}> {
         <style jsx={'yes'} global={'yes'} >{`
           html {
             font-size: 15px;
-            font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, sans-serif, -MN-Lanna;
           }
           body {
             min-height: 500px;
+            font-family: BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, sans-serif, -MN-Lanna;
           }
           .heavent {
             font-family: -DB-HeaventRounded, Helvetica Neue, sans-serif;

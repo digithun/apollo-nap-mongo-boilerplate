@@ -9,6 +9,7 @@ import { UILabel } from '../../../common/Label'
 const UserNameLabel = styled(UILabel) `
 `
 const CommentCreatedAtLabel = styled(UILabel)`
+  font-style: italic;
   color: ${(props: { theme?: UITheme }) => props.theme.darkGrey};
   font-size: 0.8rem;
 `

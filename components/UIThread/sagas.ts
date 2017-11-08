@@ -48,11 +48,11 @@ export function* replySaga(context: ApplicationSagaContext) {
   /**
    * Begin fetching first data
    */
-  yield put({type: 'global/loading-start'})
+  yield put({ type: 'global/loading-start' })
   const commentObservableQuery: ObservableQuery<CommentListQueryResult> = yield initFetchQuery(context, ThreadQueryVariables)
   const result = yield commentObservableQuery.result()
   yield put(Actions.set({ hasNextPage: result.data.thread.comments.pageInfo.hasNextPage }))
-  yield put({type: 'global/loading-done'})
+  yield put({ type: 'global/loading-done' })
 
   /**
    * Loadmore from latest cursor
@@ -114,6 +114,37 @@ export function* replySaga(context: ApplicationSagaContext) {
       })
 
     }
+    const data = context.apolloClient.readQuery<any>({ query: ThreadQuery, variables: ThreadQueryVariables })
+    context.apolloClient.writeQuery({
+      query: ThreadQuery,
+      variables: ThreadQueryVariables,
+      data: Object.assign({}, data, {
+        thread: {
+          ...data.thread,
+          comments: {
+            ...data.thread.comments,
+            edges: [
+              {
+                __typename: 'CommentEdge',
+                cursor: '',
+                node: {
+                  _id: 'optimisitc-comment-id',
+                  createdAt: new Date(),
+                  threadId: queryResult.thread._id,
+                  message: commentInputData.message,
+                  user: {
+                    ...commentInputData.user,
+                    __typename: 'User'
+                  },
+                  __typename: 'Comment'
+                }
+              },
+              ...data.thread.comments.edges,
+            ]
+          }
+        }
+      })
+    })
     try {
       const mutationResult = yield context.apolloClient.mutate({
         variables: {
@@ -133,9 +164,7 @@ export function* replySaga(context: ApplicationSagaContext) {
            }
          }
         }
-      `
-      })
-      const data = context.apolloClient.readQuery<any>({ query: ThreadQuery, variables: ThreadQueryVariables })
+      ` })
       context.apolloClient.writeQuery({
         query: ThreadQuery,
         variables: ThreadQueryVariables,
@@ -148,9 +177,19 @@ export function* replySaga(context: ApplicationSagaContext) {
                 {
                   __typename: 'CommentEdge',
                   cursor: '',
-                  node: mutationResult.data.reply.record
+                  node: {
+                    _id: mutationResult.data.reply.record._id,
+                    createdAt: new Date(),
+                    threadId: queryResult.thread._id,
+                    message: commentInputData.message,
+                    user: {
+                      ...commentInputData.user,
+                      __typename: 'User'
+                    },
+                    __typename: 'Comment'
+                  }
                 },
-                ...data.thread.comments.edges,
+                ...data.thread.comments.edges.filter(( node ) => node._id !== 'optimistic-comment-id'),
               ]
             }
           }
