@@ -14,7 +14,7 @@ declare global {
 
 export default function withReduxApollo(WrappedComponent: React.ComponentClass) {
 
-  class ConnectWithReduxAndApollo extends React.Component<{ url: any }, {}> {
+  class ConnectWithReduxAndApollo extends React.Component<{ url: any, graphQLEndpoint?: string }, {}> {
     private client: ApolloClient<Cache>
     constructor(props) {
       super(props)
@@ -52,7 +52,7 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
         }).restore({}) as any
 
         const link: any = new HttpLink({
-          uri: '/graphql',
+          uri: this.props.graphQLEndpoint || '/graphql',
           headers: {
             authorization: `Bearer ${this.props.url.query.sessionToken}`
           }
