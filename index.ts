@@ -19,10 +19,10 @@ async function run() {
   const SVContext: SVContext = {
     config,
     logger,
-    __connection
+    __connection,
+
   }
   const app = await initApp(SVContext)
-
   async function clearConnection() {
     logger.log(chalk.green('closing app...'))
     await __connection.close()

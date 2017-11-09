@@ -13,7 +13,7 @@ const config: ApplicationConfig = {
   dev: optionalEnvWithDefault('NODE_ENV', 'development') === 'development',
   MONGODB_URI: optionalEnvWithDefault('MONGODB_URI', undefined),
   NAP_URI: optionalEnvWithDefault('NAP_URI', 'CASUAL'),
-  PORT: optionalEnvWithDefault('PORT', 3000)
+  PORT: optionalEnvWithDefault('PORT', 80)
 }
 
 export default config
