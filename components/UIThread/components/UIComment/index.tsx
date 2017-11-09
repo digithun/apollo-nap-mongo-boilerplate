@@ -53,7 +53,7 @@ interface UICommentComponent extends React.ComponentClass<UICommentPropTypes> {
   }
 }
 const UICommentComponent = compose<UICommentPropTypes, {}>(
-)((props: UICommentPropTypes) => (
+)((props: UICommentPropTypes) => !props.user ? <div onClick={() => { console.log(props) }} >{'error'}</div> : (
   <CommentContainer className={props.className}>
     <CommentHeader>
       <UserInfoWrap>
