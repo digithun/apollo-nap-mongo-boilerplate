@@ -65,7 +65,7 @@ const UICommentComponent = compose<UICommentPropTypes, {}>(
       <CommentCreatedAtLabel>{moment(props.createdAt).fromNow()}</CommentCreatedAtLabel>
     </CommentHeader>
     <TextContainer>
-      <UIText> {props.message} </UIText>
+      <UIText>{props.message}</UIText>
     </TextContainer>
   </CommentContainer>
 )) as UICommentComponent
