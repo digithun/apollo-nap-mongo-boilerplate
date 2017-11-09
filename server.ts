@@ -8,7 +8,7 @@ import * as next from 'next'
 import clientRoutes from './routes'
 import { createGraphQLSchema } from './graphql'
 import createConnectors, { GQConnectors } from './connectors'
-
+const cors = require('cors')
 declare global {
   interface ApplicationLogger {
     log: (message: string) => void
@@ -39,6 +39,8 @@ export default async function init(context: SVContext) {
   const clientRoutesHandler = clientRoutes.getRequestHandler(clientApp)
   const { schema, models } = createGraphQLSchema(context)
   const connectors = createConnectors({ napEndpoint: context.config.NAP_URI, models, logger: context.logger })
+
+  server.use(cors())
 
   server.use(require('express-ping').ping())
   server.use(bodyParser.json())
