@@ -92,4 +92,4 @@ export default compose(
       return options
     }
   })
-)(UIThread)
+)(UIThread) as React.ComponentClass<CommentServiceComponentProps>
