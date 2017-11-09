@@ -10,11 +10,12 @@ import 'isomorphic-fetch'
 import initStore from './store.factory'
 declare global {
   interface ApplicationApolloClient extends ApolloClient<Cache> { }
+  interface CommentServiceComponentProps { url: any, graphQLEndpoint?: string }
 }
 
 export default function withReduxApollo(WrappedComponent: React.ComponentClass) {
 
-  class ConnectWithReduxAndApollo extends React.Component<{ url: any, graphQLEndpoint?: string }, {}> {
+  class ConnectWithReduxAndApollo extends React.Component<CommentServiceComponentProps, {}> {
     private client: ApolloClient<Cache>
     constructor(props) {
       super(props)
@@ -39,12 +40,20 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
       }
     }
 
+    public componentWillReceiveProps(nextProps) {
+      const globalWindow: any = window
+      if (globalWindow.__CommentServiceReduxStore) {
+        globalWindow.__CommentServiceReduxStore.dispatch({ type: 'global/reload', payload: nextProps.url.query.contentId });
+      }
+    }
+
     public render() {
 
       // this render is on the top of any page
       // it should render only once per reload
       // you can keep tracking this render method
       // by console.log to maintain performance
+      console.log(`Display comment section for ${this.props.url.query.contentId}`)
       try {
 
         const cache = new InMemoryCache({
@@ -61,7 +70,6 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
         let client;
         let store;
 
-        console.log(this.props.url.query.users)
         const userList = JSON.parse(this.props.url.query.users)
         const initialState = {
           global: {
@@ -81,12 +89,12 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
         } as ApplicationState
         if (typeof window !== 'undefined') {
           const globalWindow: any = window
-          if (!(window as any).client) {
-            globalWindow.client = new ApolloClient({ link, cache });
-            globalWindow.store = initStore({ apolloClient: globalWindow.client, initialState, url: this.props.url })
+          if (!(window as any).__CommentServiceApolloClient) {
+            globalWindow.__CommentServiceApolloClient = new ApolloClient({ link, cache });
+            globalWindow.__CommentServiceReduxStore = initStore({ apolloClient: globalWindow.__CommentServiceApolloClient, initialState, url: this.props.url })
           }
-          client = (window as any).client
-          store = (window as any).store
+          client = (window as any).__CommentServiceApolloClient
+          store = (window as any).__CommentServiceReduxStore
         } else {
 
           // server-side apollo and store

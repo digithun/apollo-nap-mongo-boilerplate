@@ -41,7 +41,7 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
   public render() {
     return (
       <Layout>
-        <div>
+        <div className={this.props.threadId}>
           <Reply userList={this.props.userList} />
           <div style={{ marginTop: 20 }}>
             {this.props.comments.map((comment) => {

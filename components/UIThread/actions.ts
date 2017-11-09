@@ -5,3 +5,4 @@ export const confirmCreateComment = createAction<ConfirmCreateCommentPayload>('r
 
 export const loadMoreReplyList = createAction('thread/load-more-reply')
 export const set = createAction<GBThreadState>('thread/set')
+export const reload = createAction<string>('global/reload')

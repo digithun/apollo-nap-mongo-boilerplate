@@ -35,6 +35,7 @@ async function initFetchQuery(context: ApplicationSagaContext, variables: any): 
   await loadMoreCommentQuery.result()
   return loadMoreCommentQuery
 }
+
 export function* replySaga(context: ApplicationSagaContext) {
 
   const ThreadQueryVariables = {
@@ -45,6 +46,8 @@ export function* replySaga(context: ApplicationSagaContext) {
     first: MAX_COMMENT_PER_REQUEST,
   }
 
+
+
   /**
    * Begin fetching first data
    */
@@ -53,6 +56,16 @@ export function* replySaga(context: ApplicationSagaContext) {
   const result = yield commentObservableQuery.result()
   yield put(Actions.set({ hasNextPage: result.data.thread.comments.pageInfo.hasNextPage }))
   yield put({ type: 'global/loading-done' })
+
+
+  /**
+   * reload thread information if contentId change
+   */
+  yield takeEvery<{type: string, payload: string}>(Actions.reload, function*(action) {
+    ThreadQueryVariables.filter.contentId = action.payload
+    initFetchQuery(context, ThreadQueryVariables)
+  })
+
 
   /**
    * Loadmore from latest cursor
