@@ -37,6 +37,7 @@ export const guardWrapResolver: ResolverNextRpCb<GQCommentDocument, GQResolverCo
         throw new Error('comment wrong thread id')
       }
     }
+
     return next(rp)
   }
 }

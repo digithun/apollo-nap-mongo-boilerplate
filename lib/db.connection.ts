@@ -43,13 +43,13 @@ export async function initConnection(context: DBConnectionContext): Promise<mong
     }
     (mongoose as any).Promise = global.Promise
 
-    context.logger.log('DB: ' + `create connection to ${context.config.MONGODB_URI}`)
+    context.logger.log('DB: ' + `create connection.... `)
     const __connection: any = mongoose.createConnection(context.config.MONGODB_URI, {
       promiseLibrary: global.Promise
     })
 
     __connection.on('disconnected', () => {
-      context.logger.log(`👊🏽  Disconnected => ${context.config.MONGODB_URI}`)
+      context.logger.log(`👊🏽  Disconnected`)
 
       // close inmemoery if exists
       if (_mongoServerInstance) {
@@ -58,11 +58,11 @@ export async function initConnection(context: DBConnectionContext): Promise<mong
     })
 
     __connection.on('reconnect', () => {
-      context.logger.log(`😧  Reconnect to => ${context.config.MONGODB_URI}`)
+      context.logger.log(`😧  Reconnect......`)
     })
 
     __connection.on('connected', () => {
-      context.logger.log(`🖥  Connected => ${context.config.MONGODB_URI} `)
+      context.logger.log(`🖥  Connected.... `)
       resolve(__connection)
     })
 
