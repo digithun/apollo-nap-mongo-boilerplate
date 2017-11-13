@@ -1,5 +1,4 @@
 export $(cat .env | grep -v ^# | xargs)
-yarn clean
 yarn tsc
 yarn next -- build
 rm -rf ./dist
