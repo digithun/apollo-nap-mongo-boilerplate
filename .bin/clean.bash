@@ -1,1 +1,1 @@
-find -E . -regex '.*\.(js|map)' -not -path "./node_modules/*" -not -path  "./.next/*" -delete
+find -E . -regex '.*\.(js|map|d.ts)' -not -path "./node_modules/*" -not -path  "./.next/*" -delete
