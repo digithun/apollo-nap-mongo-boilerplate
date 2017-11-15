@@ -71,7 +71,8 @@
     "redux-logger": "^3.0.6",
     "redux-saga": "^0.15.6",
     "remove": "^0.1.5",
-    "styled-components": "^2.2.1"
+    "styled-components": "^2.2.1",
+    "uglifyjs-webpack-plugin": "^1.0.0-rc.0"
   },
   "devDependencies": {
     "@storybook/react": "^3.2.12",
