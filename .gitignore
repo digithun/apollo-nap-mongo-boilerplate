@@ -1,9 +1,10 @@
 **/*.js
 **/*.js.map
 
+.DS_Store
 node_modules
 .env
 dist
 .db
 .next
-d.ts
+*.d.ts
