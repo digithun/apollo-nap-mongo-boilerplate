@@ -8,7 +8,7 @@ declare global {
   interface GQUserDocument extends mongoose.Document, GBUserType { }
 }
 const threadSchema = new mongoose.Schema({
-  _id: { type: String, required: true, unique: true },
+  _id: { type: String, required: true },
   name: { type: String, required: true },
   profilePicture: { type: String }
 })
