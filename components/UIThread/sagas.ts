@@ -104,10 +104,15 @@ export function* replySaga(context: ApplicationSagaContext) {
    * reply/confirm-create-comment
    * reply comment to thread
    */
+
   yield takeEvery<{ payload: Actions.ConfirmCreateCommentPayload, type: string }>(Actions.confirmCreateComment, function*(action) {
     yield put({ type: 'global/loading-start' })
     const commentInputData = yield select<ApplicationState>((state) => state.reply)
     const variables = ThreadQueryVariables
+    if (action.payload.message.length > 300) {
+      alert('Limit 300 charactors')
+      return
+    }
     let queryResult = context.apolloClient.readQuery<{ thread: GBThreadType }>({
       query: ThreadQuery,
       variables
