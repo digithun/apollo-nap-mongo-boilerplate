@@ -58,7 +58,7 @@ export function* replySaga(context: ApplicationSagaContext) {
   /**
    * reload thread information if contentId change
    */
-  yield takeEvery<{type: string, payload: string}>(Actions.reload, function*(action) {
+  yield takeEvery<{ type: string, payload: string }>(Actions.reload, function* (action) {
     ThreadQueryVariables.filter.contentId = action.payload
     initFetchQuery(context, ThreadQueryVariables)
   })
@@ -67,7 +67,7 @@ export function* replySaga(context: ApplicationSagaContext) {
    * Loadmore from latest cursor
    * and rewrite to loadmoreComment collection
    */
-  yield takeEvery<{ type: string }>(Actions.loadMoreReplyList, function*(action) {
+  yield takeEvery<{ type: string }>(Actions.loadMoreReplyList, function* (action) {
     yield put({ type: 'global/loading-start' })
     const data = context.apolloClient.readQuery<CommentListQueryResult>({ query: ThreadQuery, variables: commentObservableQuery.variables })
     const lastCursor = getLatestCursorOfConnectionEdges(data.thread.comments)
@@ -105,18 +105,24 @@ export function* replySaga(context: ApplicationSagaContext) {
    * reply comment to thread
    */
 
-  yield takeEvery<{ payload: Actions.ConfirmCreateCommentPayload, type: string }>(Actions.confirmCreateComment, function*(action) {
+  yield takeEvery<{ payload: Actions.ConfirmCreateCommentPayload, type: string }>(Actions.confirmCreateComment, function* (action) {
     yield put({ type: 'global/loading-start' })
+
     const commentInputData = yield select<ApplicationState>((state) => state.reply)
     const variables = ThreadQueryVariables
-    if (action.payload.message.length > 300) {
-      alert('Limit 300 charactors')
-      return
+    try {
+      if (commentInputData.message.length > 300) {
+        alert('Limit 300 charactors')
+        return
+      }
+    } catch (e) {
+      console.error(e)
     }
     let queryResult = context.apolloClient.readQuery<{ thread: GBThreadType }>({
       query: ThreadQuery,
       variables
     })
+    console.log('get result from query')
     if (!queryResult.thread) {
 
       // check if data is undefined
@@ -159,6 +165,7 @@ export function* replySaga(context: ApplicationSagaContext) {
         }
       })
     })
+
     try {
       const mutationResult = yield context.apolloClient.mutate({
         variables: {
@@ -203,7 +210,7 @@ export function* replySaga(context: ApplicationSagaContext) {
                     __typename: 'Comment'
                   }
                 },
-                ...data.thread.comments.edges.filter(( node ) => node._id !== 'optimistic-comment-id'),
+                ...data.thread.comments.edges.filter((node) => node._id !== 'optimistic-comment-id'),
               ]
             }
           }
