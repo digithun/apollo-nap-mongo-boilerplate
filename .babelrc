@@ -1,7 +1,10 @@
 {
   "env": {
     "development": {
-
+      "presets": [
+        "env",
+        "next/babel"
+      ],
       "plugins": [
         "transform-decorators-legacy",
         ["styled-components", { "ssr": true }],
@@ -9,7 +12,10 @@
       ]
     },
     "production": {
- 
+      "presets": [
+        "env",
+        "next/babel"
+      ],
       "plugins": [
         "transform-decorators-legacy",
         ["styled-components", { "ssr": true }],
