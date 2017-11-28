@@ -8,3 +8,5 @@ dist
 .db
 .next
 *.d.ts
+vim
+*.swp
