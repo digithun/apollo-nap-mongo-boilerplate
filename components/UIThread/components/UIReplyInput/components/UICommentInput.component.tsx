@@ -58,7 +58,7 @@ class UICommentInput extends React.Component<UICommentInputPropTypes & enchanceP
   }
 }
 // @ts-ignore
-UICommentInput.displayName = 'CommentInputDialog'
+( UICommentInput as any ).displayName = 'CommentInputDialog'
 interface UICommentInputComponent extends React.ComponentClass<UICommentInputPropTypes> {
   fragments: {
 
