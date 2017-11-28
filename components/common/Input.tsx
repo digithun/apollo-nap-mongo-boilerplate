@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 export const InputTextMultiline = styled.textarea`
   flex: 1;
+  font-family: Segoe UI, Roboto, Helvetica Neue, sans-serif,Thonburi, Tahoma, -MN-Lanna;
   background: ${(props: { theme?: UITheme }) => props.theme.matteWhite};
   resize: none;
   border-radius: 3px;

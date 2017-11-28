@@ -58,7 +58,7 @@ export function* replySaga(context: ApplicationSagaContext) {
   /**
    * reload thread information if contentId change
    */
-  yield takeEvery<{ type: string, payload: string }>(Actions.reload, function* (action) {
+  yield takeEvery<{ type: string, payload: string }>(Actions.reload, function*(action) {
     ThreadQueryVariables.filter.contentId = action.payload
     initFetchQuery(context, ThreadQueryVariables)
   })
@@ -67,7 +67,7 @@ export function* replySaga(context: ApplicationSagaContext) {
    * Loadmore from latest cursor
    * and rewrite to loadmoreComment collection
    */
-  yield takeEvery<{ type: string }>(Actions.loadMoreReplyList, function* (action) {
+  yield takeEvery<{ type: string }>(Actions.loadMoreReplyList, function*(action) {
     yield put({ type: 'global/loading-start' })
     const data = context.apolloClient.readQuery<CommentListQueryResult>({ query: ThreadQuery, variables: commentObservableQuery.variables })
     const lastCursor = getLatestCursorOfConnectionEdges(data.thread.comments)
@@ -105,7 +105,7 @@ export function* replySaga(context: ApplicationSagaContext) {
    * reply comment to thread
    */
 
-  yield takeEvery<{ payload: Actions.ConfirmCreateCommentPayload, type: string }>(Actions.confirmCreateComment, function* (action) {
+  yield takeEvery<{ payload: Actions.ConfirmCreateCommentPayload, type: string }>(Actions.confirmCreateComment, function*(action) {
     yield put({ type: 'global/loading-start' })
 
     const commentInputData = yield select<ApplicationState>((state) => state.reply)
@@ -113,6 +113,7 @@ export function* replySaga(context: ApplicationSagaContext) {
     try {
       if (commentInputData.message.length > 300) {
         alert('Limit 300 charactors')
+        yield put({ type: 'global/loading-done' })
         return
       }
     } catch (e) {

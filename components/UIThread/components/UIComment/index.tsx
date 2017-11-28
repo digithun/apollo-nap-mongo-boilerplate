@@ -31,6 +31,7 @@ const ProfilePictureContainer = styled.div`
   height: 40px;
   position: relative;
   border-radius: 50%;
+  flex: 0 0 40px;
   margin: 0 8px;
   overflow: hidden;
   border: 1px solid rgba(0,0,0,0.15);

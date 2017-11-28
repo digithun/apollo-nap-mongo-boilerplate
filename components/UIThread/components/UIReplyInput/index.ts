@@ -6,25 +6,40 @@ import gql from 'graphql-tag'
 import { compose, withProps, withState } from 'recompose'
 
 declare global {
+  interface ReplyState extends GBCommentType {
+    currentSelectedUserIndex?: number
+  }
   interface ApplicationState {
-    reply: GBCommentType
+    reply: ReplyState
   }
 }
-export const replyReducer = (state: GBCommentType, action) => {
-
+export const replyReducer = (state: ReplyState, action) => {
+  if (!state) {
+    return {
+      currentSelectedUserIndex: 0,
+    }
+  }
   switch (action.type) {
+    case 'reply/set-selected-user-index': {
+      return {
+        ...state,
+        currentSelectedUserIndex: action.payload
+      }
+    }
     case 'reply/clear': {
       return {
+        currentSelectedUserIndex: state.currentSelectedUserIndex,
         _id: 'init',
         commentType: 'text',
         message: '',
         user: {
           ...state.user
-        }
+        },
       }
     }
     case 'reply/input-update': {
       return {
+        currentSelectedUserIndex: 0,
         ...state,
         ...action.payload
       }
@@ -35,12 +50,13 @@ export const replyReducer = (state: GBCommentType, action) => {
   }
 }
 export default compose(
-  connect<{}, {}, {value: GBCommentType, threadId: string}>((state: ApplicationState) => ({
+  connect<{}, {}, { value: GBCommentType, threadId: string }>((state: ApplicationState) => ({
     value: state.reply,
   }), (dispatch, ownProps) => {
     return {
       onChange: (payload) => dispatch({ type: 'reply/input-update', payload }),
-      onConfirm: () => dispatch({ type: 'reply/confirm-create-comment' })
+      onConfirm: () => dispatch({ type: 'reply/confirm-create-comment' }),
+      setCurrentSelectedUserIndex: (userIndex) => dispatch({ type: 'reply/set-selected-user-index', payload: userIndex })
     }
   }),
 )(CommentInput) as React.ComponentClass<{

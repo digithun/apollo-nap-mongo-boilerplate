@@ -77,6 +77,7 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
           },
           reply: {
             _id: 'init',
+            currentSelectedUserIndex: 0,
             user: userList[0],
             message: '',
             reactions: []

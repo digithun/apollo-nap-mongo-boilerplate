@@ -26,7 +26,7 @@ const Container = styled.div`
   opacity: 0;
   transition: 0.222s ease-out all;
   pointer-events: none;
-  z-index: 99;
+  z-index: 100;
   ${(props) => props.visible ? VisibleStyles : ''}
   ${(props: UIPopoverContainerPropTypes) => {
     if (props.direction === 'down') {
@@ -48,6 +48,7 @@ const Outside = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
+  z-index:99;
 `
 
 export const UIPopoverContainer = (props: UIPopoverContainerPropTypes) => (

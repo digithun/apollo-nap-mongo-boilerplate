@@ -39,6 +39,19 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
     super(props)
   }
   public render() {
+
+    const Loadmore = this.props.hasNextPage
+      ? (
+        <Button.PrimaryButton onClick={this.props.requestLoadMoreComments} disabled={this.props.loading} >
+          {this.props.loading ? 'กำลังโหลด' : 'โหลดเพิ่ม'}
+        </Button.PrimaryButton>
+      ) :
+      (
+        <Label.UILabel style={{ fontSize: '0.8rem' }} >
+          {this.props.loadMoreComments.length > 20 ? 'สิ้นสุด... กันทีไม่ว่า ชาตินี้ ชาติไหน คอมเม้นหมดแล้วจ้า 👋🏼' : ''}
+        </Label.UILabel>
+      )
+
     return (
       <Layout>
         <div className={this.props.threadId}>
@@ -51,18 +64,7 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
               return (<UIComment className='loadmore' key={comment._id} {...comment} />)
             })}
           </div>
-
-          {this.props.hasNextPage
-            ? <Button.PrimaryButton
-              onClick={this.props.requestLoadMoreComments}
-              disabled={this.props.loading}
-            >
-              {this.props.loading ? 'กำลังโหลด' : 'โหลดเพิ่ม'}
-            </Button.PrimaryButton>
-            : <Label.UILabel style={{ fontSize: '0.8rem' }} >
-              {this.props.loadMoreComments.length > 20 ? 'สิ้นสุด... กันทีไม่ว่า ชาตินี้ ชาติไหน คอมเม้นหมดแล้วจ้า 👋🏼' : ''}
-            </Label.UILabel>
-          }
+          {this.props.comments.length !== 0 ? Loadmore : <div style={{color: '#bcbcbc', textAlign: 'center'}}>{'ไม่มีคอมเม้นท์'}</div>}
         </div>
       </Layout>
     )

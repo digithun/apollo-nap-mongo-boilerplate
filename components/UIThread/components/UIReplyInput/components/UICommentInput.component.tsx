@@ -57,6 +57,8 @@ class UICommentInput extends React.Component<UICommentInputPropTypes & enchanceP
     this.props.setCurrentSelectedUserIndex(userIndex)
   }
 }
+// @ts-ignore
+UICommentInput.displayName = 'CommentInputDialog'
 interface UICommentInputComponent extends React.ComponentClass<UICommentInputPropTypes> {
   fragments: {
 
@@ -64,8 +66,8 @@ interface UICommentInputComponent extends React.ComponentClass<UICommentInputPro
 }
 export default compose<UICommentInputPropTypes & enchanceProps, UICommentInputPropTypes>(
   withDict,
-  withState('currentSelectedUserIndex', 'setCurrentSelectedUserIndex', 0),
   connect((state: ApplicationState) => ({
-    loading: state.global.loading
+    loading: state.global.loading,
+    currentSelectedUserIndex: state.reply.currentSelectedUserIndex
   }))
 )(UICommentInput) as UICommentInputComponent

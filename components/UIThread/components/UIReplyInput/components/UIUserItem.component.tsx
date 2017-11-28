@@ -44,6 +44,7 @@ type ContainerPropTypes = {
 }
 
 const Container = styled(ContainerRoot) `
+  max-width: 320px;
   &:hover{
     background: ${(props: ContainerPropTypes) => props.theme.pumpkin};
     color: white;
@@ -54,6 +55,14 @@ const NameLabel = styled(UILabel) `
   font-size: 0.8em;
   -webkit-font-smoothing: antialiased;
   ${(props: { theme?: UITheme }) => props.theme.matteBlack};
+
+  max-width: 200px;
+  display: block;
+  white-space: nowrap;
+  -webkit-line-clamp: 1;
+  word-break: break-all;
+  text-overflow: ellipsis;
+  overflow: hidden;
 `
 const UserSelectButtonItem = styled(UIUserSelectorButton) `
   width: 25px;
