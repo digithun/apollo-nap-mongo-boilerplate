@@ -53,7 +53,7 @@ const Outside = styled.div`
 
 export const UIPopoverContainer = (props: UIPopoverContainerPropTypes) => (
   <div>
-    {props.visible ? <Outside key={'outside'} onMouseDown={props.onClose} /> : null}
+    {props.visible ? <Outside key={'outside'} onMouseDown={props.onClose} onTouchStart={props.onClose} /> : null}
     <Container key={'content'} {...props} > {props.children} </Container>
   </div>
 )

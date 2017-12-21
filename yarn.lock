@@ -1075,12 +1075,12 @@ babel-plugin-react-require@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-react-require/-/babel-plugin-react-require-3.0.0.tgz#2e4e7b4496b93a654a1c80042276de4e4eeb20e3"
 
-"babel-plugin-styled-components@git+https://github.com/zapkub/babel-plugin-styled-components.git":
-  version "1.2.1"
-  resolved "git+https://github.com/zapkub/babel-plugin-styled-components.git#e6bf1b7be401fb6f3fa6ab87f90f44f40d3f9136"
+babel-plugin-styled-components@^1.1.4:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-styled-components/-/babel-plugin-styled-components-1.3.0.tgz#9e4d9f718b2975dadbfab0bc1c6793d93c751404"
   dependencies:
     babel-types "^6.26.0"
-    stylis "^3.2.1"
+    stylis "3.x"
 
 babel-plugin-syntax-async-functions@^6.8.0:
   version "6.13.0"
@@ -8327,9 +8327,13 @@ stylis-rule-sheet@0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/stylis-rule-sheet/-/stylis-rule-sheet-0.0.6.tgz#059f89125a8e8db546e8adb0e07c4b4bcb81911b"
 
-stylis@3.3.2, stylis@^3.2.1:
+stylis@3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/stylis/-/stylis-3.3.2.tgz#95ef285836e98243f8b8f64a9a72706ea6c893ea"
+
+stylis@3.x:
+  version "3.4.5"
+  resolved "https://registry.yarnpkg.com/stylis/-/stylis-3.4.5.tgz#d7b9595fc18e7b9c8775eca8270a9a1d3e59806e"
 
 sum-up@^1.0.1:
   version "1.0.3"

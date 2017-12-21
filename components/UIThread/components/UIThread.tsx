@@ -54,9 +54,9 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
 
     return (
       <Layout>
-        <div className={this.props.threadId}>
+        <div style={{minHeight: 300}} className={this.props.threadId}>
           <Reply userList={this.props.userList} />
-          <div style={{ marginTop: 20 }}>
+          <div style={{ marginTop: 20,  }}>
             {this.props.comments.map((comment) => {
               return (<UIComment key={comment._id} {...comment} />)
             })}
