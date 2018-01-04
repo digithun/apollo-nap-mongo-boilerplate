@@ -8,6 +8,7 @@ import * as next from 'next'
 import clientRoutes from './routes'
 import { createGraphQLSchema } from './graphql'
 import createConnectors, { GQConnectors } from './connectors'
+import config from './config';
 const cors = require('cors')
 declare global {
   interface ApplicationLogger {
@@ -31,12 +32,10 @@ declare global {
 export default async function init(context: SVContext) {
   let server = context.server
   if (!server) {
-   server = express()
+    server = express()
   }
 
   console.log(chalk.greenBright(context.config.dev ? 'Run app in dev mode' : 'Run app in prod mode'))
-  const clientApp = next({ dev: context.config.dev })
-  const clientRoutesHandler = clientRoutes.getRequestHandler(clientApp)
   const { schema, models } = createGraphQLSchema(context)
   const connectors = createConnectors({ napEndpoint: context.config.NAP_URI, models, logger: context.logger })
 
@@ -56,10 +55,14 @@ export default async function init(context: SVContext) {
     }
   })))
 
-  server.use(clientRoutesHandler)
   return {
     start: async () => {
-      await clientApp.prepare()
+      if (config.dev) {
+        const clientApp = next({ dev: context.config.dev })
+        const clientRoutesHandler = clientRoutes.getRequestHandler(clientApp)
+        server.use(clientRoutesHandler)
+        await clientApp.prepare()
+      }
       server.listen(context.config.PORT, () => {
         context.logger.log(chalk.bgGreen(`Start application !!`))
         context.logger.log(chalk.green(`Application start on port =>> ${context.config.PORT}`))
