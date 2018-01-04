@@ -1,4 +1,13 @@
 
+graphql:
+  image: gcr.io/jamplay-deploy-poc/jamplay-comment:latest
+  links:
+    - mongo:mongo
+  volumes:
+    - ./.env:/usr/app/.env
+  ports:
+    - 1671:1671
+
 mongo:
   image: mongo:3.4
   volumes_from:

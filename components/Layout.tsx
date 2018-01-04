@@ -1,9 +1,10 @@
 import * as React from 'react'
-import styled, { ThemeProvider } from 'styled-components'
+import styled, { ThemeProvider, StyledFunction } from 'styled-components'
 import theme from './theme'
 import * as moment from 'moment'
 // Augmentation of React
 import 'react';
+
 
 declare module 'react' {
   interface StyleHTMLAttributes<T> extends React.HTMLAttributes<T> {
