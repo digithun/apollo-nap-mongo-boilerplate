@@ -39,7 +39,7 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
     super(props)
   }
   public render() {
-
+    console.log('this.props.hasNextPage==>',this.props.hasNextPage)
     const Loadmore = this.props.hasNextPage
       ? (
         <Button.PrimaryButton onClick={this.props.requestLoadMoreComments} disabled={this.props.loading} >
@@ -64,7 +64,9 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
               return (<UIComment className='loadmore' key={comment._id} {...comment} />)
             })}
           </div>
-          {this.props.comments.length !== 0 ? Loadmore : <div style={{color: '#bcbcbc', textAlign: 'center'}}>{'ไม่มีคอมเม้นท์'}</div>}
+          <div style={{ color: '#bcbcbc', textAlign: 'center' }}>
+            {this.props.comments.length !== 0 ? Loadmore : 'ไม่มีคอมเม้นท์'}
+          </div>
         </div>
       </Layout>
     )
