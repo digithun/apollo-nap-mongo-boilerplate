@@ -1,5 +1,6 @@
 import * as mongoose from 'mongoose'
 import { TypeComposer, ResolverNextRpCb } from 'graphql-compose'
+import gql from 'graphql-tag';
 
 declare global {
   type GQReplyArgs = {
@@ -16,7 +17,46 @@ declare global {
 export const guardWrapResolver: ResolverNextRpCb<GQCommentDocument, GQResolverContext> = (next) => {
   return async (rp) => {
     const args: GQReplyArgs = rp.args as any
-    const thread = await rp.context.models.Thread.findOne({contentId: args.record.contentId})
+    const { context } = rp
+
+    /**
+     * Check content is visible in platform
+     * by split prefix and id
+     */
+    const words = args.record.contentId.split('.')
+    const prefix = words[0]
+    const id = words[1]
+    if (prefix && id) {
+      try {
+
+        const response = await fetch(context.config.NAP_URI, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            query: `
+              query {
+                ${prefix} (_id: "${id}") {
+                  _id
+                }
+              }
+            `
+          })
+        })
+        const result = await response.json()
+        if (!result.data.episode) {
+          throw new Error('no-content')
+        }
+      } catch (e) {
+        console.error(e)
+        const error = new Error()
+        error.name = 'error/content-not-found'
+        throw error
+      }
+    }
+
+    const thread = await rp.context.models.Thread.findOne({ contentId: args.record.contentId })
     // if (!rp.context.user) {
     //   throw new Error('unauthorized')
     // }
