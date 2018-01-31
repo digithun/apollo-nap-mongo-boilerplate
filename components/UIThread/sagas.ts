@@ -1,10 +1,11 @@
 
-import { takeEvery, select, put } from 'redux-saga/effects'
+import { takeEvery, select, put, call } from 'redux-saga/effects'
 import { ObservableQuery } from 'apollo-client'
 import * as Actions from './actions'
 import { ThreadQuery } from './graphql'
 import gql from 'graphql-tag'
 import UIThread from './components/UIThread'
+import ApolloClient from 'apollo-client/ApolloClient';
 export const MAX_COMMENT_PER_REQUEST = 3
 interface ThreadResultType extends GBThreadType {
   comments: GQConnectionResult<GBCommentType>
@@ -38,6 +39,7 @@ async function initFetchQuery(context: ApplicationSagaContext, variables: any): 
 
 export function* replySaga(context: ApplicationSagaContext) {
 
+  const { apolloClient } = context
   const ThreadQueryVariables = {
     filter: {
       contentId: context.url.query.contentId,
@@ -47,31 +49,37 @@ export function* replySaga(context: ApplicationSagaContext) {
   }
 
   /**
+   * @Init data
    * Begin fetching first data
    */
   yield put({ type: 'global/loading-start' })
-  const commentObservableQuery: ObservableQuery<CommentListQueryResult> = yield initFetchQuery(context, ThreadQueryVariables)
-  const result = yield commentObservableQuery.result()
+  let commentObservableQuery: ObservableQuery<CommentListQueryResult> = yield call(initFetchQuery, context, ThreadQueryVariables)
+  let result = yield commentObservableQuery.result()
   yield put(Actions.set({ hasNextPage: result.data.thread.comments.pageInfo.hasNextPage }))
   yield put({ type: 'global/loading-done' })
 
   /**
+   * @Refetch
+   * global/reload
    * reload thread information if contentId change
    */
   yield takeEvery<{ type: string, payload: string }>(Actions.reload, function*(action) {
     ThreadQueryVariables.filter.contentId = action.payload
-    initFetchQuery(context, ThreadQueryVariables)
+    commentObservableQuery = yield call(initFetchQuery, context, ThreadQueryVariables)
+    result = yield commentObservableQuery.result()
+    yield put(Actions.set({ hasNextPage: result.data.thread.comments.pageInfo.hasNextPage }))
   })
 
   /**
+   * @loadmore event
    * Loadmore from latest cursor
    * and rewrite to loadmoreComment collection
    */
   yield takeEvery<{ type: string }>(Actions.loadMoreReplyList, function*(action) {
     yield put({ type: 'global/loading-start' })
-    const data = context.apolloClient.readQuery<CommentListQueryResult>({ query: ThreadQuery, variables: commentObservableQuery.variables })
+    const data: CommentListQueryResult = yield call([apolloClient, apolloClient.readQuery ], { query: ThreadQuery, variables: commentObservableQuery.variables })
     const lastCursor = getLatestCursorOfConnectionEdges(data.thread.comments)
-    const loadMoreCommentResult: { data: CommentListQueryResult } = yield context.apolloClient.query<CommentListQueryResult>({
+    const loadMoreCommentResult: { data: CommentListQueryResult } = yield call(apolloClient.query, {
       query: ThreadQuery,
       variables: {
         ...ThreadQueryVariables,
@@ -79,7 +87,7 @@ export function* replySaga(context: ApplicationSagaContext) {
       }
     })
 
-    context.apolloClient.writeQuery({
+    yield call([apolloClient, apolloClient.writeQuery ], {
       query: ThreadQuery,
       variables: {
         ...commentObservableQuery.variables,
@@ -101,6 +109,7 @@ export function* replySaga(context: ApplicationSagaContext) {
   })
 
   /**
+   * @Create new commment
    * reply/confirm-create-comment
    * reply comment to thread
    */
@@ -119,7 +128,7 @@ export function* replySaga(context: ApplicationSagaContext) {
     } catch (e) {
       console.error(e)
     }
-    let queryResult = context.apolloClient.readQuery<{ thread: GBThreadType }>({
+    let queryResult: { thread: GBThreadType } = yield call([apolloClient, apolloClient.readQuery], {
       query: ThreadQuery,
       variables
     })
@@ -129,14 +138,14 @@ export function* replySaga(context: ApplicationSagaContext) {
       // check if data is undefined
       // reload data if data is not available
 
-      queryResult = yield context.apolloClient.query({
+      queryResult = yield call(apolloClient.query, {
         query: ThreadQuery,
         variables
       })
 
     }
-    const data = context.apolloClient.readQuery<any>({ query: ThreadQuery, variables: ThreadQueryVariables })
-    context.apolloClient.writeQuery({
+    const data: { thread: ThreadResultType } = yield call([apolloClient, apolloClient.readQuery], { query: ThreadQuery, variables: ThreadQueryVariables })
+    yield call([ apolloClient, apolloClient.writeQuery ], {
       query: ThreadQuery,
       variables: ThreadQueryVariables,
       data: Object.assign({}, data, {
@@ -168,10 +177,10 @@ export function* replySaga(context: ApplicationSagaContext) {
     })
 
     try {
-      const mutationResult = yield context.apolloClient.mutate({
+      const mutationResult = yield call([apolloClient, apolloClient.mutate], {
         variables: {
           record: {
-            threadId: queryResult.thread._id,
+            contentId: queryResult.thread.contentId,
             message: commentInputData.message,
             userId: commentInputData.user._id,
           }
@@ -187,7 +196,7 @@ export function* replySaga(context: ApplicationSagaContext) {
          }
         }
       ` })
-      context.apolloClient.writeQuery({
+      yield call([apolloClient, apolloClient.writeQuery ], {
         query: ThreadQuery,
         variables: ThreadQueryVariables,
         data: Object.assign({}, data, {
@@ -211,7 +220,7 @@ export function* replySaga(context: ApplicationSagaContext) {
                     __typename: 'Comment'
                   }
                 },
-                ...data.thread.comments.edges.filter((node) => node._id !== 'optimistic-comment-id'),
+                ...data.thread.comments.edges.filter((node: any) => node._id !== 'optimistic-comment-id'),
               ]
             }
           }

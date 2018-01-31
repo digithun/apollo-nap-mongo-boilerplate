@@ -14,7 +14,7 @@ export function getModels(context: SVContext) {
 }
 export function createGraphQLSchema(context: SVContext) {
 
-  const graphqlComposeSchema = createSchemaFromCompose(context.__connection)
+  const graphqlComposeSchema = createSchemaFromCompose(context)
 
   const schemas = [simpleSchema, graphqlComposeSchema.schema]
   __models = graphqlComposeSchema.models

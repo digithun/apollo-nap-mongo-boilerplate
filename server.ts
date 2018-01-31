@@ -9,6 +9,7 @@ import clientRoutes from './routes'
 import { createGraphQLSchema } from './graphql'
 import createConnectors, { GQConnectors } from './connectors'
 import config from './config';
+import { jwtSessionMiddleware } from 'jamplay-service-utility'
 const cors = require('cors')
 declare global {
   interface ApplicationLogger {
@@ -44,6 +45,7 @@ export default async function init(context: SVContext) {
   server.use(require('express-ping').ping())
   server.use(bodyParser.json())
   server.use(bearerToken())
+  server.use('/graphql', jwtSessionMiddleware({ secret: context.config.JWT_SECRET }))
   server.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
   server.use('/graphql', graphqlExpress(async (req) => ({
     schema,

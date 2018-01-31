@@ -29,6 +29,8 @@ const verifyAvailableCommentUserIdQuery = gql`
   }
 `
 
+
+
 export type GQUserConnector = {
   resolveUserInfo: (userId: string) => Promise<GBUserType>
   getUserIdFromToken: (token: string) => Promise<string>
