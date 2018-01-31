@@ -19,7 +19,11 @@ describe('reply.resolver', () => {
       config,
       logger: console
     })
-    models = composeSchema(connection).models
+    models = composeSchema({
+      config,
+      logger: console,
+      __connection: connection
+    }).models
     thread = await models.Thread.create({
       appId: 'test',
       contentPrefix: 'prefix',

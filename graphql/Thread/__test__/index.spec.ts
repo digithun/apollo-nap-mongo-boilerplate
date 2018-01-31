@@ -12,7 +12,11 @@ describe('Thread resolver test', () => {
       config,
       logger: console
     })
-    models = composeSchema(connection).models
+    models = composeSchema({
+      config,
+      logger: console,
+      __connection: connection
+    }).models
   })
   afterAll(async () => {
     await connection.close()

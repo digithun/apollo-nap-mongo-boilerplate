@@ -122,7 +122,7 @@ export default class Index extends React.Component<IndexPropTypes, { username: s
           {this.state.user.email}
           <button onClick={() => this.setState({ threadId: 'mock-1' })}>{'mock-1'}</button>
           <button onClick={() => this.setState({ threadId: 'mock-2' })}>{'mock-2'}</button>
-          <button onClick={() => this.setState({ threadId: 'mock-6' })}>{'mock-6'}</button>
+          <button onClick={() => this.setState({ threadId: '5a61e4859ae70d000f7fb6bc' })}>{'mock-6'}</button>
           <Thread
             graphQLEndpoint={'/graphql'}
             url={{
