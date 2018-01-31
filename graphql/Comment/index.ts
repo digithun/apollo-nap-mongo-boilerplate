@@ -29,8 +29,11 @@ export default {
 
     typeComposers.Comment.addRelation('thread', {
       resolver: typeComposers.Thread.getResolver('findById'),
+      projection: { threadId: true },
       prepareArgs: {
-        _id: (source) => source._id
+        _id: (source) => {
+          return source.threadId.toString()
+        }
       }
     })
 

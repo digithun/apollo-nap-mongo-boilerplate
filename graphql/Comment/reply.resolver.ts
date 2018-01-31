@@ -4,10 +4,11 @@ import { TypeComposer, ResolverNextRpCb } from 'graphql-compose'
 declare global {
   type GQReplyArgs = {
     record: {
-      threadId: mongoose.Types.ObjectId
+      threadId?: mongoose.Types.ObjectId
       userId: string
       message: string
       replyToId?: string
+      contentId?: string
     }
   }
 }
@@ -15,7 +16,7 @@ declare global {
 export const guardWrapResolver: ResolverNextRpCb<GQCommentDocument, GQResolverContext> = (next) => {
   return async (rp) => {
     const args: GQReplyArgs = rp.args as any
-    const thread = await rp.context.models.Thread.findById(args.record.threadId)
+    const thread = await rp.context.models.Thread.findOne({contentId: args.record.contentId})
     // if (!rp.context.user) {
     //   throw new Error('unauthorized')
     // }
@@ -37,7 +38,7 @@ export const guardWrapResolver: ResolverNextRpCb<GQCommentDocument, GQResolverCo
         throw new Error('comment wrong thread id')
       }
     }
-
+    rp.args.record.threadId = thread._id
     return next(rp)
   }
 }
@@ -60,8 +61,13 @@ export default function enchanceCreate(typeComposer: TypeComposer) {
     .wrapResolve(guardWrapResolver)
 
   replyResolver.description = 'Reply thread or comment'
-  replyResolver.getArgTC('record').removeOtherFields(['message', 'replyToId', 'threadId', 'userId'])
+  replyResolver.getArgTC('record').removeOtherFields(['message', 'replyToId', 'userId'])
   replyResolver.makeRequired('record')
+  replyResolver.getArgTC('record').addFields({
+    contentId: {
+      type: 'String!'
+    }
+  })
   replyResolver.getArgTC('record').makeRequired(['message', 'threadId', 'userId'])
 
   typeComposer.setResolver('reply', replyResolver)

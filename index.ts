@@ -4,7 +4,6 @@ import initApp from './server'
 import { Connection, Model } from 'mongoose'
 import chalk from 'chalk'
 import * as DBConnection from './lib/db.connection'
-
 const logger = {
   log: (message) => {
     console.log(message)

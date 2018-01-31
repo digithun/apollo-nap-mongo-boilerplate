@@ -19,12 +19,14 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
     private client: ApolloClient<Cache>
     constructor(props) {
       super(props)
+      if (typeof window !== 'undefined') {
+        (window as any).config = props.config
+      }
     }
     public static getInitialProps(ctx) {
-      console.log(ctx.query)
       let config: ApplicationConfig;
       if (typeof window === 'undefined') {
-        config = require('../config')
+        config = require('../config').default
       } else {
         config = (window as any).config
       }
@@ -56,17 +58,6 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
       console.log(`Display comment section for ${this.props.url.query.contentId}`)
       try {
 
-        const cache = new InMemoryCache({
-          dataIdFromObject: (value: any) => value._id
-        }).restore({}) as any
-
-        const link: any = new HttpLink({
-          uri: this.props.graphQLEndpoint || '/graphql',
-          headers: {
-            authorization: `Bearer ${this.props.url.query.sessionToken}`
-          }
-        })
-
         let client;
         let store;
 
@@ -91,6 +82,16 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
         if (typeof window !== 'undefined') {
           const globalWindow: any = window
           if (!(window as any).__CommentServiceApolloClient) {
+            const cache = new InMemoryCache({
+              dataIdFromObject: (value: any) => value._id
+            }).restore({}) as any
+
+            const link: any = new HttpLink({
+              uri: this.props.graphQLEndpoint || '/graphql',
+              headers: {
+                authorization: `Bearer ${this.props.url.query.sessionToken}`
+              }
+            })
             globalWindow.__CommentServiceApolloClient = new ApolloClient({ link, cache });
             globalWindow.__CommentServiceReduxStore = initStore({ apolloClient: globalWindow.__CommentServiceApolloClient, initialState, url: this.props.url })
           }
@@ -99,8 +100,8 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
         } else {
 
           // server-side apollo and store
-          client = new ApolloClient({ link, cache })
-          store = initStore({ initialState, apolloClient: client, url: this.props.url })
+          // client = new ApolloClient({ link, cache })
+          // store = initStore({ initialState, apolloClient: client, url: this.props.url })
         }
         const enhanceElement = React.createElement<any, any, any>(WrappedComponent, {
           ...this.props

@@ -4,11 +4,13 @@ module.exports = {
     cfg.plugins = cfg.plugins.filter(
       (plugin) => (plugin.constructor.name !== 'UglifyJsPlugin')
     )
-    cfg.plugins.push(
-      new Uglify({
-        sourceMap: false
-      })
-    )
+    if (( process as any ).NODE_ENV === 'production') {
+      cfg.plugins.push(
+        new Uglify({
+          sourceMap: false
+        })
+      )
+    }
 
     return cfg;
   }
