@@ -91,7 +91,9 @@ const UICommentComponent = compose<UICommentPropTypes, {}>(
     </TextContainer>
   </CommentContainer>
 )) as UICommentComponent
-UICommentComponent.fragments = {
+
+const enchanceComponent = withDict<UICommentPropTypes, UICommentPropTypes>(UICommentComponent as any) as any
+enchanceComponent.fragments = {
   comment: gql`
     fragment UICommentDataFragment on Comment {
       message
@@ -106,5 +108,4 @@ UICommentComponent.fragments = {
     }
   `
 }
-
-export default withDict(UICommentComponent as any)
+export default enchanceComponent as any
