@@ -6,6 +6,8 @@ import { ThreadQuery, REMOVE_COMMENT_MUTATION, THREAD_FRAGMENT } from './graphql
 import gql from 'graphql-tag'
 import UIThread from './components/UIThread'
 import ApolloClient from 'apollo-client/ApolloClient';
+import { OPTIMISTIC_COMMENT_ID, ALERT_ACTIONS, ERROR_ACTIONS } from './actions';
+import { request } from 'https';
 export const MAX_COMMENT_PER_REQUEST = 3
 interface ThreadResultType extends GBThreadType {
   comments: GQConnectionResult<GBCommentType>
@@ -14,10 +16,14 @@ interface CommentListQueryResult {
   thread: ThreadResultType
 }
 export function getLatestCursorOfConnectionEdges(connection: GQConnectionResult<GBCommentType>): string {
-  if (connection.edges.length <= 0) {
-    return undefined
-  }
-  return connection.edges[connection.edges.length - 1].cursor
+  // remove deprecated method and use pageInfo.endCursor
+  //
+  // if (connection.edges.length <= 0) {
+  //   return undefined
+  // }
+  // return connection.edges[connection.edges.length - 1].cursor
+
+  return connection.pageInfo.endCursor
 }
 async function initFetchQuery(context: ApplicationSagaContext, variables: any): Promise<ObservableQuery<CommentListQueryResult>> {
 
@@ -39,24 +45,61 @@ async function initFetchQuery(context: ApplicationSagaContext, variables: any): 
 
 /**
  * Remove comment saga handler
+ * - will receive thread Id from payload
+ * - mutate and wait for response to confirm delete
  */
 
-function removeComment(context: ApplicationSagaContext) {
-  return function *({ type, payload }) {
+function removeComment(context: ApplicationSagaContext, loadMoreQuery: ObservableQuery<CommentListQueryResult>) {
+  return function*({ type, payload }) {
     try {
+      // ### Optimistic part ###
+      // create variables for first 3 comment query
+
+      function filterCommentFromTheadById(variables: any, commentId: any) {
+        let data: CommentListQueryResult = context.apolloClient.readQuery({
+          query: ThreadQuery,
+          variables
+        })
+        data = Object.assign({}, data, {
+          thread: {
+            ...data.thread,
+            comments: {
+              ...data.thread.comments,
+              edges: data.thread.comments.edges.filter((edge: any) => edge.node._id !== commentId),
+            }
+          }
+        })
+        context.apolloClient.writeQuery({
+          query: ThreadQuery,
+          variables,
+          data
+        })
+      }
+
+      const ThreadQueryVariables = {
+        filter: {
+          contentId: context.url.query.contentId,
+          appId: context.url.query.appId
+        },
+        first: MAX_COMMENT_PER_REQUEST,
+      }
+
+      // get data from first 3 comment and "loadmore" query
+      // and filter out comment in payload
+      yield call(filterCommentFromTheadById, ThreadQueryVariables, payload)
+      yield call(filterCommentFromTheadById, loadMoreQuery.variables, payload)
+
+      // ### End optimistic part ###
+
+      // start mutate at remote server
+
       yield call(context.apolloClient.mutate, {
         mutation: REMOVE_COMMENT_MUTATION,
         variables: {
           id: payload
         }
       })
-
-      const commentList = yield call(context.apolloClient.readFragment, {
-        fragment: THREAD_FRAGMENT,
-        id: payload
-      })
-
-      console.log(commentList)
+      yield put({ type: ALERT_ACTIONS, payload: { message: 'comment-has-been-deleted' } })
 
     } catch (e) {
       console.error(e)
@@ -66,8 +109,6 @@ function removeComment(context: ApplicationSagaContext) {
 }
 
 export function* replySaga(context: ApplicationSagaContext) {
-
-  yield takeEvery(Actions.remove, removeComment(context))
 
   const { apolloClient } = context
   const ThreadQueryVariables = {
@@ -88,6 +129,7 @@ export function* replySaga(context: ApplicationSagaContext) {
   yield put(Actions.set({ hasNextPage: result.data.thread.comments.pageInfo.hasNextPage }))
   yield put({ type: 'global/loading-done' })
 
+  yield takeEvery(Actions.remove, removeComment(context, commentObservableQuery))
   /**
    * @Refetch
    * global/reload
@@ -175,7 +217,6 @@ export function* replySaga(context: ApplicationSagaContext) {
 
     }
     const data: { thread: ThreadResultType } = yield call([apolloClient, apolloClient.readQuery], { query: ThreadQuery, variables: ThreadQueryVariables })
-    console.log(data)
     yield call([apolloClient, apolloClient.writeQuery], {
       query: ThreadQuery,
       variables: ThreadQueryVariables,
@@ -189,7 +230,7 @@ export function* replySaga(context: ApplicationSagaContext) {
                 __typename: 'CommentEdge',
                 cursor: '',
                 node: {
-                  _id: 'optimisitc-comment-id',
+                  _id: OPTIMISTIC_COMMENT_ID,
                   createdAt: new Date(),
                   threadId: queryResult.thread._id,
                   message: commentInputData.message,
@@ -209,6 +250,7 @@ export function* replySaga(context: ApplicationSagaContext) {
     })
 
     try {
+      yield put({ type: Actions.DISABLED_TEXT_INPUT_DIALOG, payload: true })
       const mutationResult = yield call([apolloClient, apolloClient.mutate], {
         variables: {
           record: {
@@ -260,6 +302,7 @@ export function* replySaga(context: ApplicationSagaContext) {
         })
       })
       yield put({ type: 'reply/clear' })
+      yield put({ type: Actions.DISABLED_TEXT_INPUT_DIALOG, payload: false })
     } catch (e) {
       console.error(e)
       alert('ไม่สามารถ Comment ได้ เกิดข้อผิดพลาดบางอย่าง')

@@ -1,5 +1,6 @@
 import * as express from 'express'
 import * as bearerToken from 'express-bearer-token'
+import * as fs from 'fs'
 import * as bodyParser from 'body-parser'
 import chalk from 'chalk'
 import { Connection, Model } from 'mongoose'
@@ -46,6 +47,7 @@ export default async function init(context: SVContext) {
   server.use(bodyParser.json())
   server.use(bearerToken())
   server.use('/graphql', jwtSessionMiddleware({ secret: context.config.JWT_SECRET }))
+
   server.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
   server.use('/graphql', graphqlExpress(async (req) => ({
     schema,
@@ -65,9 +67,46 @@ export default async function init(context: SVContext) {
         server.use(clientRoutesHandler)
         await clientApp.prepare()
       }
-      server.listen(context.config.PORT, () => {
+      server.listen(context.config.PORT, async () => {
         context.logger.log(chalk.bgGreen(`Start application !!`))
         context.logger.log(chalk.green(`Application start on port =>> ${context.config.PORT}`))
+
+        // Create fragment matcher
+        // await fetch(`http://localhost:${context.config.PORT}/graphql`, {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   },
+        //   body: JSON.stringify({
+        //     query: ` {
+        //       __schema {
+        //         types {
+        //           kind
+        //           name
+        //           possibleTypes {
+        //             name
+        //           }
+        //         }
+        //       }
+        //     }
+        //   `,
+        //   }),
+        // })
+        //   .then((result) => result.json())
+        //   .then((result) => {
+        //     // here we're filtering out any type information unrelated to unions or interfaces
+        //     const filteredData = result.data.__schema.types.filter(
+        //       (type) => type.possibleTypes !== null,
+        //     );
+        //     result.data.__schema.types = filteredData;
+        //     fs.writeFile('./static/fragmentTypes.json', JSON.stringify(result.data), (err) => {
+        //       if (err) {
+        //         console.error('Error writing fragmentTypes file', err);
+        //       }
+        //       console.log('Fragment types successfully extracted!');
+        //     });
+        //   });
+
       })
     }
   }

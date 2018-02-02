@@ -1,13 +1,15 @@
 import * as React from 'react'
 import ApolloClient from 'apollo-client'
 import { HttpLink } from 'apollo-link-http'
-import { InMemoryCache } from 'apollo-cache-inmemory'
+import { IntrospectionFragmentMatcher, InMemoryCache } from 'apollo-cache-inmemory'
 import { Provider } from 'react-redux'
 import { ApolloProvider } from 'react-apollo'
 const hoistNonReactStatic = require('hoist-non-react-statics')
 import passthrough from 'react-passthrough'
 import 'isomorphic-fetch'
 import initStore from './store.factory'
+
+const fragmentMacherResult = require('../static/fragmentTypes.json')
 declare global {
   interface ApplicationApolloClient extends ApolloClient<Cache> { }
   interface CommentServiceComponentProps { url: any, graphQLEndpoint?: string, cache?: any }
@@ -85,7 +87,10 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
             let cache
             if (!this.props.cache) {
               cache = new InMemoryCache({
-                dataIdFromObject: (value: any) => value._id
+                dataIdFromObject: (value: any) => value._id,
+                fragmentMatcher: new IntrospectionFragmentMatcher({
+                  introspectionQueryResultData: fragmentMacherResult
+                })
               }).restore({}) as any
             } else {
               cache = this.props.cache

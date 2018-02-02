@@ -1,12 +1,19 @@
 import gql from 'graphql-tag'
 import UIThread from './components/UIThread'
 export const THREAD_FRAGMENT = gql`
-  fragment ThreadData on Thread {
-    commentComment {
+  ${UIThread.fragments.comment}
+  fragment ReadThread on Thread {
+    _id
+    comments: commentConnection {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }
       edges {
+        cursor
         node {
-          userId
           _id
+          ...UICommentDataFragment
         }
       }
     }
@@ -30,6 +37,7 @@ query ($filter: FilterFindOneThreadInput, $after: String, $first: Int) {
       pageInfo {
         hasNextPage
         hasPreviousPage
+        endCursor
       }
       edges {
         cursor

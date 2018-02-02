@@ -3,9 +3,11 @@ import { compose } from 'recompose'
 import * as moment from 'moment'
 import gql from 'graphql-tag'
 import styled from 'styled-components'
+import withDict from '../../../../lib/with-dict'
 import { UIUserImageThumbnailCircle } from '../UIReplyInput/components/UIUserItem.component'
 import { UIText } from '../../../common/Text'
 import { UILabel } from '../../../common/Label'
+import { OPTIMISTIC_COMMENT_ID } from '../../actions';
 const UserNameLabel = styled(UILabel) `
 `
 const CommentCreatedAtLabel = styled(UILabel) `
@@ -57,6 +59,7 @@ interface UICommentPropTypes extends GBCommentType {
   className?: string
   isRemovable?: boolean
   onRemove?: (id: string) => void
+  t?: any
 }
 interface UICommentComponent extends React.ComponentClass<UICommentPropTypes> {
   fragments: {
@@ -73,12 +76,15 @@ const UICommentComponent = compose<UICommentPropTypes, {}>(
         </ProfilePictureContainer>
         <UserNameLabel style={{ fontWeight: 600 }}>
           <div>{props.user.name}</div>
-          <CommentCreatedAtLabel>{moment(props.createdAt).fromNow()}</CommentCreatedAtLabel>
+          <CommentCreatedAtLabel>{props._id !== OPTIMISTIC_COMMENT_ID ?  moment(props.createdAt).fromNow() : '....'}</CommentCreatedAtLabel>
         </UserNameLabel>
       </UserInfoWrap>
-      <UIText onClick={() => props.onRemove(props._id)} className='comment-item__delete-button'>
-        {props.isRemovable ? 'ลบ' : null}
-      </UIText>
+      {
+        props._id !== OPTIMISTIC_COMMENT_ID
+          ? (<UIText onClick={() => props.onRemove(props._id)} className='comment-item__delete-button'>
+            {props.isRemovable ? props.t('delete') : null}
+          </UIText>) : null
+      }
     </CommentHeader>
     <TextContainer>
       <UIText>{props.message}</UIText>
@@ -101,4 +107,4 @@ UICommentComponent.fragments = {
   `
 }
 
-export default UICommentComponent
+export default withDict(UICommentComponent as any)

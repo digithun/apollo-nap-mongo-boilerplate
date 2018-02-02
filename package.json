@@ -38,7 +38,7 @@
     "@types/storybook__react": "^3.0.5",
     "@types/zen-observable": "^0.5.3",
     "apollo-cache-inmemory": "^0.2.0-beta.4",
-    "apollo-client": "^2.0.0-beta.8",
+    "apollo-client": "^2.2.1",
     "apollo-link": "^0.8.0",
     "apollo-link-http": "^0.8.0",
     "apollo-server-express": "^1.1.3",

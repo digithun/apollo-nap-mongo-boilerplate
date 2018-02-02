@@ -1,3 +1,4 @@
+import { DISABLED_TEXT_INPUT_DIALOG } from './actions';
 
 declare global {
   interface GBThreadState {
@@ -11,6 +12,7 @@ declare global {
 
 export const threadReducer = (state, action) => {
   switch (action.type) {
+ 
     case 'thread/set': {
       return {
         ...state,

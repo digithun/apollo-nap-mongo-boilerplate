@@ -30,6 +30,7 @@ const ConfirmButton = styled(PrimaryButton) `
 type enchanceProps = {
   t?: UIi18nTranslator
   currentSelectedUserIndex: number
+  isTextInputDisabled?: boolean
   loading?: boolean
   setCurrentSelectedUserIndex: (value: number) => void
 }
@@ -41,8 +42,18 @@ class UICommentInput extends React.Component<UICommentInputPropTypes & enchanceP
     return (
       <CommentInputContainer>
         {props.userList.length > 0 ? <UIUserSelector onChange={this.onUserChange} users={props.userList} value={props.currentSelectedUserIndex} /> : null}
-        <InputTextMultiline style={{ height: 60 }} onChange={this.onInputTextChange} value={props.value.message} placeholder={props.t('comment-input-placeholder')} />
-        <ConfirmButton disabled={this.props.loading || this.props.value.message.length < 1} text={props.t('confirm')} onClick={props.onConfirm} />
+        <InputTextMultiline
+          disabled={props.isTextInputDisabled}
+          style={{ height: 60 }}
+          onChange={this.onInputTextChange}
+          value={props.value.message}
+          placeholder={props.t('comment-input-placeholder')}
+        />
+        <ConfirmButton
+          disabled={this.props.isTextInputDisabled || this.props.value.message.length < 1}
+          text={props.t(this.props.isTextInputDisabled ? 'posting' : 'confirm')}
+          onClick={props.onConfirm}
+        />
       </CommentInputContainer>
     )
   }
@@ -58,7 +69,7 @@ class UICommentInput extends React.Component<UICommentInputPropTypes & enchanceP
   }
 }
 // @ts-ignore
-( UICommentInput as any ).displayName = 'CommentInputDialog'
+(UICommentInput as any).displayName = 'CommentInputDialog'
 interface UICommentInputComponent extends React.ComponentClass<UICommentInputPropTypes> {
   fragments: {
 
@@ -68,6 +79,7 @@ export default compose<UICommentInputPropTypes & enchanceProps, UICommentInputPr
   withDict,
   connect((state: ApplicationState) => ({
     loading: state.global.loading,
-    currentSelectedUserIndex: state.reply.currentSelectedUserIndex
+    currentSelectedUserIndex: state.reply.currentSelectedUserIndex,
+    isTextInputDisabled: state.reply.isTextInputDisabled
   }))
 )(UICommentInput) as UICommentInputComponent

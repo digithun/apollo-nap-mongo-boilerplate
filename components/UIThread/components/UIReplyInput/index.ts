@@ -4,9 +4,11 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import gql from 'graphql-tag'
 import { compose, withProps, withState } from 'recompose'
+import { DISABLED_TEXT_INPUT_DIALOG } from '../../actions';
 
 declare global {
   interface ReplyState extends GBCommentType {
+    isTextInputDisabled?: boolean
     currentSelectedUserIndex?: number
   }
   interface ApplicationState {
@@ -24,6 +26,12 @@ export const replyReducer = (state: ReplyState, action) => {
       return {
         ...state,
         currentSelectedUserIndex: action.payload
+      }
+    }
+    case DISABLED_TEXT_INPUT_DIALOG: {
+      return {
+        ...state,
+        isTextInputDisabled: action.payload
       }
     }
     case 'reply/clear': {
