@@ -10,7 +10,7 @@ import 'isomorphic-fetch'
 import initStore from './store.factory'
 declare global {
   interface ApplicationApolloClient extends ApolloClient<Cache> { }
-  interface CommentServiceComponentProps { url: any, graphQLEndpoint?: string }
+  interface CommentServiceComponentProps { url: any, graphQLEndpoint?: string, cache?: any }
 }
 
 export default function withReduxApollo(WrappedComponent: React.ComponentClass) {
@@ -82,9 +82,14 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
         if (typeof window !== 'undefined') {
           const globalWindow: any = window
           if (!(window as any).__CommentServiceApolloClient) {
-            const cache = new InMemoryCache({
-              dataIdFromObject: (value: any) => value._id
-            }).restore({}) as any
+            let cache
+            if (!this.props.cache) {
+              cache = new InMemoryCache({
+                dataIdFromObject: (value: any) => value._id
+              }).restore({}) as any
+            } else {
+              cache = this.props.cache
+            }
 
             const link: any = new HttpLink({
               uri: this.props.graphQLEndpoint || '/graphql',

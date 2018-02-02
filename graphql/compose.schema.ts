@@ -75,6 +75,7 @@ export default function createSchema({ __connection, config }: SVContext) {
   GQC.rootMutation().addFields({
     createThread: typeComposers.Thread.getResolver('createOne'),
     updateCommentById: typeComposers.Comment.getResolver('updateById'),
+    remove: typeComposers.Comment.getResolver('remove'),
     ...wrapResolvers<any, { user: any }>({
       reply: typeComposers.Comment.getResolver('reply')
     }, (next) => async (rp) => {

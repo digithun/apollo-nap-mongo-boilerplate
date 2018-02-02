@@ -3,6 +3,7 @@ import gql from 'graphql-tag'
 import Reply from './UIReplyInput'
 import Layout from '../../Layout'
 import * as Button from '../../common/Button'
+import * as Actions from '../actions'
 import * as Label from '../../common/Label'
 import UIComment from './UIComment'
 interface ThreadPropTypes {
@@ -13,6 +14,7 @@ interface ThreadPropTypes {
   loadMoreComments: GBCommentType[]
   loadMoreCursor: string
   requestLoadMoreComments: () => void
+  dispatch?: (action: any) => void
 
   loading: boolean
   hasNextPage: boolean
@@ -38,8 +40,16 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
   constructor(props) {
     super(props)
   }
+  public findUserListById(_id) {
+    for (const user of this.props.userList) {
+      console.log(user._id, _id)
+      if (user._id === _id) {
+        return user
+      }
+    }
+  }
   public render() {
-    console.log('this.props.hasNextPage==>',this.props.hasNextPage)
+    console.log('this.props.hasNextPage==>', this.props.hasNextPage)
     const Loadmore = this.props.hasNextPage
       ? (
         <Button.PrimaryButton onClick={this.props.requestLoadMoreComments} disabled={this.props.loading} >
@@ -58,10 +68,10 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
           <Reply userList={this.props.userList} />
           <div style={{ marginTop: 20,  }}>
             {this.props.comments.map((comment) => {
-              return (<UIComment key={comment._id} {...comment} />)
+              return (<UIComment onRemove={(id) => this.props.dispatch(Actions.remove(id))} key={comment._id} isRemovable={!!this.findUserListById(comment.userId)} {...comment} />)
             })}
             {this.props.loadMoreComments.map((comment) => {
-              return (<UIComment className='loadmore' key={comment._id} {...comment} />)
+              return (<UIComment onRemove={(id) => this.props.dispatch(Actions.remove(id))} className='loadmore' isRemovable={!!this.findUserListById(comment.userId)} key={comment._id} {...comment} />)
             })}
           </div>
           <div style={{ color: '#bcbcbc', textAlign: 'center' }}>

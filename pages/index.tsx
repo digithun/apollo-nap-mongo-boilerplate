@@ -39,7 +39,7 @@ export default class Index extends React.Component<IndexPropTypes, { username: s
       password: '',
       token: undefined,
       user: undefined,
-      threadId: 'mock-2'
+      threadId: '5a718979c0163b000f32d710'
     }
     this.onChange = this.onChange.bind(this)
     this.login = this.login.bind(this)
@@ -121,7 +121,7 @@ export default class Index extends React.Component<IndexPropTypes, { username: s
         <div>
           {this.state.user.email}
           <button onClick={() => this.setState({ threadId: 'mock-1' })}>{'mock-1'}</button>
-          <button onClick={() => this.setState({ threadId: 'mock-2' })}>{'mock-2'}</button>
+          <button onClick={() => this.setState({ threadId: '5a718979c0163b000f32d710' })}>{'mock-2'}</button>
           <button onClick={() => this.setState({ threadId: '5a61e4859ae70d000f7fb6bc' })}>{'mock-6'}</button>
           <Thread
             graphQLEndpoint={'/graphql'}

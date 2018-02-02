@@ -2,7 +2,7 @@
 import { takeEvery, select, put, call } from 'redux-saga/effects'
 import { ObservableQuery } from 'apollo-client'
 import * as Actions from './actions'
-import { ThreadQuery } from './graphql'
+import { ThreadQuery, REMOVE_COMMENT_MUTATION, THREAD_FRAGMENT } from './graphql'
 import gql from 'graphql-tag'
 import UIThread from './components/UIThread'
 import ApolloClient from 'apollo-client/ApolloClient';
@@ -37,7 +37,37 @@ async function initFetchQuery(context: ApplicationSagaContext, variables: any): 
   return loadMoreCommentQuery
 }
 
+/**
+ * Remove comment saga handler
+ */
+
+function removeComment(context: ApplicationSagaContext) {
+  return function *({ type, payload }) {
+    try {
+      yield call(context.apolloClient.mutate, {
+        mutation: REMOVE_COMMENT_MUTATION,
+        variables: {
+          id: payload
+        }
+      })
+
+      const commentList = yield call(context.apolloClient.readFragment, {
+        fragment: THREAD_FRAGMENT,
+        id: payload
+      })
+
+      console.log(commentList)
+
+    } catch (e) {
+      console.error(e)
+    }
+
+  }
+}
+
 export function* replySaga(context: ApplicationSagaContext) {
+
+  yield takeEvery(Actions.remove, removeComment(context))
 
   const { apolloClient } = context
   const ThreadQueryVariables = {
@@ -77,7 +107,7 @@ export function* replySaga(context: ApplicationSagaContext) {
    */
   yield takeEvery<{ type: string }>(Actions.loadMoreReplyList, function*(action) {
     yield put({ type: 'global/loading-start' })
-    const data: CommentListQueryResult = yield call([apolloClient, apolloClient.readQuery ], { query: ThreadQuery, variables: commentObservableQuery.variables })
+    const data: CommentListQueryResult = yield call([apolloClient, apolloClient.readQuery], { query: ThreadQuery, variables: commentObservableQuery.variables })
     const lastCursor = getLatestCursorOfConnectionEdges(data.thread.comments)
     const loadMoreCommentResult: { data: CommentListQueryResult } = yield call(apolloClient.query, {
       query: ThreadQuery,
@@ -87,7 +117,7 @@ export function* replySaga(context: ApplicationSagaContext) {
       }
     })
 
-    yield call([apolloClient, apolloClient.writeQuery ], {
+    yield call([apolloClient, apolloClient.writeQuery], {
       query: ThreadQuery,
       variables: {
         ...commentObservableQuery.variables,
@@ -145,7 +175,8 @@ export function* replySaga(context: ApplicationSagaContext) {
 
     }
     const data: { thread: ThreadResultType } = yield call([apolloClient, apolloClient.readQuery], { query: ThreadQuery, variables: ThreadQueryVariables })
-    yield call([ apolloClient, apolloClient.writeQuery ], {
+    console.log(data)
+    yield call([apolloClient, apolloClient.writeQuery], {
       query: ThreadQuery,
       variables: ThreadQueryVariables,
       data: Object.assign({}, data, {
@@ -162,6 +193,7 @@ export function* replySaga(context: ApplicationSagaContext) {
                   createdAt: new Date(),
                   threadId: queryResult.thread._id,
                   message: commentInputData.message,
+                  userId: commentInputData.user._id,
                   user: {
                     ...commentInputData.user,
                     __typename: 'User'
@@ -196,7 +228,7 @@ export function* replySaga(context: ApplicationSagaContext) {
          }
         }
       ` })
-      yield call([apolloClient, apolloClient.writeQuery ], {
+      yield call([apolloClient, apolloClient.writeQuery], {
         query: ThreadQuery,
         variables: ThreadQueryVariables,
         data: Object.assign({}, data, {
@@ -213,6 +245,7 @@ export function* replySaga(context: ApplicationSagaContext) {
                     createdAt: new Date(),
                     threadId: queryResult.thread._id,
                     message: commentInputData.message,
+                    userId: commentInputData.user._id,
                     user: {
                       ...commentInputData.user,
                       __typename: 'User'

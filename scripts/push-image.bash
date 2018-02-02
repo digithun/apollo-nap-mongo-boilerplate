@@ -12,7 +12,7 @@ PACKAGE_NAME=$(cat package.json \
 | sed 's/[",]//g' \
 | tr -d '[[:space:]]')
 
-echo 'Start push image to project id: ' $(gcloud config get-value project), tag: $PACKAGE_VERSION, image: $PACKAGE_NAME
-gcloud docker -- push gcr.io/$(gcloud config get-value project)/$PACKAGE_NAME:$PACKAGE_VERSION
+# echo 'Start push image to project id: ' $(gcloud config get-value project), tag: $PACKAGE_VERSION, image: $PACKAGE_NAME
+# gcloud docker -- push gcr.io/$(gcloud config get-value project)/$PACKAGE_NAME:$PACKAGE_VERSION
 echo 'Start push image to project id: ' $(gcloud config get-value project), tag: latest, image: $PACKAGE_NAME
 gcloud docker -- push gcr.io/$(gcloud config get-value project)/$PACKAGE_NAME:latest

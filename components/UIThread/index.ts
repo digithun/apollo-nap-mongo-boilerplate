@@ -25,8 +25,10 @@ export default compose(
     hasNextPage: state.thread.hasNextPage,
     loading: state.global.loading
   }), (dispatch) => ({
-    requestLoadMoreComments: () => dispatch(Actions.loadMoreReplyList())
+    requestLoadMoreComments: () => dispatch(Actions.loadMoreReplyList()),
+    dispatch,
   })),
+
   graphql<any, { url: any }>(ThreadQuery, {
     props: ({ data }) => {
       if (data.loading || !data.thread) {

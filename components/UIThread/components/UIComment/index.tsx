@@ -8,7 +8,7 @@ import { UIText } from '../../../common/Text'
 import { UILabel } from '../../../common/Label'
 const UserNameLabel = styled(UILabel) `
 `
-const CommentCreatedAtLabel = styled(UILabel)`
+const CommentCreatedAtLabel = styled(UILabel) `
   font-style: italic;
   color: ${(props: { theme?: UITheme }) => props.theme.darkGrey};
   font-size: 0.8rem;
@@ -19,6 +19,13 @@ const CommentContainer = styled.div`
   min-height: 90px;
   &:nth-last-child(1){
     border-bottom: none;
+  }
+
+  .comment-item__delete-button {
+    font-size: 0.8em;
+    color: ${(props: any) => props.theme.darkGrey};
+    margin-right: 8px;
+    cursor: pointer;
   }
 `
 const UserInfoWrap = styled.div`
@@ -42,11 +49,14 @@ const CommentHeader = styled.div`
 `
 const TextContainer = styled.div`
   padding: 0 56px ;
+  margin-top: 8px;
 `
 const ProfilePicture = styled(UIUserImageThumbnailCircle) `
 `
 interface UICommentPropTypes extends GBCommentType {
   className?: string
+  isRemovable?: boolean
+  onRemove?: (id: string) => void
 }
 interface UICommentComponent extends React.ComponentClass<UICommentPropTypes> {
   fragments: {
@@ -61,9 +71,14 @@ const UICommentComponent = compose<UICommentPropTypes, {}>(
         <ProfilePictureContainer>
           <ProfilePicture src={props.user.profilePicture} />
         </ProfilePictureContainer>
-        <UserNameLabel style={{ fontWeight: 600 }}>{props.user.name}</UserNameLabel>
+        <UserNameLabel style={{ fontWeight: 600 }}>
+          <div>{props.user.name}</div>
+          <CommentCreatedAtLabel>{moment(props.createdAt).fromNow()}</CommentCreatedAtLabel>
+        </UserNameLabel>
       </UserInfoWrap>
-      <CommentCreatedAtLabel>{moment(props.createdAt).fromNow()}</CommentCreatedAtLabel>
+      <UIText onClick={() => props.onRemove(props._id)} className='comment-item__delete-button'>
+        {props.isRemovable ? 'ลบ' : null}
+      </UIText>
     </CommentHeader>
     <TextContainer>
       <UIText>{props.message}</UIText>
@@ -76,6 +91,7 @@ UICommentComponent.fragments = {
       message
       _id
       createdAt
+      userId
       user {
         name
         _id

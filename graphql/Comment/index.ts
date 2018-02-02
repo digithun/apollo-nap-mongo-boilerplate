@@ -3,6 +3,7 @@ import { TypeComposer } from 'graphql-compose'
 import composeWithMongoose from 'graphql-compose-mongoose'
 import schema from './comment.schema'
 import addReplyResolver from './reply.resolver'
+import addRemoveResolver from './remove.resolver'
 import addConnectionResolver from './connection.resolver'
 
 export default {
@@ -10,6 +11,7 @@ export default {
   createTypeComposer: (CommentModel): TypeComposer => {
     const typeComposer = composeWithMongoose(CommentModel) as TypeComposer
     addReplyResolver(typeComposer)
+    addRemoveResolver(typeComposer)
     addConnectionResolver(typeComposer)
     return typeComposer
   },
