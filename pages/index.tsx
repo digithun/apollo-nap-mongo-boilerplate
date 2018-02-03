@@ -1,13 +1,13 @@
 import Thread from '../components/UIThread'
 import * as localStorage from 'localforage'
 import * as React from 'react'
-import gql from 'graphql-tag';
-import { ApolloClient } from 'apollo-client';
-import { HttpLink } from 'apollo-link-http';
-import { InMemoryCache } from 'apollo-cache-inmemory/lib/inMemoryCache';
+import gql from 'graphql-tag'
+import { ApolloClient } from 'apollo-client'
+import { HttpLink } from 'apollo-link-http'
+import { InMemoryCache } from 'apollo-cache-inmemory/lib/inMemoryCache'
 import { ApolloLink } from 'apollo-link'
 
-const SIGN_IN_WITH_EMAIL_MUTATION = gql`
+const SIGN_IN_WITH_EMAIL_MUTATION = `
   mutation signin($username: String!, $password: String!) {
     login(email: $username, password: $password) {
       isLoggedIn
@@ -29,9 +29,18 @@ interface IndexPropTypes {
   config: ApplicationConfig
   url: any
 }
-export default class Index extends React.Component<IndexPropTypes, { username: string, password: string, token: any, user: any, threadId: string }> {
+export default class Index extends React.Component<
+  IndexPropTypes,
+  {
+    username: string
+    password: string
+    token: any
+    user: any
+    threadId: string
+  }
+> {
   public static getInitialProps = (Thread as any).getInitialProps
-  private nap: ApolloClient<any>
+  // private nap: ApolloClient<any>
   constructor(props: IndexPropTypes) {
     super(props)
     this.state = {
@@ -44,21 +53,21 @@ export default class Index extends React.Component<IndexPropTypes, { username: s
     this.onChange = this.onChange.bind(this)
     this.login = this.login.bind(this)
 
-    const httpLink = new HttpLink({
-      uri: this.props.config.NAP_URI
-    })
-    const middlewareLink = new ApolloLink((operation, forward) => {
-      operation.setContext({
-        headers: {
-          authorization: 'Bearer ' + this.state.token || null
-        }
-      });
-      return forward(operation);
-    });
-    this.nap = new ApolloClient(({
-      link: middlewareLink.concat(httpLink),
-      cache: new InMemoryCache({})
-    }) as any)
+    // const httpLink = new HttpLink({
+    //   uri: this.props.config.NAP_URI
+    // })
+    // const middlewareLink = new ApolloLink((operation, forward) => {
+    //   operation.setContext({
+    //     headers: {
+    //       authorization: 'Bearer ' + this.state.token || null
+    //     }
+    //   });
+    //   return forward(operation);
+    // });
+    // this.nap = new ApolloClient(({
+    //   link: middlewareLink.concat(httpLink),
+    //   cache: new InMemoryCache({})
+    // }) as any)
   }
   public onChange(key: any) {
     return (e: React.ChangeEvent<any>) => {
@@ -71,38 +80,53 @@ export default class Index extends React.Component<IndexPropTypes, { username: s
     const token = await localStorage.getItem('token')
     if (token) {
       this.setState({ token })
-      const me = await this.nap.query<{ user: any }>({
-        query: gql`
-          query {
-            user {
-              email
-              name
-              _id
-              authors {
-                id
-                _id
+      const response = await fetch(this.props.config.NAP_URI, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'authorization': 'Bearer ' + this.state.token || null
+        },
+        body: JSON.stringify({
+          query: `
+            query {
+              user {
+                email
                 name
+                _id
+                authors {
+                  id
+                  _id
+                  name
+                  profilePicture
+                }
                 profilePicture
               }
-              profilePicture
             }
-          }
         `
+        })
       })
+      const result = await response.json()
       this.setState({
-        user: me.data.user
+        user: result.data.user
       })
     }
   }
   public async login() {
-
-    const result = await this.nap.mutate({
-      mutation: SIGN_IN_WITH_EMAIL_MUTATION,
+    const payload = {
+      query: SIGN_IN_WITH_EMAIL_MUTATION,
       variables: {
         username: this.state.username,
-        password: this.state.password,
+        password: this.state.password
       }
+    }
+    const response = await fetch(this.props.config.NAP_URI, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
     })
+    const result = await response.json()
     console.log(result.data.login.sessionToken)
     try {
       await localStorage.setItem('token', result.data.login.sessionToken)
@@ -113,16 +137,38 @@ export default class Index extends React.Component<IndexPropTypes, { username: s
   public render() {
     if (this.state.user) {
       const userListForComment = [
-        { name: this.state.user.name, _id: `user.${this.state.user._id}`, profilePicture: this.state.user.profilePicture },
-        ...this.state.user.authors.map((author) => ({ ...author, _id: `author.${author.id}` }))
+        {
+          name: this.state.user.name,
+          _id: `user.${this.state.user._id}`,
+          profilePicture: this.state.user.profilePicture
+        },
+        ...this.state.user.authors.map((author) => ({
+          ...author,
+          _id: `author.${author.id}`
+        }))
       ]
-      const encodeUserList = (JSON.stringify(userListForComment))
+      const encodeUserList = JSON.stringify(userListForComment)
       return (
         <div>
           {this.state.user.email}
-          <button onClick={() => this.setState({ threadId: 'mock-1' })}>{'mock-1'}</button>
-          <button onClick={() => this.setState({ threadId: '5a718979c0163b000f32d710' })}>{'mock-2'}</button>
-          <button onClick={() => this.setState({ threadId: '5a61e4859ae70d000f7fb6bc' })}>{'mock-6'}</button>
+          <button onClick={() => this.setState({ threadId: 'mock-1' })}>
+            {'mock-1'}
+          </button>
+          <button
+            onClick={() =>
+              this.setState({ threadId: '5a718979c0163b000f32d710' })
+            }
+          >
+            {'mock-2'}
+          </button>
+          <button
+            onClick={() =>
+              this.setState({ threadId: '5a61e4859ae70d000f7fb6bc' })
+            }
+          >
+            {'mock-6'}
+          </button>
+          {this.state.threadId}
           <Thread
             graphQLEndpoint={'/graphql'}
             url={{

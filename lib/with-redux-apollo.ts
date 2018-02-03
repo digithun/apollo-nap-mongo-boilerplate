@@ -1,7 +1,10 @@
 import * as React from 'react'
 import ApolloClient from 'apollo-client'
 import { HttpLink } from 'apollo-link-http'
-import { IntrospectionFragmentMatcher, InMemoryCache } from 'apollo-cache-inmemory'
+import {
+  IntrospectionFragmentMatcher,
+  InMemoryCache
+} from 'apollo-cache-inmemory'
 import { Provider } from 'react-redux'
 import { ApolloProvider } from 'react-apollo'
 const hoistNonReactStatic = require('hoist-non-react-statics')
@@ -11,13 +14,29 @@ import initStore from './store.factory'
 
 const fragmentMacherResult = require('../static/fragmentTypes.json')
 declare global {
-  interface ApplicationApolloClient extends ApolloClient<Cache> { }
-  interface CommentServiceComponentProps { url: any, graphQLEndpoint?: string, cache?: any }
+  interface ApplicationApolloClient extends ApolloClient<Cache> {}
+  type CommentServiceURLPropTypes = {
+      query: {
+        contentId: any
+        users: any
+        sessionToken: any
+        appId: any
+      }
+  }
+  interface CommentServiceComponentProps {
+    url: CommentServiceURLPropTypes
+    graphQLEndpoint?: string
+    cache?: any
+  }
 }
 
-export default function withReduxApollo(WrappedComponent: React.ComponentClass) {
-
-  class ConnectWithReduxAndApollo extends React.Component<CommentServiceComponentProps, {}> {
+export default function withReduxApollo(
+  WrappedComponent: React.ComponentClass
+) {
+  class ConnectWithReduxAndApollo extends React.Component<
+    CommentServiceComponentProps,
+    {}
+  > {
     private client: ApolloClient<Cache>
     constructor(props) {
       super(props)
@@ -26,14 +45,16 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
       }
     }
     public static getInitialProps(ctx) {
-      let config: ApplicationConfig;
+      let config: ApplicationConfig
       if (typeof window === 'undefined') {
         config = require('../config').default
       } else {
         config = (window as any).config
       }
       if ((WrappedComponent as any).getInitialProps) {
-        const WrappedComponentInitialProps = (WrappedComponent as any).getInitialProps(ctx)
+        const WrappedComponentInitialProps = (WrappedComponent as any).getInitialProps(
+          ctx
+        )
         return {
           config,
           ...WrappedComponentInitialProps
@@ -47,21 +68,26 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
     public componentWillReceiveProps(nextProps) {
       const globalWindow: any = window
       if (globalWindow.__CommentServiceReduxStore) {
-        globalWindow.__CommentServiceReduxStore.dispatch({ type: 'global/reload', payload: nextProps.url.query.contentId });
+        globalWindow.__CommentServiceReduxStore.dispatch({
+          type: 'global/reload',
+          payload: {
+            query: nextProps.url.query
+          }
+        })
       }
     }
 
     public render() {
-
       // this render is on the top of any page
       // it should render only once per reload
       // you can keep tracking this render method
       // by console.log to maintain performance
-      console.log(`Display comment section for ${this.props.url.query.contentId}`)
+      console.log(
+        `Display comment section for ${this.props.url.query.contentId}`
+      )
       try {
-
-        let client;
-        let store;
+        let client
+        let store
 
         const userList = JSON.parse(this.props.url.query.users)
         const initialState = {
@@ -102,27 +128,43 @@ export default function withReduxApollo(WrappedComponent: React.ComponentClass) 
                 authorization: `Bearer ${this.props.url.query.sessionToken}`
               }
             })
-            globalWindow.__CommentServiceApolloClient = new ApolloClient({ link, cache });
-            globalWindow.__CommentServiceReduxStore = initStore({ apolloClient: globalWindow.__CommentServiceApolloClient, initialState, url: this.props.url })
+            globalWindow.__CommentServiceApolloClient = new ApolloClient({
+              link,
+              cache
+            })
+            globalWindow.__CommentServiceReduxStore = initStore({
+              apolloClient: globalWindow.__CommentServiceApolloClient,
+              initialState,
+              url: this.props.url
+            })
           }
           client = (window as any).__CommentServiceApolloClient
           store = (window as any).__CommentServiceReduxStore
         } else {
-
           // server-side apollo and store
           // client = new ApolloClient({ link, cache })
           // store = initStore({ initialState, apolloClient: client, url: this.props.url })
         }
-        const enhanceElement = React.createElement<any, any, any>(WrappedComponent, {
-          ...this.props
-        })
-        const storeElement = React.createElement(Provider, {
-          store
-        }, enhanceElement)
-        return React.createElement(ApolloProvider, {
-          client,
-        }, storeElement)
-
+        const enhanceElement = React.createElement<any, any, any>(
+          WrappedComponent,
+          {
+            ...this.props
+          }
+        )
+        const storeElement = React.createElement(
+          Provider,
+          {
+            store
+          },
+          enhanceElement
+        )
+        return React.createElement(
+          ApolloProvider,
+          {
+            client
+          },
+          storeElement
+        )
       } catch (e) {
         console.log(e)
         return React.createElement('div')
