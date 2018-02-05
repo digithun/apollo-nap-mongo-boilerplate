@@ -10,7 +10,8 @@ import UIUserSelector from './UIUserSelector.component'
 import withDict from '../../../../../lib/with-dict'
 
 interface UICommentInputPropTypes {
-
+  disabled?: boolean
+  disabledPlaceholder?: string
   userList: GBUserType[]
   onChange: (value: GBCommentType) => void
   onConfirm: () => void
@@ -43,14 +44,14 @@ class UICommentInput extends React.Component<UICommentInputPropTypes & enchanceP
       <CommentInputContainer>
         {props.userList.length > 0 ? <UIUserSelector onChange={this.onUserChange} users={props.userList} value={props.currentSelectedUserIndex} /> : null}
         <InputTextMultiline
-          disabled={props.isTextInputDisabled}
+          disabled={props.isTextInputDisabled || props.disabled}
           style={{ height: 60 }}
           onChange={this.onInputTextChange}
           value={props.value.message}
-          placeholder={props.t('comment-input-placeholder')}
+          placeholder={props.disabled ? props.disabledPlaceholder : props.t('comment-input-placeholder')}
         />
         <ConfirmButton
-          disabled={this.props.isTextInputDisabled || this.props.value.message.length < 1}
+          disabled={this.props.isTextInputDisabled || this.props.value.message.length < 1 || props.disabled}
           text={props.t(this.props.isTextInputDisabled ? 'posting' : 'confirm')}
           onClick={props.onConfirm}
         />
