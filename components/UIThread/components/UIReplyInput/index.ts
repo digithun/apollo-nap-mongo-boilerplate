@@ -69,4 +69,6 @@ export default compose(
   }),
 )(CommentInput) as React.ComponentClass<{
   userList: GBUserType[]
+  disabled?: Boolean
+  disabledPlaceholder?: String
 }>

@@ -7,6 +7,8 @@ import * as Actions from '../actions'
 import * as Label from '../../common/Label'
 import UIComment from './UIComment'
 interface ThreadPropTypes {
+  replyDisabled?: boolean
+  replyDisabledPlaceholder?: string
   url: any
   userList: GBUserType[]
   threadId: string
@@ -65,7 +67,7 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
     return (
       <Layout>
         <div style={{minHeight: 300}} className={this.props.threadId}>
-          <Reply userList={this.props.userList} />
+          <Reply disabled={this.props.replyDisabled === true} disabledPlaceholder={this.props.replyDisabledPlaceholder} userList={this.props.userList} />
           <div style={{ marginTop: 20,  }}>
             {this.props.comments.map((comment) => {
               return (<UIComment onRemove={(id) => this.props.dispatch(Actions.remove(id))} key={comment._id} isRemovable={!!this.findUserListById(comment.userId)} {...comment} />)
