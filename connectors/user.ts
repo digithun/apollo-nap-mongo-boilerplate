@@ -9,6 +9,7 @@ type Config = { logger: ApplicationLogger, endpoint: string, userModel: mongoose
 
 const UserInfoResolver = gql`
   query UserInfoResolver($userId: String!){
+    # return GQUserDocument
     resolveUserInfo(_id: $userId) {
       _id
       name
@@ -19,17 +20,17 @@ const UserInfoResolver = gql`
 
 const getUserIdFromTokenQuery = gql`
   query getUserIdFromToken($token: String!){
+    # return string
     getUserIdFromToken(token: $token)
   }
 `
 
 const verifyAvailableCommentUserIdQuery = gql`
   query verifyAvailableCommentUserId($token: String!, $userId: String!){
+    # return boolean
     verifyAvailableCommentUserId(token: $token, userId: $userId)
   }
 `
-
-
 
 export type GQUserConnector = {
   resolveUserInfo: (userId: string) => Promise<GBUserType>
