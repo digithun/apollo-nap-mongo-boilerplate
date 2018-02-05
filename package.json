@@ -1,6 +1,6 @@
 {
   "name": "jamplay-comment",
-  "version": "0.0.3-patch.2",
+  "version": "0.0.3-patch.3",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
