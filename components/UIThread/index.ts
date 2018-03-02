@@ -80,6 +80,7 @@ export default compose(
       }
     },
     options: (props) => {
+      
       const options = ({
         fetchPolicy: 'cache-only',
         variables: {
