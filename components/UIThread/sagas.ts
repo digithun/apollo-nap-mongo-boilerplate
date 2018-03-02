@@ -26,10 +26,10 @@ export function getLatestCursorOfConnectionEdges(
 ): string {
   // remove deprecated method and use pageInfo.endCursor
   //
-  // if (connection.edges.length <= 0) {
-  //   return undefined
-  // }
-  // return connection.edges[connection.edges.length - 1].cursor
+  //if (connection.edges.length <= 0) {
+  // return undefined
+  //}
+  //return connection.edges[connection.edges.length - 1].cursor
 
   return connection.pageInfo.endCursor
 }
@@ -94,6 +94,7 @@ function removeComment(context: ApplicationSagaContext) {
             }
           }
         })
+
         context.apolloClient.writeQuery({
           query: ThreadQuery,
           variables,
@@ -215,6 +216,7 @@ export function* replySaga(context: ApplicationSagaContext) {
       { query: ThreadQuery, variables: commentObservableQuery.variables }
     )
     const lastCursor = getLatestCursorOfConnectionEdges(data.thread.comments)
+   
     const loadMoreCommentResult: { data: CommentListQueryResult } = yield call(
       apolloClient.query,
       {
@@ -239,7 +241,11 @@ export function* replySaga(context: ApplicationSagaContext) {
             edges: [
               ...data.thread.comments.edges,
               ...loadMoreCommentResult.data.thread.comments.edges
-            ]
+            ],
+            pageInfo: {
+              ...loadMoreCommentResult.data.thread.comments.pageInfo
+            }
+        
           }
         }
       })
