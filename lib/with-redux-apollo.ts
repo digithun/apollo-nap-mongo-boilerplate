@@ -14,14 +14,14 @@ import initStore from './store.factory'
 
 const fragmentMacherResult = require('../static/fragmentTypes.json')
 declare global {
-  interface ApplicationApolloClient extends ApolloClient<Cache> {}
+  interface ApplicationApolloClient extends ApolloClient<Cache> { }
   type CommentServiceURLPropTypes = {
-      query: {
-        contentId: any
-        users: any
-        sessionToken: any
-        appId: any
-      }
+    query: {
+      contentId: any
+      users: any
+      sessionToken: any
+      appId: any
+    }
   }
   interface CommentServiceComponentProps {
     url: CommentServiceURLPropTypes
@@ -36,7 +36,7 @@ export default function withReduxApollo(
   class ConnectWithReduxAndApollo extends React.Component<
     CommentServiceComponentProps,
     {}
-  > {
+    > {
     private client: ApolloClient<Cache>
     constructor(props) {
       super(props)
@@ -89,7 +89,11 @@ export default function withReduxApollo(
         let client
         let store
 
-        const userList = JSON.parse(this.props.url.query.users)
+        let userList = [];
+        if (this.props.url.query.users) {
+          userList = JSON.parse(this.props.url.query.users)
+        }
+
         const initialState = {
           global: {
             loading: true
@@ -144,6 +148,7 @@ export default function withReduxApollo(
           // server-side apollo and store
           // client = new ApolloClient({ link, cache })
           // store = initStore({ initialState, apolloClient: client, url: this.props.url })
+          return React.createElement('div', '...')
         }
         const enhanceElement = React.createElement<any, any, any>(
           WrappedComponent,

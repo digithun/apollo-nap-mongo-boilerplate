@@ -46,7 +46,15 @@ export default async function init(context: SVContext) {
   server.use(require('express-ping').ping())
   server.use(bodyParser.json())
   server.use(bearerToken())
-  server.use('/graphql', jwtSessionMiddleware({ secret: context.config.JWT_SECRET }))
+  server.use('/graphql', (req, res, next) => {
+    const mockRes = ({
+      status: () => ({
+        send: () => ({})
+      })
+    })
+    jwtSessionMiddleware({ secret: context.config.JWT_SECRET }).forEach((item) => item(req, mockRes, () => { }))
+    next()
+  })
 
   server.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
   server.use('/graphql', graphqlExpress(async (req) => ({

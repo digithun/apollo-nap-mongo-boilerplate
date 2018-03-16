@@ -38,7 +38,7 @@ export default class Index extends React.Component<
     user: any
     threadId: string
   }
-> {
+  > {
   public static getInitialProps = (Thread as any).getInitialProps
   // private nap: ApolloClient<any>
   constructor(props: IndexPropTypes) {
@@ -195,6 +195,17 @@ export default class Index extends React.Component<
           onChange={this.onChange('password')}
         />
         <button onClick={this.login}>{'submit'}</button>
+        <Thread
+          graphQLEndpoint={'/graphql'}
+          url={{
+            ...this.props.url,
+            query: {
+              contentId: `episode.${this.state.threadId || 'comment-test'}`,
+              sessionToken: this.state.token,
+              appId: 'Jamplay'
+            }
+          }}
+        />
       </div>
     )
   }

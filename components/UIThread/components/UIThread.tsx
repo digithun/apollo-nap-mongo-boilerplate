@@ -44,7 +44,6 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
   }
   public findUserListById(_id) {
     for (const user of this.props.userList) {
-      console.log(user._id, _id)
       if (user._id === _id) {
         return user
       }
@@ -66,14 +65,25 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
 
     return (
       <Layout>
-        <div style={{minHeight: 300}} className={this.props.threadId}>
-          <Reply disabled={this.props.replyDisabled === true} disabledPlaceholder={this.props.replyDisabledPlaceholder} userList={this.props.userList} />
-          <div style={{ marginTop: 20,  }}>
+        <div style={{ minHeight: 300 }} className={this.props.threadId}>
+          <Reply
+            disabled={this.props.replyDisabled === true || this.props.userList.length <= 0}
+            disabledPlaceholder={this.props.replyDisabledPlaceholder}
+            userList={this.props.userList}
+          />
+          <div style={{ marginTop: 20, }}>
             {this.props.comments.map((comment) => {
-              return (<UIComment onRemove={(id) => this.props.dispatch(Actions.remove(id))} key={comment._id} isRemovable={!!this.findUserListById(comment.userId)} {...comment} />)
+              return (<UIComment onRemove={this.onRemove} key={comment._id} isRemovable={!!this.findUserListById(comment.userId)} {...comment} />)
             })}
             {this.props.loadMoreComments.map((comment) => {
-              return (<UIComment onRemove={(id) => this.props.dispatch(Actions.remove(id))} className='loadmore' isRemovable={!!this.findUserListById(comment.userId)} key={comment._id} {...comment} />)
+              return (
+                <UIComment
+                  onRemove={this.onRemove}
+                  className='loadmore'
+                  isRemovable={this.getIsRemovable(comment)}
+                  key={comment._id}
+                  {...comment}
+                />)
             })}
           </div>
           <div style={{ color: '#bcbcbc', textAlign: 'center' }}>
@@ -82,6 +92,13 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
         </div>
       </Layout>
     )
+  }
+
+  private onRemove = (id) => {
+    this.props.dispatch(Actions.remove(id))
+  }
+  private getIsRemovable = (comment) => {
+    return !!this.findUserListById(comment.userId)
   }
 }
 
