@@ -34,8 +34,8 @@ const SIGN_IN_WITH_EMAIL_MUTATION = `
 `
 
 describe('Comment API integration test', () => {
-  let client: ApolloClient<any>
-  let clientWithToken: ApolloClient<any>
+  let client: any
+  let clientWithToken: any
   let server: Server
   let token: string
   let __connection: Connection
@@ -54,7 +54,7 @@ describe('Comment API integration test', () => {
       server = sv.server.listen(4912, () => {
         resolve()
         const cache: any = new InMemoryCache({})
-        const link = new HttpLink({
+        const link:any = new HttpLink({
           uri: 'http://localhost:4912/graphql'
         })
         const linkWithAuth = new HttpLink({
