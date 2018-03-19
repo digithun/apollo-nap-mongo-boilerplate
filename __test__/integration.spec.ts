@@ -57,7 +57,7 @@ describe('Comment API integration test', () => {
         const link:any = new HttpLink({
           uri: 'http://localhost:4912/graphql'
         })
-        const linkWithAuth = new HttpLink({
+        const linkWithAuth: any = new HttpLink({
           uri: 'http://localhost:4912/graphql',
           headers: {
             authorization: `Bearer ${this.props.url.query.sessionToken}`
