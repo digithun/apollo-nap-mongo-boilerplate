@@ -159,6 +159,15 @@ const casualConnector = (): GQUserConnector => {
     },
     async verifyAvailableUserId(token, userId) {
       return true
+    },
+    async checkAvaliableToReplyContentByToken(token, contentId) {
+      const content = contentId.split('.')
+      const prefix = content[0]
+      const id = content[1]
+      return {
+        isLockedBy: null,
+        _id: id
+      }
     }
   }
 }
