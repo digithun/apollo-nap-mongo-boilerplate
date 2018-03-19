@@ -12,6 +12,7 @@
     "storybook": "start-storybook -p 9001 -s ./ -c storybook",
     "test": "jest --runInBand --forceExit||true",
     "watch": "yarn run clean && tsc --watch||true",
+    "": "sh scripts/build.bash",
     "docker:push": "sh scripts/tag-latest-version.bash && sh scripts/push-image.bash",
     "babel-node": "BABEL_ENV=development babel-node",
     "dev": "NODE_ENV=development nodemon index.js",
@@ -79,7 +80,8 @@
     "redux-saga": "^0.15.6",
     "remove": "^0.1.5",
     "styled-components": "^2.2.4",
-    "uglifyjs-webpack-plugin": "^1.0.0-rc.0"
+    "uglifyjs-webpack-plugin": "^1.0.0-rc.0",
+    "typescript": "^2.5.3"
   },
   "devDependencies": {
     "@storybook/react": "^3.2.12",
@@ -102,7 +104,6 @@
     "nodemon": "^1.12.1",
     "tslint": "^5.7.0",
     "tslint-react": "^3.2.0",
-    "typescript": "^2.5.3",
     "webpack": "^3.8.1"
   }
 }
