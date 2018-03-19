@@ -60,7 +60,9 @@ export default {
     typeComposers.Comment.addRelation('user', {
       resolver: typeComposers.User.getResolver('getUserInfo'),
       prepareArgs: {
-        _id: (source) => source.userId
+        _id: (source) => {
+          return source.userId
+         }
       },
       projection: { userId: true }
     })

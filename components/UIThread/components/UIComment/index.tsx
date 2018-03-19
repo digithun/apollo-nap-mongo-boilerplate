@@ -67,7 +67,7 @@ interface UICommentComponent extends React.ComponentClass<UICommentPropTypes> {
   }
 }
 const UICommentComponent = compose<UICommentPropTypes, {}>(
-)((props: UICommentPropTypes) => !props.user ? <div onClick={() => { console.log(props) }} >{'error'}</div> : (
+)((props: UICommentPropTypes) => !props.user ? <div onClick={console.log.bind(null, props)} >{'error'}</div> : (
   <CommentContainer className={props.className}>
     <CommentHeader>
       <UserInfoWrap>
@@ -81,7 +81,7 @@ const UICommentComponent = compose<UICommentPropTypes, {}>(
       </UserInfoWrap>
       {
         props._id !== OPTIMISTIC_COMMENT_ID
-          ? (<UIText onClick={() => props.onRemove(props._id)} className='comment-item__delete-button'>
+          ? (<UIText onClick={props.onRemove.bind(null, props._id)} className='comment-item__delete-button'>
             {props.isRemovable ? props.t('delete') : null}
           </UIText>) : null
       }

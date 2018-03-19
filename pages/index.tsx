@@ -48,7 +48,7 @@ export default class Index extends React.Component<
       password: '',
       token: undefined,
       user: undefined,
-      threadId: '5a718979c0163b000f32d710'
+      threadId: '5a55b7e7ae592800134d12f6'
     }
     this.onChange = this.onChange.bind(this)
     this.login = this.login.bind(this)
@@ -135,7 +135,7 @@ export default class Index extends React.Component<
     }
   }
   public render() {
-    if (this.state.user) {
+    if (this.state.user && this.state.token) {
       const userListForComment = [
         {
           name: this.state.user.name,
@@ -151,24 +151,25 @@ export default class Index extends React.Component<
       return (
         <div>
           {this.state.user.email}
-          <button onClick={() => this.setState({ threadId: 'mock-1' })}>
-            {'mock-1'}
+          <button onClick={() => this.setState({ threadId: '5a55b7e7ae592800134d12f6' })}>
+            {'ซื้อแล้ว'}
           </button>
           <button
             onClick={() =>
               this.setState({ threadId: '5a718979c0163b000f32d710' })
             }
           >
-            {'mock-2'}
+            {'ยังไม่ได้ซื้อ'}
           </button>
           <button
             onClick={() =>
-              this.setState({ threadId: '5a61e4859ae70d000f7fb6bc' })
+              this.setState({ threadId: '5a55b7e7ae592800134d12f6' })
             }
           >
             {'mock-6'}
           </button>
           {this.state.threadId}
+          {this.state.token}
           <Thread
             graphQLEndpoint={'/graphql'}
             url={{
@@ -195,7 +196,7 @@ export default class Index extends React.Component<
           onChange={this.onChange('password')}
         />
         <button onClick={this.login}>{'submit'}</button>
-        <Thread
+        {/* <Thread
           graphQLEndpoint={'/graphql'}
           url={{
             ...this.props.url,
@@ -205,7 +206,7 @@ export default class Index extends React.Component<
               appId: 'Jamplay'
             }
           }}
-        />
+        /> */}
       </div>
     )
   }

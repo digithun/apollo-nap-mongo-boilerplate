@@ -26,10 +26,10 @@ export function getLatestCursorOfConnectionEdges(
 ): string {
   // remove deprecated method and use pageInfo.endCursor
   //
-  //if (connection.edges.length <= 0) {
+  // if (connection.edges.length <= 0) {
   // return undefined
-  //}
-  //return connection.edges[connection.edges.length - 1].cursor
+  // }
+  // return connection.edges[connection.edges.length - 1].cursor
 
   return connection.pageInfo.endCursor
 }
@@ -39,22 +39,22 @@ async function initFetchQuery(
 ): Promise<ObservableQuery<CommentListQueryResult>> {
   const firstCommentQuery = context.apolloClient.watchQuery<
     CommentListQueryResult
-  >({
-    query: ThreadQuery,
-    variables
-  })
+    >({
+      query: ThreadQuery,
+      variables
+    })
   const firstCommentList = await firstCommentQuery.result()
   const loadMoreCommentQuery = context.apolloClient.watchQuery<
     CommentListQueryResult
-  >({
-    query: ThreadQuery,
-    variables: {
-      ...variables,
-      after: getLatestCursorOfConnectionEdges(
-        firstCommentList.data.thread.comments
-      )
-    }
-  })
+    >({
+      query: ThreadQuery,
+      variables: {
+        ...variables,
+        after: getLatestCursorOfConnectionEdges(
+          firstCommentList.data.thread.comments
+        )
+      }
+    })
   await loadMoreCommentQuery.result()
   return loadMoreCommentQuery
 }
@@ -216,7 +216,7 @@ export function* replySaga(context: ApplicationSagaContext) {
       { query: ThreadQuery, variables: commentObservableQuery.variables }
     )
     const lastCursor = getLatestCursorOfConnectionEdges(data.thread.comments)
-   
+
     const loadMoreCommentResult: { data: CommentListQueryResult } = yield call(
       apolloClient.query,
       {
@@ -245,7 +245,7 @@ export function* replySaga(context: ApplicationSagaContext) {
             pageInfo: {
               ...loadMoreCommentResult.data.thread.comments.pageInfo
             }
-        
+
           }
         }
       })
@@ -306,6 +306,11 @@ export function* replySaga(context: ApplicationSagaContext) {
       [apolloClient, apolloClient.readQuery],
       { query: ThreadQuery, variables: ThreadQueryVariables }
     )
+    console.log(queryResult, commentInputData)
+    if (!commentInputData.user) {
+      yield call(alert, 'no user selected')
+      return
+    }
     yield call([apolloClient, apolloClient.writeQuery], {
       query: ThreadQuery,
       variables: ThreadQueryVariables,

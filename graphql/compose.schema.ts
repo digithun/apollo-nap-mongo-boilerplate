@@ -75,11 +75,20 @@ export default function createSchema({ __connection, config }: SVContext) {
   })
   GQC.rootMutation().addFields({
     createThread: typeComposers.Thread.getResolver('createOne'),
-    updateCommentById: typeComposers.Comment.getResolver('updateById'),
-    remove: typeComposers.Comment.getResolver('remove'),
+    ...wrapResolvers<any, { user: any }>({
+      updateCommentById: typeComposers.Comment.getResolver('updateById'),
+      remove: typeComposers.Comment.getResolver('remove'),
+    }, (next) => async (rp) => {
+      if (rp.context.user) {
+        return next(rp)
+      } else {
+        throw new Error('unauthorized')
+      }
+    }),
     ...wrapResolvers<any, { user: any }>({
       reply: typeComposers.Comment.getResolver('reply')
     }, (next) => async (rp) => {
+      const result = await next(rp)
       try {
 
         if (!rp.projection.record) {
@@ -90,7 +99,6 @@ export default function createSchema({ __connection, config }: SVContext) {
         }
 
         rp.projection.record.thread.contentId = {}
-        const result = await next(rp)
 
         const eventResponse = await fetch(config.EVENT_SERVICE_URL, {
           headers: {
@@ -110,7 +118,8 @@ export default function createSchema({ __connection, config }: SVContext) {
         const json = await eventResponse.json()
         return result
       } catch (e) {
-        throw e
+        console.error('[post-reply] cannot dispatch event message to event service...')
+        return result
       }
 
     })

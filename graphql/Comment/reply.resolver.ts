@@ -69,6 +69,13 @@ export const guardWrapResolver: ResolverNextRpCb<GQCommentDocument, GQResolverCo
     if (!thread) {
       throw new Error('thread not exists')
     }
+
+    // check if episode avaiable to reploy
+    const content = await rp.context.connectors.User.checkAvaliableToReplyContentByToken(rp.context.token, rp.args.record.contentId)
+    if (content.isLockedBy) {
+        throw new Error(`episode/is-locked-by-${content.isLockedBy}`)
+    }
+
     if (args.record.replyToId) {
       const comment = await rp.context.models.Comment.findById(args.record.replyToId)
       if (!comment) {

@@ -17,6 +17,8 @@ export default function enhanceRemove(typeComposer: TypeComposer) {
         throw new Error('no comment id found')
       }
 
+      console.log(comment)
+      console.log(args)
       if (!await context.connectors.User.verifyAvailableUserId(context.token, comment.userId)) {
         throw new Error('no permission')
       }

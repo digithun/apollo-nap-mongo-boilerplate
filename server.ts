@@ -43,16 +43,17 @@ export default async function init(context: SVContext) {
 
   server.use(cors())
 
-  server.use(require('express-ping').ping())
   server.use(bodyParser.json())
   server.use(bearerToken())
-  server.use('/graphql', (req, res, next) => {
+  server.use('/graphql', async (req, res, next) => {
     const mockRes = ({
       status: () => ({
         send: () => ({})
       })
     })
-    jwtSessionMiddleware({ secret: context.config.JWT_SECRET }).forEach((item) => item(req, mockRes, () => { }))
+    const q = jwtSessionMiddleware({ secret: context.config.JWT_SECRET }).map((item) => item(req, mockRes, () => { }))
+    await Promise.all(q)
+    console.log(( req as any ).user)
     next()
   })
 
@@ -68,7 +69,9 @@ export default async function init(context: SVContext) {
   })))
 
   return {
+    server,
     start: async () => {
+      server.use(require('express-ping').ping())
       if (config.dev) {
         const clientApp = next({ dev: context.config.dev })
         const clientRoutesHandler = clientRoutes.getRequestHandler(clientApp)

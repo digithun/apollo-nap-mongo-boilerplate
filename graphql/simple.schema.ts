@@ -1,5 +1,4 @@
 import { makeExecutableSchema } from 'graphql-tools';
-const packageInfo = require('../package.json')
 
 // Define global Models
 declare global {
@@ -15,7 +14,10 @@ export default makeExecutableSchema({
   `,
   resolvers: {
     Query: {
-      version: () => packageInfo.version,
+      version: () => {
+        const packageInfo = require('../package.json')
+        return packageInfo.version
+      },
     }
   }
 })
