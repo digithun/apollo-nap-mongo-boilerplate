@@ -2,10 +2,9 @@ FROM node:8.9.1 as builder
 
 COPY . /usr/app
 WORKDIR /usr/app
-ENV NODE_ENV production
-RUN yarn global add typescript && \
+RUN yarn && \
+  yarn global add typescript && \
   yarn add styled-components && \
-  yarn install && \
   tsc && \
   rm -rf .git
 
