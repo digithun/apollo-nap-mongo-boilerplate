@@ -5,7 +5,7 @@ WORKDIR /usr/app
 ENV NODE_ENV production
 RUN yarn global add typescript && \
   yarn add styled-components && \
-  yarn --production --only=production && \
+  yarn install && \
   tsc && \
   rm -rf .git
 
