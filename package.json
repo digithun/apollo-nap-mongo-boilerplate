@@ -1,6 +1,6 @@
 {
   "name": "jamplay-comment",
-  "version": "0.0.3-patch.3",
+  "version": "0.0.4",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -68,11 +68,6 @@
     "next": "^4.0.1",
     "next-routes": "^1.0.40",
     "query-string": "^5.0.0",
-    "react": "^16.0.0",
-    "react-apollo": "^2.0.0-beta.0",
-    "react-dom": "^16.0.0",
-    "react-passthrough": "^0.1.0",
-    "react-redux": "^5.0.6",
     "recompose": "^0.26.0",
     "redux": "^3.7.2",
     "redux-actions": "^2.2.1",
@@ -84,6 +79,11 @@
     "typescript": "^2.5.3"
   },
   "devDependencies": {
+    "react-apollo": "^2.0.0-beta.0",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "react-passthrough": "^0.1.0",
+    "react-redux": "^5.0.6",
     "@storybook/react": "^3.2.12",
     "@types/async": "^2.0.31",
     "babel": "^6.23.0",
