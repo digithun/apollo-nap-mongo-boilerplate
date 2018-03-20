@@ -12,7 +12,6 @@
     "storybook": "start-storybook -p 9001 -s ./ -c storybook",
     "test": "jest --runInBand --forceExit||true",
     "watch": "yarn run clean && tsc --watch||true",
-    "postinstall": "sh scripts/build.bash",
     "docker:push": "sh scripts/tag-latest-version.bash && sh scripts/push-image.bash",
     "babel-node": "BABEL_ENV=development babel-node",
     "dev": "NODE_ENV=development nodemon index.js",
