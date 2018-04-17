@@ -1,10 +1,10 @@
 import * as mongoose from 'mongoose'
 declare global {
 
-  type GBReactionType = {
-    actionType: | 'smile' | 'laugh' | 'sad'
-    userId: string
-  }
+  // type GBReactionType = {
+  //   actionType: | 'smile' | 'laugh' | 'sad'
+  //   userId: string
+  // }
   type GBCommentType = {
     _id: any
     threadId?: any
@@ -14,7 +14,8 @@ declare global {
     userId?: string
     commentType?: | 'text'
     message: string
-    reactions?: GBReactionType[]
+    reactionSummary?: any
+    // reactions?: GBReactionType[]
 
     // relation field
     user?: GBUserType
@@ -30,6 +31,7 @@ const commentSchema = new mongoose.Schema({
     type: String,
     enum: ['TEXT'],
   },
+  reactionSummary: {},
   reactions: {
     default: [],
     type: {

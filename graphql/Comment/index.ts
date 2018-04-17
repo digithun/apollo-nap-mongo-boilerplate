@@ -1,4 +1,4 @@
-import { Model } from 'mongoose'
+import { Model, Types } from 'mongoose'
 import { TypeComposer } from 'graphql-compose'
 import composeWithMongoose from 'graphql-compose-mongoose'
 import schema from './comment.schema'
@@ -16,6 +16,19 @@ export default {
     return typeComposer
   },
   createGraphQLRelation: (typeComposers) => {
+
+    typeComposers.Comment.addFields({
+      userReaction: {
+        type: typeComposers.Reaction,
+        resolve: (source, args, context: GQResolverContext) => {
+          console.log(context.userId, 'userId', source._id)
+          if (!context.userId) {
+            return null
+          }
+          return context.models.Reaction.findOne({ userId: context.userId, commentId: source._id }) 
+        }
+      }
+    })
 
     const replyResolverResultType = typeComposers.Comment.getResolver('reply')
       .getTypeComposer()
