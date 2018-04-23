@@ -5,6 +5,7 @@ import gql from 'graphql-tag'
 import styled from 'styled-components'
 import withDict from '../../../../lib/with-dict'
 import { UIUserImageThumbnailCircle } from '../UIReplyInput/components/UIUserItem.component'
+import ReactionCompose from '../../../Reaction/ReactionCompose.component'
 import { UIText } from '../../../common/Text'
 import { UILabel } from '../../../common/Label'
 import { OPTIMISTIC_COMMENT_ID } from '../../actions';
@@ -53,12 +54,20 @@ const TextContainer = styled.div`
   padding: 0 56px ;
   margin-top: 8px;
 `
+const ReactionContainer = styled.div`
+  padding: 0 56px;
+  margin-top: 8px;
+`
 const ProfilePicture = styled(UIUserImageThumbnailCircle) `
 `
 interface UICommentPropTypes extends GBCommentType {
   className?: string
   isRemovable?: boolean
   onRemove?: (id: string) => void
+  userReaction?: {
+    type: string
+  }
+  reactionSummary?: any
   t?: any
 }
 interface UICommentComponent extends React.ComponentClass<UICommentPropTypes> {
@@ -89,6 +98,9 @@ const UICommentComponent = compose<UICommentPropTypes, {}>(
     <TextContainer>
       <UIText>{props.message}</UIText>
     </TextContainer>
+    <ReactionContainer>
+      <ReactionCompose userReaction={props.userReaction} reactionSummary={props.reactionSummary}/>
+    </ReactionContainer>
   </CommentContainer>
 )) as UICommentComponent
 
@@ -100,6 +112,10 @@ enchanceComponent.fragments = {
       _id
       createdAt
       userId
+      reactionSummary
+      userReaction {
+        type
+      }
       user {
         name
         _id

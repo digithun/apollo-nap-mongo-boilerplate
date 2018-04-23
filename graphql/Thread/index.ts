@@ -13,6 +13,18 @@ export default {
     return typeComposer
   },
   createGraphQLRelation: (typeComposers) => {
+    typeComposers.Thread.addFields({
+      userReaction: {
+        type: typeComposers.Reaction,
+        resolve: (source, args, context: GQResolverContext) => {
+          if (!context.userId) {
+            return null
+          }
+          return context.models.Reaction.findOne({ userId: context.userId, contentId: source._id, contentType: "THREAD" }) 
+        }
+      }
+    })
+
     typeComposers.Thread.addRelation('comments', {
       resolver: typeComposers.Comment.getResolver('findMany'),
       prepareArgs: {

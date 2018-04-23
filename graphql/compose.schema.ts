@@ -1,4 +1,4 @@
-
+import { GraphQLObjectType, GraphQLString } from 'graphql'
 import { GQC, TypeComposer } from 'graphql-compose'
 import * as mongoose from 'mongoose'
 import thread from './Thread'
@@ -31,7 +31,7 @@ declare global {
     Thread: mongoose.Model<GQThreadDocument>
     Comment: mongoose.Model<GQCommentDocument>
     User: mongoose.Model<GQUserDocument>
-    Reaction: mongoose.Model<GQReactionDocument> & { aggregateByCommentId: (id: any) => any, delete: any }
+    Reaction: mongoose.Model<GQReactionDocument> & { getSummary: (type: any, id: any) => any, delete: any }
   }
 
   interface GQCreateOneArgs<Schema> {
@@ -73,8 +73,26 @@ export default function createSchema({ __connection, config }: SVContext) {
 
   thread.createGraphQLRelation(typeComposers)
   comment.createGraphQLRelation(typeComposers)
+  const Viewer = TypeComposer.create("Viewer")
+  Viewer.addFields({
+    threads: typeComposers.Thread.getResolver('findMany'),
+    thread: typeComposers.Thread.getResolver('findAndUpdate'),
+    comment: typeComposers.Comment.getResolver('findById')
+  })
 
   GQC.rootQuery().addFields({
+    viewer: {
+      type: Viewer,
+      args: {
+        userId: { type: GraphQLString },
+      },
+      resolve: (source, args, context) => {
+        if (args.userId) {
+          context.userId = args.userId
+        }
+        return {}
+      }
+    },
     threads: typeComposers.Thread.getResolver('findMany'),
     thread: typeComposers.Thread.getResolver('findAndUpdate'),
     comment: typeComposers.Comment.getResolver('findById')

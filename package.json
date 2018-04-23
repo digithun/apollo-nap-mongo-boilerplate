@@ -102,6 +102,7 @@
     "react-dom": "^16.0.0",
     "react-passthrough": "^0.1.0",
     "react-redux": "^5.0.6",
+    "storybook": "^1.0.0",
     "tslint": "^5.7.0",
     "tslint-react": "^3.2.0",
     "webpack": "^3.8.1"

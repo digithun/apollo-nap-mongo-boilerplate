@@ -5,9 +5,6 @@ export function createThreadWrapResolver(next) {
   return async (rp) => {
     const context: GQResolverContext = rp.context
     const result = await next(rp)
-    if (rp.args.userId) {
-      context.userId = rp.args.userId
-    }
     if (!result) {
       context.logger.log('Thread: Create new thread...')
       try {
@@ -35,8 +32,5 @@ export default function enchanceCreate(typeComposer: TypeComposer) {
   findAndUpdateThread.getArgTC('filter').makeRequired('appId')
   findAndUpdateThread.getArgTC('filter').makeRequired('contentId')
   findAndUpdateThread.getArgTC('filter').removeField('_ids')
-  findAndUpdateThread.addArgs({
-    userId: { type: GraphQLString },
-  })
   typeComposer.setResolver('findAndUpdate', findAndUpdateThread)
 }

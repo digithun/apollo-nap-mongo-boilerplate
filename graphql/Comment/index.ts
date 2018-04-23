@@ -21,11 +21,10 @@ export default {
       userReaction: {
         type: typeComposers.Reaction,
         resolve: (source, args, context: GQResolverContext) => {
-          console.log(context.userId, 'userId', source._id)
           if (!context.userId) {
             return null
           }
-          return context.models.Reaction.findOne({ userId: context.userId, commentId: source._id }) 
+          return context.models.Reaction.findOne({ userId: context.userId, contentId: source._id, contentType: "COMMENT" }) 
         }
       }
     })
