@@ -25,6 +25,19 @@ class ToggleReactionList extends React.Component {
   }
 }
 
+class ToggleReactionButton extends React.Component {
+  state = {
+    show: true
+  }
+  render() {
+    return (
+      <div>
+        <ReactButton onClick={() => this.setState({ show: !this.state.show })} expand={this.state.show} />
+      </div>
+    )
+  }
+}
+
 storiesOf("Reaction", module)
   .addDecorator(story => (
     <Layout>
@@ -32,14 +45,20 @@ storiesOf("Reaction", module)
     </Layout>
   ))
   .add("show simple button", () => (
-    <ReactButton />  
+    <ReactButton expand/>
+  ))
+  .add("un expand react button", () => (
+    <ReactButton expand={false}/>
+  ))
+  .add("toggle react button", () => (
+    <ToggleReactionButton/>
   ))
   .add("show reacted reaction", () => (
     <div>
       {
         reactions.map(reaction => (
           <div key={reaction.type}>
-            <ReactButton onClick={action("react")} userReaction={{ type: reaction.type }} />
+            <ReactButton onClick={action("react")} userReaction={{ type: reaction.type }} expand/>
           </div>
         ))
       }

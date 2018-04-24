@@ -4,7 +4,9 @@ import * as Actions from './actions'
 import {
   ThreadQuery,
   REMOVE_COMMENT_MUTATION,
-  THREAD_FRAGMENT
+  THREAD_FRAGMENT,
+  AddReaction,
+  RemoveReaction
 } from './graphql'
 import gql from 'graphql-tag'
 import UIThread from './components/UIThread'
@@ -19,7 +21,9 @@ interface ThreadResultType extends GBThreadType {
   comments: GQConnectionResult<GBCommentType>
 }
 interface CommentListQueryResult {
-  thread: ThreadResultType
+  viewer: {
+    thread: ThreadResultType
+  }
 }
 export function getLatestCursorOfConnectionEdges(
   connection: GQConnectionResult<GBCommentType>
@@ -41,7 +45,8 @@ async function initFetchQuery(
     CommentListQueryResult
     >({
       query: ThreadQuery,
-      variables
+      variables,
+      fetchPolicy: "network-only"
     })
   const firstCommentList = await firstCommentQuery.result()
   const loadMoreCommentQuery = context.apolloClient.watchQuery<
@@ -51,11 +56,11 @@ async function initFetchQuery(
       variables: {
         ...variables,
         after: getLatestCursorOfConnectionEdges(
-          firstCommentList.data.thread.comments
+          firstCommentList.data.viewer.thread.comments
         )
-      }
+      },
+      fetchPolicy: "network-only"
     })
-  await loadMoreCommentQuery.result()
   return loadMoreCommentQuery
 }
 
@@ -84,13 +89,15 @@ function removeComment(context: ApplicationSagaContext) {
         })
 
         data = Object.assign({}, data, {
-          thread: {
-            ...data.thread,
-            comments: {
-              ...data.thread.comments,
-              edges: data.thread.comments.edges.filter(
-                (edge: any) => edge.node._id !== commentId
-              )
+          viewer: {
+            thread: {
+              ...data.viewer.thread,
+              comments: {
+                ...data.viewer.thread.comments,
+                edges: data.viewer.thread.comments.edges.filter(
+                  (edge: any) => edge.node._id !== commentId
+                )
+              }
             }
           }
         })
@@ -101,7 +108,9 @@ function removeComment(context: ApplicationSagaContext) {
           data
         })
       }
-
+      const commentInputData = yield select<ApplicationState>(
+        (state) => state.reply
+      )
       const url = yield select<ApplicationState>((state) => state.thread.url)
       console.log(url)
       const ThreadQueryVariables = {
@@ -109,7 +118,8 @@ function removeComment(context: ApplicationSagaContext) {
           contentId: url.query.contentId,
           appId: url.query.appId
         },
-        first: MAX_COMMENT_PER_REQUEST
+        first: MAX_COMMENT_PER_REQUEST,
+        userId: commentInputData.user._id
       }
 
       // get data from first 3 comment and "loadmore" query
@@ -148,11 +158,15 @@ export function* replySaga(context: ApplicationSagaContext) {
     type: 'thread/set-url-context',
     payload: { query: context.url.query }
   })
+  const commentInputData = yield select<ApplicationState>(
+    (state) => state.reply
+  )
   const ThreadQueryVariables = {
     filter: {
       contentId: context.url.query.contentId,
       appId: context.url.query.appId
     },
+    userId: commentInputData.user ? commentInputData.user._id : null,
     first: MAX_COMMENT_PER_REQUEST
   }
 
@@ -169,10 +183,30 @@ export function* replySaga(context: ApplicationSagaContext) {
   let result = yield commentObservableQuery.result()
   yield put(
     Actions.set({
-      hasNextPage: result.data.thread.comments.pageInfo.hasNextPage
+      hasNextPage: result.data.viewer.thread.comments.pageInfo.hasNextPage
     })
   )
   yield put({ type: 'global/loading-done' })
+
+  yield takeEvery<{ payload: { user?: { _id: string } } }>(
+    "reply/input-update" as any,
+    function*(action) {
+      if (action.payload.user) {
+        ThreadQueryVariables.userId = action.payload.user._id
+        commentObservableQuery = yield call(
+          initFetchQuery,
+          context,
+          ThreadQueryVariables
+        )
+        result = yield commentObservableQuery.result()
+        yield put(
+          Actions.set({
+            hasNextPage: result.data.viewer.thread.comments.pageInfo.hasNextPage
+          })
+        )
+      }
+    }
+  )
 
   /**
    * @Refetch
@@ -192,7 +226,7 @@ export function* replySaga(context: ApplicationSagaContext) {
       result = yield commentObservableQuery.result()
       yield put(
         Actions.set({
-          hasNextPage: result.data.thread.comments.pageInfo.hasNextPage
+          hasNextPage: result.data.viewer.thread.comments.pageInfo.hasNextPage
         })
       )
 
@@ -215,7 +249,7 @@ export function* replySaga(context: ApplicationSagaContext) {
       [apolloClient, apolloClient.readQuery],
       { query: ThreadQuery, variables: commentObservableQuery.variables }
     )
-    const lastCursor = getLatestCursorOfConnectionEdges(data.thread.comments)
+    const lastCursor = getLatestCursorOfConnectionEdges(data.viewer.thread.comments)
 
     const loadMoreCommentResult: { data: CommentListQueryResult } = yield call(
       apolloClient.query,
@@ -234,18 +268,21 @@ export function* replySaga(context: ApplicationSagaContext) {
         ...commentObservableQuery.variables
       },
       data: Object.assign({}, data, {
-        thread: {
-          ...data.thread,
-          comments: {
-            ...data.thread.comments,
-            edges: [
-              ...data.thread.comments.edges,
-              ...loadMoreCommentResult.data.thread.comments.edges
-            ],
-            pageInfo: {
-              ...loadMoreCommentResult.data.thread.comments.pageInfo
-            }
+        viewer: {
+          ...data.viewer,
+          thread: {
+            ...data.viewer.thread,
+            comments: {
+              ...data.viewer.thread.comments,
+              edges: [
+                ...data.viewer.thread.comments.edges,
+                ...loadMoreCommentResult.data.viewer.thread.comments.edges
+              ],
+              pageInfo: {
+                ...loadMoreCommentResult.data.viewer.thread.comments.pageInfo
+              }
 
+            }
           }
         }
       })
@@ -254,10 +291,126 @@ export function* replySaga(context: ApplicationSagaContext) {
     yield put(
       Actions.set({
         hasNextPage:
-          loadMoreCommentResult.data.thread.comments.pageInfo.hasNextPage
+          loadMoreCommentResult.data.viewer.thread.comments.pageInfo.hasNextPage
       })
     )
     yield put({ type: 'global/loading-done' })
+  })
+
+  /**
+   * @Add Reaction
+   */
+
+  yield takeEvery<{
+    payload: any
+    type: string
+  }>(Actions.addReaction, function*(action) {
+    try {
+      const commentInputData = yield select<ApplicationState>(
+        (state) => state.reply
+      )
+      const apolloType = action.payload.contentType === "COMMENT" ? "Comment" : "Thread"
+      let data = apolloClient.readFragment<{ __typename: string, userReaction?: { type: string, __typename: string }, reactionSummary?: { type: string, count: number }[] }>({
+        id: action.payload.contentId,
+        fragment: gql`
+          fragment ReadReaction${apolloType} on ${apolloType} {
+            reactionSummary
+          }
+        `
+      })
+      data.userReaction = { type: action.payload.type, __typename: "Reaction" }
+      data.reactionSummary = data.reactionSummary || []
+      if (data.reactionSummary.find(r => r.type === action.payload.type)) {
+        data.reactionSummary = data.reactionSummary.map(r => ({ ...r, count: r.count + 1 }))
+      } else {
+        data.reactionSummary = [].concat([], data.reactionSummary, { type: action.payload.type, count: 1 })
+      }
+      apolloClient.writeFragment({
+        id: action.payload.contentId,
+        fragment: gql`
+          fragment WriteReaction${apolloType} on ${apolloType} {
+            userReaction {
+              type
+            }
+            reactionSummary
+          }
+        `,
+        data: {
+          __typename: apolloType,
+          userReaction: { type: action.payload.type, __typename: "Reaction" },
+          reactionSummary: data.reactionSummary
+        }
+      })
+      const mutationResult = yield call([apolloClient, apolloClient.mutate], {
+        variables: {
+          contentId: action.payload.contentId,
+          contentType: action.payload.contentType,
+          type: action.payload.type,
+          userId: commentInputData.user._id
+        },
+        mutation: AddReaction
+      })
+    } catch(error) {
+      console.error(error)
+    }
+  })
+
+  /**
+   * @Remove Reaction
+   */
+
+  yield takeEvery<{
+    payload: any
+    type: string
+  }>(Actions.removeReaction, function*(action) {
+    try {
+      const commentInputData = yield select<ApplicationState>(
+        (state) => state.reply
+      )
+      const apolloType = action.payload.contentType === "COMMENT" ? "Comment" : "Thread"
+      let data = apolloClient.readFragment<{ __typename: string, userReaction?: { type: string, __typename: string }, reactionSummary?: { type: string, count: number }[] }>({
+        id: action.payload.contentId,
+        fragment: gql`
+          fragment ReadReaction${apolloType} on ${apolloType} {
+            userReaction {
+              type
+            }
+            reactionSummary
+          }
+        `
+      })
+      const userReaction = data.userReaction
+      data.userReaction = null
+      data.reactionSummary = data.reactionSummary || []
+      data.reactionSummary = data.reactionSummary.map(r => ({ ...r, count: r.type === userReaction.type ? r.count - 1 : r.count }))
+      data.reactionSummary = data.reactionSummary.filter(r => r.count !== 0)
+      apolloClient.writeFragment({
+        id: action.payload.contentId,
+        fragment: gql`
+          fragment WriteReaction${apolloType} on ${apolloType} {
+            userReaction {
+              type
+            }
+            reactionSummary
+          }
+        `,
+        data: {
+          __typename: apolloType,
+          userReaction: null,
+          reactionSummary: data.reactionSummary
+        }
+      })
+      const mutationResult = yield call([apolloClient, apolloClient.mutate], {
+        variables: {
+          contentId: action.payload.contentId,
+          contentType: action.payload.contentType,
+          userId: commentInputData.user._id
+        },
+        mutation: RemoveReaction
+      })
+    } catch(error) {
+      console.error(error)
+    }
   })
 
   /**
@@ -285,7 +438,7 @@ export function* replySaga(context: ApplicationSagaContext) {
     } catch (e) {
       console.error(e)
     }
-    let queryResult: { thread: GBThreadType } = yield call(
+    let queryResult: { viewer: { thread: GBThreadType } } = yield call(
       [apolloClient, apolloClient.readQuery],
       {
         query: ThreadQuery,
@@ -293,7 +446,7 @@ export function* replySaga(context: ApplicationSagaContext) {
       }
     )
     console.log('get result from query')
-    if (!queryResult.thread) {
+    if (!queryResult.viewer.thread) {
       // check if data is undefined
       // reload data if data is not available
 
@@ -302,7 +455,7 @@ export function* replySaga(context: ApplicationSagaContext) {
         variables
       })
     }
-    const data: { thread: ThreadResultType } = yield call(
+    const data: { viewer: { thread: ThreadResultType } } = yield call(
       [apolloClient, apolloClient.readQuery],
       { query: ThreadQuery, variables: ThreadQueryVariables }
     )
@@ -315,29 +468,34 @@ export function* replySaga(context: ApplicationSagaContext) {
       query: ThreadQuery,
       variables: ThreadQueryVariables,
       data: Object.assign({}, data, {
-        thread: {
-          ...data.thread,
-          comments: {
-            ...data.thread.comments,
-            edges: [
-              {
-                __typename: 'CommentEdge',
-                cursor: '',
-                node: {
-                  _id: OPTIMISTIC_COMMENT_ID,
-                  createdAt: new Date(),
-                  threadId: queryResult.thread._id,
-                  message: commentInputData.message,
-                  userId: commentInputData.user._id,
-                  user: {
-                    ...commentInputData.user,
-                    __typename: 'User'
-                  },
-                  __typename: 'Comment'
-                }
-              },
-              ...data.thread.comments.edges
-            ]
+        viewer: {
+          ...data.viewer,
+          thread: {
+            ...data.viewer.thread,
+            comments: {
+              ...data.viewer.thread.comments,
+              edges: [
+                {
+                  __typename: 'CommentEdge',
+                  cursor: '',
+                  node: {
+                    _id: OPTIMISTIC_COMMENT_ID,
+                    createdAt: new Date(),
+                    threadId: queryResult.viewer.thread._id,
+                    message: commentInputData.message,
+                    userId: commentInputData.user._id,
+                    userReaction: null,
+                    reactionSummary: null,
+                    user: {
+                      ...commentInputData.user,
+                      __typename: 'User'
+                    },
+                    __typename: 'Comment'
+                  }
+                },
+                ...data.viewer.thread.comments.edges
+              ]
+            }
           }
         }
       })
@@ -348,7 +506,7 @@ export function* replySaga(context: ApplicationSagaContext) {
       const mutationResult = yield call([apolloClient, apolloClient.mutate], {
         variables: {
           record: {
-            contentId: queryResult.thread.contentId,
+            contentId: queryResult.viewer.thread.contentId,
             message: commentInputData.message,
             userId: commentInputData.user._id
           }
@@ -369,31 +527,36 @@ export function* replySaga(context: ApplicationSagaContext) {
         query: ThreadQuery,
         variables: ThreadQueryVariables,
         data: Object.assign({}, data, {
-          thread: {
-            ...data.thread,
-            comments: {
-              ...data.thread.comments,
-              edges: [
-                {
-                  __typename: 'CommentEdge',
-                  cursor: '',
-                  node: {
-                    _id: mutationResult.data.reply.record._id,
-                    createdAt: new Date(),
-                    threadId: queryResult.thread._id,
-                    message: commentInputData.message,
-                    userId: commentInputData.user._id,
-                    user: {
-                      ...commentInputData.user,
-                      __typename: 'User'
-                    },
-                    __typename: 'Comment'
-                  }
-                },
-                ...data.thread.comments.edges.filter(
-                  (node: any) => node._id !== 'optimistic-comment-id'
-                )
-              ]
+          viewer: {
+            ...data.viewer,
+            thread: {
+              ...data.viewer.thread,
+              comments: {
+                ...data.viewer.thread.comments,
+                edges: [
+                  {
+                    __typename: 'CommentEdge',
+                    cursor: '',
+                    node: {
+                      _id: mutationResult.data.reply.record._id,
+                      createdAt: new Date(),
+                      threadId: queryResult.viewer.thread._id,
+                      message: commentInputData.message,
+                      userId: commentInputData.user._id,
+                      userReaction: null,
+                      reactionSummary: null,
+                      user: {
+                        ...commentInputData.user,
+                        __typename: 'User'
+                      },
+                      __typename: 'Comment'
+                    }
+                  },
+                  ...data.viewer.thread.comments.edges.filter(
+                    (node: any) => node._id !== 'optimistic-comment-id'
+                  )
+                ]
+              }
             }
           }
         })

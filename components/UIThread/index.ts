@@ -21,33 +21,36 @@ export default compose(
    * Read First 5 comment from local cache
    * by saga init
    */
-  connect((state: ApplicationState) => ({
+  connect((state: ApplicationState, props: any) => ({
     hasNextPage: state.thread.hasNextPage,
+    userId: state.reply.user ? state.reply.user._id : null, 
     loading: state.global.loading
   }), (dispatch) => ({
     requestLoadMoreComments: () => dispatch(Actions.loadMoreReplyList()),
     dispatch,
   })),
 
-  graphql<any, { url: any }>(ThreadQuery, {
+  graphql<any, { url: any, userId: any }>(ThreadQuery, {
     props: ({ data }) => {
-      if (data.loading || !data.thread) {
+      const viewer = data.viewer
+      if (data.loading || !viewer || !viewer.thread) {
         return {
           threadId: undefined,
           comments: []
         }
       }
-      const commentsLength = data.thread.comments.edges.length
+      const commentsLength = viewer.thread.comments.edges.length
       return {
-        threadId: data.thread._id,
-        comments: data.thread.comments.edges.map((edge) => edge.node),
-        loadMoreCursor: getLatestCursorOfConnectionEdges(data.thread.comments)
+        threadId: viewer.thread._id,
+        comments: viewer.thread.comments.edges.map((edge) => edge.node),
+        loadMoreCursor: getLatestCursorOfConnectionEdges(viewer.thread.comments)
       }
     },
     options: (props) => {
       return {
         fetchPolicy: 'cache-only',
         variables: {
+          userId: props.userId,
           filter: {
             contentId: props.url.query.contentId,
             appId: props.url.query.appId
@@ -62,7 +65,7 @@ export default compose(
    * Read loadMoreComent from local Cache
    * for more information read in Saga `UIThread/index.ts`
    */
-  graphql<any, { url: any, threadId: string, loadMoreCursor: string }>(ThreadQuery, {
+  graphql<any, { url: any, threadId: string, loadMoreCursor: string, userId: string }>(ThreadQuery, {
     props: ({ data, ownProps: { loadMoreCursor } }) => {
       if (!loadMoreCursor) {
         return {
@@ -71,7 +74,7 @@ export default compose(
       }
       try {
         return {
-          loadMoreComments: data.thread.comments.edges.map((edge) => edge.node)
+          loadMoreComments: data.viewer.thread.comments.edges.map((edge) => edge.node)
         }
       } catch (e) {
         return {
@@ -87,6 +90,7 @@ export default compose(
             contentId: props.url.query.contentId,
             appId: props.url.query.appId,
           },
+          userId: props.userId,
           first: MAX_COMMENT_PER_REQUEST,
           after: props.loadMoreCursor
         },

@@ -64,6 +64,9 @@ interface UICommentPropTypes extends GBCommentType {
   className?: string
   isRemovable?: boolean
   onRemove?: (id: string) => void
+  onAddReaction?: (type: string) => void
+  onRemoveReaction?: () => void
+  isAbleToReact?: boolean
   userReaction?: {
     type: string
   }
@@ -99,7 +102,7 @@ const UICommentComponent = compose<UICommentPropTypes, {}>(
       <UIText>{props.message}</UIText>
     </TextContainer>
     <ReactionContainer>
-      <ReactionCompose userReaction={props.userReaction} reactionSummary={props.reactionSummary}/>
+      <ReactionCompose isAbleToReact={props.isAbleToReact} onAddReaction={props.onAddReaction} onRemoveReaction={props.onRemoveReaction} userReaction={props.userReaction} reactionSummary={props.reactionSummary}/>
     </ReactionContainer>
   </CommentContainer>
 )) as UICommentComponent
