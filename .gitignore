@@ -10,3 +10,4 @@ dist
 *.d.ts
 vim
 *.swp
+yarn-error.log
