@@ -20,7 +20,7 @@ const Container = styled.div`
   }
 `
 
-export default class ReactionCompose extends React.Component<{ userReaction?: any, reactionSummary?: any, style?: any, onAddReaction?: any, onRemoveReaction?: any, isAbleToReact?: boolean}> {
+export default class ReactionCompose extends React.Component<{ className?: string, userReaction?: any, reactionSummary?: any, style?: any, onAddReaction?: any, onRemoveReaction?: any, isAbleToReact?: boolean}> {
   static fragments = {
     threadReaction: gql`
       fragment ThreadReaction on Thread {
@@ -80,7 +80,7 @@ export default class ReactionCompose extends React.Component<{ userReaction?: an
     if (this.ticker) {
       clearTimeout(this.ticker)
     }
-    this.ticker = setTimeout(this.handleAfterMouseEnter, 300)
+    this.ticker = setTimeout(this.handleAfterMouseEnter, 500)
   }
   handleOnMouseLeave = () => {
     if (this.props.userReaction) return
@@ -94,11 +94,11 @@ export default class ReactionCompose extends React.Component<{ userReaction?: an
     if (this.tickerLeave) {
       clearTimeout(this.tickerLeave)
     }
-    this.tickerLeave = setTimeout(this.handleAfterMouseLeave, 300)
+    this.tickerLeave = setTimeout(this.handleAfterMouseLeave, 500)
   }
   handleReactionClick = (type) => {
-    type && this.props.onAddReaction && this.props.onAddReaction(type)
-    !type && this.props.onRemoveReaction && this.props.onRemoveReaction()
+    this.props.userReaction && this.props.onRemoveReaction && this.props.onRemoveReaction()
+    !this.props.userReaction && this.props.onAddReaction && this.props.onAddReaction(type)
     this.setState({
       showReactionList: false,
     })
@@ -113,11 +113,11 @@ export default class ReactionCompose extends React.Component<{ userReaction?: an
   }
   render() {
     return (
-      <Container style={this.props.style}>
+      <Container className={this.props.className} style={this.props.style}>
         {/* <ReactionList onClick={this.handleReactionClick} className="reaction-list" show={this.state.showReactionList} onMouseEnter={this.handleOnMouseEnter} onMouseLeave={this.handleOnMouseLeave}/> */}
         {
           this.props.isAbleToReact
-          ? <ReactButton onClick={this.handleReactionClick} userReaction={this.props.userReaction} onMouseEnter={this.handleOnMouseEnter} onMouseLeave={this.handleOnMouseLeave} expand={this.state.showReactionList}/>
+          ? <ReactButton onClick={this.handleReactionClick} userReaction={this.props.userReaction} onEnter={this.handleOnMouseEnter} onLeave={this.handleOnMouseLeave} expand={this.state.showReactionList}/>
           : null
         }
         <ReactionSummary style={{ marginLeft: this.props.isAbleToReact ? 5 : 0 }} reactions={this.props.reactionSummary}/>
