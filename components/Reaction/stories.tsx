@@ -27,7 +27,7 @@ class ToggleReactionList extends React.Component {
 
 class ToggleReactionButton extends React.Component {
   state = {
-    show: true
+    show: false
   }
   render() {
     return (
@@ -38,22 +38,33 @@ class ToggleReactionButton extends React.Component {
   }
 }
 
-storiesOf("Reaction", module)
+storiesOf("Reaction/combine", module)
   .addDecorator(story => (
     <Layout>
       {story()}
     </Layout>
   ))
-  .add("show simple button", () => (
-    <ReactButton expand/>
+  .add("compose", () => (
+    <div style={{ paddingTop: 90, paddingLeft: 40 }}>
+      <ReactionCompose isAbleToReact={false} reactionSummary={[{ count: 4, type: "LIKE" }, { count: 4, type: "WOW" }]}/>
+      <br/>
+      <ReactionCompose isAbleToReact onAddReaction={action('add')} onRemoveReaction={action('remove')} reactionSummary={[{ count: 4, type: "LIKE" }, { count: 4, type: "WOW" }]}/>
+      <ReactionCompose isAbleToReact onAddReaction={action('add')} onRemoveReaction={action('remove')} reactionSummary={[]}/>
+      <ReactionCompose isAbleToReact onAddReaction={action('add')} onRemoveReaction={action('remove')} userReaction={{ type: "LIKE" }} reactionSummary={[{ count: 4, type: "LIKE" }, { count: 4, type: "WOW" }]}/>
+      <ReactionCompose isAbleToReact onAddReaction={action('add')} onRemoveReaction={action('remove')} userReaction={{ type: "WOW" }} reactionSummary={[]}/>
+    </div>
   ))
-  .add("un expand react button", () => (
+
+storiesOf("Reaction/ReactButton", module)
+  .addDecorator(story => (
+    <Layout>
+      {story()}
+    </Layout>
+  ))
+  .add("No Reacted", () => (
     <ReactButton expand={false}/>
   ))
-  .add("toggle react button", () => (
-    <ToggleReactionButton/>
-  ))
-  .add("show reacted reaction", () => (
+  .add("Reacted", () => (
     <div>
       {
         reactions.map(reaction => (
@@ -64,26 +75,39 @@ storiesOf("Reaction", module)
       }
     </div>
   ))
-  .add("show list of reaction", () => (
+  .add("Expanded", () => (
+    <ReactButton expand/>
+  ))
+  .add("Toggle", () => (
+    <ToggleReactionButton/>
+  ))
+  
+
+storiesOf("Reaction/ReactionList", module)
+  .addDecorator(story => (
+    <Layout>
+      {story()}
+    </Layout>
+  ))
+  .add("show", () => (
     <ReactionList onClick={action('reaction')} show/>
   ))
-  .add("action list toggle", () => (
+  .add("toggle", () => (
     <ToggleReactionList/>
+  ))
+
+storiesOf("Reaction/ReactionSummary", module)
+  .addDecorator(story => (
+    <Layout>
+      {story()}
+    </Layout>
   ))
   .add("summary reaction", () => (
     <ReactionSummary reactions={[{ count: 4, type: "LIKE" }, { count: 4, type: "WOW" }]}/>
   ))
-  .add("empty summary reaction", () => (
+  .add("empty", () => (
     <ReactionSummary reactions={[]}/>
   ))
-  .add("null summary reaction", () => (
+  .add("null", () => (
     <ReactionSummary reactions={null}/>
-  ))
-  .add("compose", () => (
-    <div style={{ paddingTop: 70, paddingLeft: 40 }}>
-      <ReactionCompose onAddReaction={action('add')} onRemoveReaction={action('remove')} reactionSummary={[{ count: 4, type: "LIKE" }, { count: 4, type: "WOW" }]}/>
-      <ReactionCompose onAddReaction={action('add')} onRemoveReaction={action('remove')} reactionSummary={[]}/>
-      <ReactionCompose onAddReaction={action('add')} onRemoveReaction={action('remove')} userReaction={{ type: "LIKE" }} reactionSummary={[{ count: 4, type: "LIKE" }, { count: 4, type: "WOW" }]}/>
-      <ReactionCompose onAddReaction={action('add')} onRemoveReaction={action('remove')} userReaction={{ type: "WOW" }} reactionSummary={[]}/>
-    </div>
   ))
