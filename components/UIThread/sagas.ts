@@ -6,7 +6,8 @@ import {
   REMOVE_COMMENT_MUTATION,
   THREAD_FRAGMENT,
   AddReaction,
-  RemoveReaction
+  RemoveReaction,
+  ThreadReactionQuery
 } from './graphql'
 import gql from 'graphql-tag'
 import UIThread from './components/UIThread'
@@ -41,6 +42,12 @@ async function initFetchQuery(
   context: ApplicationSagaContext,
   variables: any
 ): Promise<ObservableQuery<CommentListQueryResult>> {
+  await context.apolloClient.query({
+    query: ThreadReactionQuery,
+    variables,
+    fetchPolicy: "network-only"
+  })
+
   const firstCommentQuery = context.apolloClient.watchQuery<
     CommentListQueryResult
     >({

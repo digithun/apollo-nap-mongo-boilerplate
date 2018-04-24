@@ -110,20 +110,18 @@ const UICommentComponent = compose<UICommentPropTypes, {}>(
 const enchanceComponent = withDict<UICommentPropTypes, UICommentPropTypes>(UICommentComponent as any) as any
 enchanceComponent.fragments = {
   comment: gql`
+    ${ReactionCompose.fragments.commentReaction}
     fragment UICommentDataFragment on Comment {
       message
       _id
       createdAt
       userId
-      reactionSummary
-      userReaction {
-        type
-      }
       user {
         name
         _id
         profilePicture
       }
+      ...CommentReaction
     }
   `
 }

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import gql from 'graphql-tag'
 import styled from 'styled-components'
 import ReactButton from './ReactButton.component'
 import ReactionList from './ReactionList.component'
@@ -20,6 +21,24 @@ const Container = styled.div`
 `
 
 export default class ReactionCompose extends React.Component<{ userReaction?: any, reactionSummary?: any, style?: any, onAddReaction?: any, onRemoveReaction?: any, isAbleToReact?: boolean}> {
+  static fragments = {
+    threadReaction: gql`
+      fragment ThreadReaction on Thread {
+        reactionSummary
+        userReaction {
+          type
+        }
+      }
+    `,
+    commentReaction: gql`
+      fragment CommentReaction on Comment {
+        reactionSummary
+        userReaction {
+          type
+        }
+      }
+    `
+  }
   ticker
   tickerLeave
   state = {

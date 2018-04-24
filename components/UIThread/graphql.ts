@@ -1,5 +1,6 @@
 import gql from 'graphql-tag'
 import UIThread from './components/UIThread'
+import ReactionCompose from '../Reaction/ReactionCompose.component'
 export const THREAD_FRAGMENT = gql`
   ${UIThread.fragments.comment}
   fragment ReadThread on Thread {
@@ -72,5 +73,17 @@ mutation($contentId: MongoID!, $userId: String!, $contentType: String!) {
     contentId: $contentId
   	userId: $userId
   )
+}
+`
+
+export const ThreadReactionQuery = gql`
+${ReactionCompose.fragments.threadReaction}
+query ($filter: FilterFindOneThreadInput$userId: String) {
+  viewer(userId: $userId) {
+    thread(filter: $filter) {
+      _id
+      ...ThreadReaction
+    }
+  }
 }
 `
