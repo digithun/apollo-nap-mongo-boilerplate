@@ -1,4 +1,5 @@
 import { TypeComposer } from 'graphql-compose'
+import { GraphQLString } from 'graphql'
 
 export function createThreadWrapResolver(next) {
   return async (rp) => {

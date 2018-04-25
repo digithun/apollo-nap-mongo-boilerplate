@@ -1,7 +1,7 @@
 import ApolloClient from 'apollo-client'
 import { Store } from 'redux'
 import { all } from 'redux-saga/effects'
-import { replySaga } from '../components/UIThread'
+import { saga as replySaga } from '../components/UIThread'
 
 declare global {
   interface ApplicationSagaContext {

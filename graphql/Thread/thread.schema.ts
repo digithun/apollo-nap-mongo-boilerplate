@@ -4,6 +4,7 @@ declare global {
     _id: any
     appId: string
     contentId: string
+    reactionSummary?: any
   }
   interface GQThreadDocument extends mongoose.Document, GBThreadType { }
 }
@@ -16,6 +17,7 @@ const threadSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  reactionSummary: {}
 })
 
 export default threadSchema

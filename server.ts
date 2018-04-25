@@ -28,6 +28,7 @@ declare global {
     connectors: GQConnectors
     token: string
     // user: GBUserType
+    userId?: string
   }
 }
 

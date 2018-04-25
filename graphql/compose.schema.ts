@@ -1,10 +1,11 @@
-
+import { GraphQLObjectType, GraphQLString } from 'graphql'
 import { GQC, TypeComposer } from 'graphql-compose'
 import * as mongoose from 'mongoose'
 import thread from './Thread'
 import { wrapResolvers } from 'graphql-compose-schema-wrapper'
 import comment from './Comment'
 import user from './User'
+import reaction from './Reaction'
 import 'isomorphic-fetch'
 
 declare global {
@@ -12,6 +13,7 @@ declare global {
     Thread: TypeComposer
     Comment: TypeComposer
     User: TypeComposer
+    Reaction: TypeComposer
   }
   /**
    * Every Graphql-compose Model strategy should implement this type
@@ -29,6 +31,7 @@ declare global {
     Thread: mongoose.Model<GQThreadDocument>
     Comment: mongoose.Model<GQCommentDocument>
     User: mongoose.Model<GQUserDocument>
+    Reaction: mongoose.Model<GQReactionDocument> & { getSummary: (type: any, id: any) => any, delete: any }
   }
 
   interface GQCreateOneArgs<Schema> {
@@ -55,25 +58,48 @@ declare global {
 
 export default function createSchema({ __connection, config }: SVContext) {
 
-  const models = {
+  const models: GQApplicationModels = {
     Thread: __connection.model<GQThreadDocument>('Thread', thread.schema),
     Comment: __connection.model<GQCommentDocument>('Comment', comment.schema),
     User: __connection.model<GQUserDocument>('User', user.schema),
+    Reaction: __connection.model<GQReactionDocument>('Reaction', reaction.schema) as any
   }
   const typeComposers: GQTypeComposers = {
     Thread: thread.createTypeComposer(models.Thread),
     Comment: comment.createTypeComposer(models.Comment),
-    User: user.createTypeComposer(models.User)
+    User: user.createTypeComposer(models.User),
+    Reaction: reaction.createTypeComposer(models.Reaction),
   }
 
   thread.createGraphQLRelation(typeComposers)
   comment.createGraphQLRelation(typeComposers)
+  const Viewer = TypeComposer.create("Viewer")
+  Viewer.addFields({
+    threads: typeComposers.Thread.getResolver('findMany'),
+    thread: typeComposers.Thread.getResolver('findAndUpdate'),
+    comment: typeComposers.Comment.getResolver('findById')
+  })
 
   GQC.rootQuery().addFields({
+    viewer: {
+      type: Viewer,
+      args: {
+        userId: { type: GraphQLString },
+      },
+      resolve: (source, args, context) => {
+        if (args.userId) {
+          context.userId = args.userId
+        }
+        return {}
+      }
+    },
     threads: typeComposers.Thread.getResolver('findMany'),
-    thread: typeComposers.Thread.getResolver('findAndUpdate')
+    thread: typeComposers.Thread.getResolver('findAndUpdate'),
+    comment: typeComposers.Comment.getResolver('findById')
   })
   GQC.rootMutation().addFields({
+    addReaction:typeComposers.Reaction.getResolver('add'),
+    removeReaction:typeComposers.Reaction.getResolver('remove'),
     createThread: typeComposers.Thread.getResolver('createOne'),
     ...wrapResolvers<any, { user: any }>({
       updateCommentById: typeComposers.Comment.getResolver('updateById'),

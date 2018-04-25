@@ -1,4 +1,5 @@
 import Thread from '../components/UIThread'
+import ThreadReaction from '../components/UIThread/Reaction.container'
 import * as localStorage from 'localforage'
 import * as React from 'react'
 import gql from 'graphql-tag'
@@ -170,6 +171,20 @@ export default class Index extends React.Component<
           </button>
           {this.state.threadId}
           {this.state.token}
+          <br/>
+          <ThreadReaction
+            graphQLEndpoint={'/graphql'}
+            url={{
+              ...this.props.url,
+              query: {
+                contentId: `episode.${this.state.threadId || 'comment-test'}`,
+                users: encodeUserList,
+                sessionToken: this.state.token,
+                appId: 'Jamplay'
+              }
+            }}
+          />
+          <br/>
           <Thread
             graphQLEndpoint={'/graphql'}
             url={{

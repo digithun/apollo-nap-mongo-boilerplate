@@ -7,6 +7,7 @@ import * as Actions from '../actions'
 import * as Label from '../../common/Label'
 import UIComment from './UIComment'
 interface ThreadPropTypes {
+  userId: string
   replyDisabled?: boolean
   replyDisabledPlaceholder?: string
   url: any
@@ -42,6 +43,12 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
   constructor(props) {
     super(props)
   }
+  onAddReaction = (id, type) => {
+    this.props.dispatch(Actions.addReaction({type, contentId: id, contentType: "COMMENT"}))
+  }
+  onRemoveReaction = (id) => {
+    this.props.dispatch(Actions.removeReaction({contentId: id, contentType: "COMMENT"}))
+  }
   public findUserListById(_id) {
     for (const user of this.props.userList) {
       if (user._id === _id) {
@@ -73,12 +80,15 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
           />
           <div style={{ marginTop: 20, }}>
             {this.props.comments.map((comment) => {
-              return (<UIComment onRemove={this.onRemove} key={comment._id} isRemovable={!!this.findUserListById(comment.userId)} {...comment} />)
+              return (<UIComment isAbleToReact={!!this.props.userId} onRemove={this.onRemove} onAddReaction={(type) => this.onAddReaction(comment._id, type)} onRemoveReaction={() => this.onRemoveReaction(comment._id)} key={comment._id} isRemovable={!!this.findUserListById(comment.userId)} {...comment} />)
             })}
             {this.props.loadMoreComments.map((comment) => {
               return (
                 <UIComment
+                  isAbleToReact={!!this.props.userId}
                   onRemove={this.onRemove}
+                  onAddReaction={(type) => this.onAddReaction(comment._id, type)}
+                  onRemoveReaction={() => this.onRemoveReaction(comment._id)}
                   className='loadmore'
                   isRemovable={this.getIsRemovable(comment)}
                   key={comment._id}

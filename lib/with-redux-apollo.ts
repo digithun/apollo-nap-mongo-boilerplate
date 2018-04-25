@@ -120,7 +120,8 @@ export default function withReduxApollo(
                 dataIdFromObject: (value: any) => value._id,
                 fragmentMatcher: new IntrospectionFragmentMatcher({
                   introspectionQueryResultData: fragmentMacherResult
-                })
+                }),
+                addTypename: true,
               }).restore({}) as any
             } else {
               cache = this.props.cache
@@ -132,10 +133,13 @@ export default function withReduxApollo(
                 authorization: `Bearer ${this.props.url.query.sessionToken}`
               }
             })
-            globalWindow.__CommentServiceApolloClient = new ApolloClient({
+            const apolloClient = new ApolloClient({
               link,
-              cache
+              cache,
+              connectToDevTools: process.env.NODE_ENV === "development",
             })
+            globalWindow.__CommentServiceApolloClient = apolloClient
+
             globalWindow.__CommentServiceReduxStore = initStore({
               apolloClient: globalWindow.__CommentServiceApolloClient,
               initialState,
