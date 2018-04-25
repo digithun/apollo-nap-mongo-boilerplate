@@ -5,7 +5,7 @@ import gql from 'graphql-tag'
 import { compose, withProps, withState } from 'recompose'
 import * as Actions from './actions'
 import { ApolloClient } from 'apollo-client';
-import { ThreadQuery } from './graphql'
+import { THREAD_QUERY } from './graphql'
 import UIThread from './components/UIThread'
 import {saga, getLatestCursorOfConnectionEdges, constants } from './sagas'
 export  {saga}
@@ -30,7 +30,7 @@ export default compose(
     dispatch,
   })),
 
-  graphql<any, { url: any, userId: any }>(ThreadQuery, {
+  graphql<any, { url: any, userId: any }>(THREAD_QUERY, {
     props: ({ data }) => {
       const viewer = data.viewer
       if (data.loading || !viewer || !viewer.thread) {
@@ -65,7 +65,7 @@ export default compose(
    * Read loadMoreComent from local Cache
    * for more information read in Saga `UIThread/index.ts`
    */
-  graphql<any, { url: any, threadId: string, loadMoreCursor: string, userId: string }>(ThreadQuery, {
+  graphql<any, { url: any, threadId: string, loadMoreCursor: string, userId: string }>(THREAD_QUERY, {
     props: ({ data, ownProps: { loadMoreCursor } }) => {
       if (!loadMoreCursor) {
         return {

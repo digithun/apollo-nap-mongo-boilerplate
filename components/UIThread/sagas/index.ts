@@ -2,8 +2,8 @@ import { takeEvery, select, put, call, fork } from 'redux-saga/effects'
 import { ObservableQuery } from 'apollo-client'
 import * as Actions from '../actions'
 import {
-  ThreadQuery,
-  ThreadReactionQuery
+  THREAD_QUERY,
+  THREAD_REACTION_QUERY
 } from '../graphql'
 import gql from 'graphql-tag'
 import { request } from 'https'
@@ -35,7 +35,7 @@ async function initFetchQuery(
   variables: any
 ): Promise<ObservableQuery<CommentListQueryResult>> {
   await context.apolloClient.query({
-    query: ThreadReactionQuery,
+    query: THREAD_REACTION_QUERY,
     variables,
     fetchPolicy: "network-only"
   })
@@ -43,7 +43,7 @@ async function initFetchQuery(
   const firstCommentQuery = context.apolloClient.watchQuery<
     CommentListQueryResult
     >({
-      query: ThreadQuery,
+      query: THREAD_QUERY,
       variables,
       fetchPolicy: "network-only"
     })
@@ -52,7 +52,7 @@ async function initFetchQuery(
   const loadMoreCommentQuery = context.apolloClient.watchQuery<
     CommentListQueryResult
     >({
-      query: ThreadQuery,
+      query: THREAD_QUERY,
       variables: {
         ...variables,
         after: getLatestCursorOfConnectionEdges(
@@ -169,14 +169,14 @@ export function* saga(context: ApplicationSagaContext) {
     yield put({ type: 'global/loading-start' })
     const data: CommentListQueryResult = yield call(
       [apolloClient, apolloClient.readQuery],
-      { query: ThreadQuery, variables: thread.commentObservableQuery.variables }
+      { query: THREAD_QUERY, variables: thread.commentObservableQuery.variables }
     )
     const lastCursor = getLatestCursorOfConnectionEdges(data.viewer.thread.comments)
 
     const loadMoreCommentResult: { data: CommentListQueryResult } = yield call(
       apolloClient.query,
       {
-        query: ThreadQuery,
+        query: THREAD_QUERY,
         variables: {
           ...thread.queryVariables,
           after: lastCursor
@@ -186,7 +186,7 @@ export function* saga(context: ApplicationSagaContext) {
     )
 
     yield call([apolloClient, apolloClient.writeQuery], {
-      query: ThreadQuery,
+      query: THREAD_QUERY,
       variables: {
         ...thread.commentObservableQuery.variables
       },

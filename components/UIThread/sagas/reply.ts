@@ -1,12 +1,12 @@
 import { takeEvery, select, put, call } from 'redux-saga/effects'
 import gql from 'graphql-tag'
 import {
-  ThreadQuery,
+  THREAD_QUERY,
   REMOVE_COMMENT_MUTATION,
   THREAD_FRAGMENT,
-  AddReaction,
-  RemoveReaction,
-  ThreadReactionQuery
+  ADD_REACTION_MUTATION,
+  REMOVE_REACTION_MUTATION,
+  THREAD_REACTION_QUERY
 } from '../graphql'
 import UIThread from '../components/UIThread'
 
@@ -41,7 +41,7 @@ export default function * saga(context: ApplicationSagaContext, thread: ThreadCo
     let queryResult: { viewer: { thread: GBThreadType } } = yield call(
       [context.apolloClient, context.apolloClient.readQuery],
       {
-        query: ThreadQuery,
+        query: THREAD_QUERY,
         variables
       }
     )
@@ -51,13 +51,13 @@ export default function * saga(context: ApplicationSagaContext, thread: ThreadCo
       // reload data if data is not available
 
       queryResult = yield call(context.apolloClient.query, {
-        query: ThreadQuery,
+        query: THREAD_QUERY,
         variables
       })
     }
     const data: { viewer: { thread: ThreadResultType } } = yield call(
       [context.apolloClient, context.apolloClient.readQuery],
-      { query: ThreadQuery, variables: thread.queryVariables }
+      { query: THREAD_QUERY, variables: thread.queryVariables }
     )
     console.log(queryResult, commentInputData)
     if (!commentInputData.user) {
@@ -65,7 +65,7 @@ export default function * saga(context: ApplicationSagaContext, thread: ThreadCo
       return
     }
     yield call([context.apolloClient, context.apolloClient.writeQuery], {
-      query: ThreadQuery,
+      query: THREAD_QUERY,
       variables: thread.queryVariables,
       data: Object.assign({}, data, {
         viewer: {
@@ -124,7 +124,7 @@ export default function * saga(context: ApplicationSagaContext, thread: ThreadCo
         `
       })
       yield call([context.apolloClient, context.apolloClient.writeQuery], {
-        query: ThreadQuery,
+        query: THREAD_QUERY,
         variables: thread.queryVariables,
         data: Object.assign({}, data, {
           viewer: {

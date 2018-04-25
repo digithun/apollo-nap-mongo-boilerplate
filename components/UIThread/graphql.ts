@@ -28,7 +28,7 @@ export const REMOVE_COMMENT_MUTATION = gql`
   }
 `
 
-export const ThreadQuery = gql`
+export const THREAD_QUERY = gql`
 ${UIThread.fragments.thread}
 ${UIThread.fragments.comment}
 query ($filter: FilterFindOneThreadInput, $after: String, $first: Int, $userId: String) {
@@ -55,7 +55,7 @@ query ($filter: FilterFindOneThreadInput, $after: String, $first: Int, $userId: 
 }
 `
 
-export const AddReaction = gql`
+export const ADD_REACTION_MUTATION = gql`
 mutation($type: String!, $contentId: MongoID!, $userId: String!, $contentType: String!) {
   addReaction(
     contentType: $contentType
@@ -66,7 +66,7 @@ mutation($type: String!, $contentId: MongoID!, $userId: String!, $contentType: S
 }
 `
 
-export const RemoveReaction = gql`
+export const REMOVE_REACTION_MUTATION = gql`
 mutation($contentId: MongoID!, $userId: String!, $contentType: String!) {
   removeReaction(
     contentType: $contentType,
@@ -76,7 +76,7 @@ mutation($contentId: MongoID!, $userId: String!, $contentType: String!) {
 }
 `
 
-export const ThreadReactionQuery = gql`
+export const THREAD_REACTION_QUERY = gql`
 ${ReactionCompose.fragments.threadReaction}
 query ($filter: FilterFindOneThreadInput$userId: String) {
   viewer(userId: $userId) {

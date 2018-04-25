@@ -1,12 +1,12 @@
 import { takeEvery, select, put, call } from 'redux-saga/effects'
 import gql from 'graphql-tag'
 import {
-  ThreadQuery,
+  THREAD_QUERY,
   REMOVE_COMMENT_MUTATION,
   THREAD_FRAGMENT,
-  AddReaction,
-  RemoveReaction,
-  ThreadReactionQuery
+  ADD_REACTION_MUTATION,
+  REMOVE_REACTION_MUTATION,
+  THREAD_REACTION_QUERY
 } from '../graphql'
 
 import { CommentListQueryResult, ThreadResultType, ThreadContext } from './types'
@@ -61,7 +61,7 @@ export default function * saga(context: ApplicationSagaContext, thread: ThreadCo
           type: action.payload.type,
           userId: commentInputData.user._id
         },
-        mutation: AddReaction
+        mutation: ADD_REACTION_MUTATION
       })
     } catch(error) {
       console.error(error)
@@ -118,7 +118,7 @@ export default function * saga(context: ApplicationSagaContext, thread: ThreadCo
           contentType: action.payload.contentType,
           userId: commentInputData.user._id
         },
-        mutation: RemoveReaction
+        mutation: REMOVE_REACTION_MUTATION
       })
     } catch(error) {
       console.error(error)

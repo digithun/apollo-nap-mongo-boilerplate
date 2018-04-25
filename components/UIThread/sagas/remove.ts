@@ -1,11 +1,11 @@
 import { takeEvery, select, put, call } from 'redux-saga/effects'
 import {
-  ThreadQuery,
+  THREAD_QUERY,
   REMOVE_COMMENT_MUTATION,
   THREAD_FRAGMENT,
-  AddReaction,
-  RemoveReaction,
-  ThreadReactionQuery
+  ADD_REACTION_MUTATION,
+  REMOVE_REACTION_MUTATION,
+  THREAD_REACTION_QUERY
 } from '../graphql'
 
 import { CommentListQueryResult, ThreadResultType, ThreadContext } from './types'
@@ -32,7 +32,7 @@ export default function * removeSaga(context: ApplicationSagaContext, thread: Th
       function filterCommentFromTheadById(variables: any, commentId: any) {
         console.log(variables.filter.contentId)
         let data: CommentListQueryResult = context.apolloClient.readQuery({
-          query: ThreadQuery,
+          query: THREAD_QUERY,
           variables
         })
 
@@ -51,7 +51,7 @@ export default function * removeSaga(context: ApplicationSagaContext, thread: Th
         })
 
         context.apolloClient.writeQuery({
-          query: ThreadQuery,
+          query: THREAD_QUERY,
           variables,
           data
         })

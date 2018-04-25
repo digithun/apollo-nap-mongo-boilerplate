@@ -5,7 +5,7 @@ import gql from 'graphql-tag'
 import { compose, withProps, withState } from 'recompose'
 import * as Actions from './actions'
 import { ApolloClient } from 'apollo-client';
-import { ThreadReactionQuery } from './graphql'
+import { THREAD_REACTION_QUERY } from './graphql'
 import ReactionCompose from '../Reaction/ReactionCompose.component'
 
 export default compose(
@@ -18,7 +18,7 @@ export default compose(
     dispatch,
   })),
   graphql<any, any, any>(
-    ThreadReactionQuery,
+    THREAD_REACTION_QUERY,
     {
       props: ({ data }) => {
         if (!data.viewer || !data.viewer.thread) {
