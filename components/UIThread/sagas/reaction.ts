@@ -34,7 +34,7 @@ export default function * saga(context: ApplicationSagaContext, thread: ThreadCo
       data.userReaction = { type: action.payload.type, __typename: "Reaction" }
       data.reactionSummary = data.reactionSummary || []
       if (data.reactionSummary.find(r => r.type === action.payload.type)) {
-        data.reactionSummary = data.reactionSummary.map(r => ({ ...r, count: r.type === action.payload.type ? r.count - 1 : r.count }))
+        data.reactionSummary = data.reactionSummary.map(r => ({ ...r, count: r.type === action.payload.type ? r.count + 1 : r.count }))
       } else {
         data.reactionSummary = [].concat([], data.reactionSummary, { type: action.payload.type, count: 1 })
       }
