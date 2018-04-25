@@ -86,8 +86,11 @@ export default function createSchema({ __connection, config }: SVContext) {
       args: {
         userId: { type: GraphQLString },
       },
-      resolve: (source, args, context) => {
+      resolve: async (source, args, context) => {
         if (args.userId) {
+          if (!await context.connectors.User.verifyAvailableUserId(context.token, args.userId)) {
+            throw new Error('no permission')
+          }
           context.userId = args.userId
         }
         return {}

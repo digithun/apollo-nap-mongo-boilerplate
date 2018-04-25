@@ -19,9 +19,9 @@ export const guardWrapResolver: ResolverNextRpCb<GQCommentDocument, GQResolverCo
     if (!rp.context.token) {
       throw new Error('unauthorized')
     }
-    // if (!await rp.context.connectors.User.verifyAvailableUserId(rp.context.token, rp.args.userId)) {
-    //   throw new Error('no permission')
-    // }
+    if (!await rp.context.connectors.User.verifyAvailableUserId(rp.context.token, rp.args.userId)) {
+      throw new Error('no permission')
+    }
     return next(rp)
   }
 }
