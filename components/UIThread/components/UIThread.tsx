@@ -1,12 +1,13 @@
 import * as React from 'react'
 import gql from 'graphql-tag'
-import * as _ from 'lodash'
 import Reply from './UIReplyInput'
 import Layout from '../../Layout'
 import * as Button from '../../common/Button'
 import * as Actions from '../actions'
 import * as Label from '../../common/Label'
 import UIComment from './UIComment'
+
+const debounce = require('lodash/debounce')
 interface ThreadPropTypes {
   userId: string
   replyDisabled?: boolean
@@ -52,7 +53,7 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
   }
 
   public componentDidMount() {
-    window.addEventListener('scroll', _.debounce(() => {
+    window.addEventListener('scroll', debounce(() => {
       if (this.props.hasNextPage) {
         let supportPageOffset = window.pageXOffset !== undefined
         let isCSS1Compat = ((document.compatMode || '') === 'CSS1Compat')
