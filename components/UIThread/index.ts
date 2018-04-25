@@ -7,8 +7,8 @@ import * as Actions from './actions'
 import { ApolloClient } from 'apollo-client';
 import { ThreadQuery } from './graphql'
 import UIThread from './components/UIThread'
-import {replySaga, getLatestCursorOfConnectionEdges, MAX_COMMENT_PER_REQUEST } from './sagas'
-export  {replySaga}
+import {saga, getLatestCursorOfConnectionEdges, constants } from './sagas'
+export  {saga}
 
 export default compose(
   withApollo,
@@ -55,7 +55,7 @@ export default compose(
             contentId: props.url.query.contentId,
             appId: props.url.query.appId
           },
-          first: MAX_COMMENT_PER_REQUEST
+          first: constants.MAX_COMMENT_PER_REQUEST
         }
       }
     }
@@ -91,7 +91,7 @@ export default compose(
             appId: props.url.query.appId,
           },
           userId: props.userId,
-          first: MAX_COMMENT_PER_REQUEST,
+          first: constants.MAX_COMMENT_PER_REQUEST,
           after: props.loadMoreCursor
         },
       })
