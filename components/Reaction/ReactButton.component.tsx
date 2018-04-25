@@ -42,7 +42,7 @@ const Reaction = styled.div`
   }
 ` as any
 
-export default class ReactButton extends React.Component<{ userReaction?: { type: string }, onClick?: any, onLeave?: any, onEnter?: any, style?: any, expand: boolean }> {
+export default class ReactButton extends React.Component<{ direction?: string, userReaction?: { type: string }, onClick?: any, onLeave?: any, onEnter?: any, style?: any, expand: boolean }> {
   reactions = {}
   state = {
     active: null
@@ -76,7 +76,7 @@ export default class ReactButton extends React.Component<{ userReaction?: { type
                 expand={this.props.expand}
                 hide={hide}
                 style={{
-                  left: !this.props.expand ? 0 : idx * 35,
+                  left: !this.props.expand ? 0 : idx * 35 * (this.props.direction === "left" ? -1 : 1),
                   visibility: hide ? "hidden" : "visible",
                   opacity:  hide ? 0 : 1,
                   zIndex: reactions.length - idx,

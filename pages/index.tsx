@@ -173,6 +173,8 @@ export default class Index extends React.Component<
           {this.state.token}
           <br/>
           <ThreadReaction
+            style={{ marginLeft: 200 }}
+            direction="left"
             graphQLEndpoint={'/graphql'}
             url={{
               ...this.props.url,

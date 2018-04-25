@@ -14,12 +14,12 @@ const Container = styled.div`
       width: 25px;
       height: 25px;
     }
-    &:not(:first-child) {
-      left: -5px;
+    &:not(:last-child) {
+      right: -5px;
     }
   }
   .count {
-    margin-left: 3px;
+    margin-left: 10px;
     line-height: 25px;
     vertical-align: top;
   }

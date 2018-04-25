@@ -53,4 +53,4 @@ export default compose(
     },
     dispatch,
   })),
-)(ReactionCompose) as React.ComponentClass<CommentServiceComponentProps>
+)(ReactionCompose) as React.ComponentClass<CommentServiceComponentProps> as any

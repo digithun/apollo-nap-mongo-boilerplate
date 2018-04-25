@@ -20,7 +20,7 @@ const Container = styled.div`
   }
 `
 
-export default class ReactionCompose extends React.Component<{ className?: string, userReaction?: any, reactionSummary?: any, style?: any, onAddReaction?: any, onRemoveReaction?: any, isAbleToReact?: boolean}> {
+export default class ReactionCompose extends React.Component<{ className?: string, direction?: string, userReaction?: any, reactionSummary?: any, style?: any, onAddReaction?: any, onRemoveReaction?: any, isAbleToReact?: boolean}> {
   static fragments = {
     threadReaction: gql`
       fragment ThreadReaction on Thread {
@@ -117,7 +117,7 @@ export default class ReactionCompose extends React.Component<{ className?: strin
         {/* <ReactionList onClick={this.handleReactionClick} className="reaction-list" show={this.state.showReactionList} onMouseEnter={this.handleOnMouseEnter} onMouseLeave={this.handleOnMouseLeave}/> */}
         {
           this.props.isAbleToReact
-          ? <ReactButton onClick={this.handleReactionClick} userReaction={this.props.userReaction} onEnter={this.handleOnMouseEnter} onLeave={this.handleOnMouseLeave} expand={this.state.showReactionList}/>
+          ? <ReactButton direction={this.props.direction} onClick={this.handleReactionClick} userReaction={this.props.userReaction} onEnter={this.handleOnMouseEnter} onLeave={this.handleOnMouseLeave} expand={this.state.showReactionList}/>
           : null
         }
         <ReactionSummary style={{ marginLeft: this.props.isAbleToReact ? 5 : 0 }} reactions={this.props.reactionSummary}/>
