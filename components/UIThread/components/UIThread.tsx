@@ -6,6 +6,8 @@ import * as Button from '../../common/Button'
 import * as Actions from '../actions'
 import * as Label from '../../common/Label'
 import UIComment from './UIComment'
+
+const debounce = require('lodash/debounce')
 interface ThreadPropTypes {
   userId: string
   replyDisabled?: boolean
@@ -44,11 +46,37 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
     super(props)
   }
   onAddReaction = (id, type) => {
-    this.props.dispatch(Actions.addReaction({type, contentId: id, contentType: "COMMENT"}))
+    this.props.dispatch(Actions.addReaction({ type, contentId: id, contentType: "COMMENT" }))
   }
   onRemoveReaction = (id) => {
-    this.props.dispatch(Actions.removeReaction({contentId: id, contentType: "COMMENT"}))
+    this.props.dispatch(Actions.removeReaction({ contentId: id, contentType: "COMMENT" }))
   }
+
+  public componentDidMount() {
+    window.addEventListener('scroll', debounce(() => {
+      if (this.props.hasNextPage) {
+        let supportPageOffset = window.pageXOffset !== undefined
+        let isCSS1Compat = ((document.compatMode || '') === 'CSS1Compat')
+        let scrollMaxY = document.body.offsetHeight - document.documentElement.clientHeight;
+        let scroll = {
+          x: supportPageOffset ? window.pageXOffset : isCSS1Compat ? document.documentElement.scrollLeft : document.body.scrollLeft,
+          y: supportPageOffset ? window.pageYOffset : isCSS1Compat ? document.documentElement.scrollTop : document.body.scrollTop,
+        }
+        if (scroll.y > scrollMaxY) {
+          this.props.requestLoadMoreComments()
+        }
+      }
+    }, 1000))
+  }
+
+  public componentDidUpdate() {
+    setTimeout(() => {
+      if (document.body.scrollHeight < document.documentElement.clientHeight && this.props.hasNextPage) {
+        this.props.requestLoadMoreComments()
+      }
+    })
+  }
+
   public findUserListById(_id) {
     for (const user of this.props.userList) {
       if (user._id === _id) {
