@@ -4,7 +4,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import gql from 'graphql-tag'
 import { compose, withProps, withState } from 'recompose'
-import { DISABLED_TEXT_INPUT_DIALOG } from '../../actions';
+import { DISABLED_TEXT_INPUT_DIALOG, reply } from '../../actions';
 
 declare global {
   interface ReplyState extends GBCommentType {
@@ -60,13 +60,14 @@ export const replyReducer = (state: ReplyState, action) => {
 export default compose(
   connect<{}, {}, { value: GBCommentType, threadId: string }>((state: ApplicationState) => ({
     value: state.reply,
-  }), (dispatch, ownProps) => {
+  })),
+  connect<{}, {}, { value: GBCommentType }>(null, (dispatch, ownProps) => {
     return {
       onChange: (payload) => dispatch({ type: 'reply/input-update', payload }),
-      onConfirm: () => dispatch({ type: 'reply/confirm-create-comment' }),
+      onConfirm: () => dispatch(reply({ message: ownProps.value.message })),
       setCurrentSelectedUserIndex: (userIndex) => dispatch({ type: 'reply/set-selected-user-index', payload: userIndex })
     }
-  }),
+  })
 )(CommentInput) as React.ComponentClass<{
   userList: GBUserType[]
   disabled?: Boolean

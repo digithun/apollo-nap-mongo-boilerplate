@@ -1,6 +1,7 @@
 import { Reducer } from 'redux'
 import { threadReducer } from '../components/UIThread/reducer'
 import { replyReducer } from '../components/UIThread/components/UIReplyInput'
+import commentReducer from './comment'
 
 declare global {
 
@@ -40,5 +41,6 @@ const globalReducer: Reducer<GlobalState> = (prevState, action) => {
 export default {
   global: globalReducer,
   reply: replyReducer,
-  thread: threadReducer
+  thread: threadReducer,
+  comment: commentReducer,
 }

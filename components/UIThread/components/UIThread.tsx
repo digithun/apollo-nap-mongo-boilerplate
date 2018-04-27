@@ -51,6 +51,9 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
   onRemoveReaction = (id) => {
     this.props.dispatch(Actions.removeReaction({ contentId: id, contentType: "COMMENT" }))
   }
+  onReply = (id, message) => {
+    this.props.dispatch(Actions.replyComment({ message: message, replyToId: id }))
+  }
 
   public componentDidMount() {
     window.addEventListener('scroll', () => {
@@ -101,7 +104,7 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
     
     return (
       <Layout>
-        <div style={{ minHeight: 300 }} className={this.props.threadId}>
+        <div style={{ minHeight: 300, marginBottom: 100 }} className={this.props.threadId}>
           <Reply
             disabled={this.props.replyDisabled === true || this.props.userList.length <= 0}
             disabledPlaceholder={this.props.replyDisabledPlaceholder}
@@ -109,18 +112,29 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
           />
           <div style={{ marginTop: 20, }}>
             {this.props.comments.map((comment) => {
-              return (<UIComment isAbleToReact={!!this.props.userId} onRemove={this.onRemove} onAddReaction={(type) => this.onAddReaction(comment._id, type)} onRemoveReaction={() => this.onRemoveReaction(comment._id)} key={comment._id} isRemovable={!!this.findUserListById(comment.userId)} {...comment} />)
+              return (
+                <UIComment
+                  onReply={(message) => this.onReply(comment._id, message)}
+                  isLoggedIn={!!this.props.userId}
+                  onRemove={this.onRemove}
+                  onAddReaction={this.onAddReaction}
+                  onRemoveReaction={this.onRemoveReaction}
+                  key={comment._id}
+                  isRemovable={!!this.findUserListById(comment.userId)}
+                  {...comment}
+                />)
             })}
             {this.props.loadMoreComments.map((comment) => {
               return (
                 <UIComment
-                  isAbleToReact={!!this.props.userId}
+                  isLoggedIn={!!this.props.userId}
                   onRemove={this.onRemove}
-                  onAddReaction={(type) => this.onAddReaction(comment._id, type)}
-                  onRemoveReaction={() => this.onRemoveReaction(comment._id)}
+                  onAddReaction={this.onAddReaction}
+                  onRemoveReaction={this.onRemoveReaction}
                   className='loadmore'
                   isRemovable={this.getIsRemovable(comment)}
                   key={comment._id}
+                  onReply={(message) => this.onReply(comment._id, message)}
                   {...comment}
                 />)
             })}

@@ -16,21 +16,131 @@ import * as Actions from '../actions'
 
 export default function * saga(context: ApplicationSagaContext, thread: ThreadContext) {
   /** @Create new commment
+  * reply comment to comment
+  */
+  yield takeEvery<{
+    payload: Actions.ReplyCommentPayload
+    type: string
+  }>(Actions.replyComment, function*(action) {
+    yield put({ type: 'global/loading-start' })
+    try {
+      const commentInputData = yield select<ApplicationState>(
+        (state) => state.reply
+      )
+      let queryResult: { viewer: { thread: GBThreadType } } = yield call(
+        [context.apolloClient, context.apolloClient.readQuery],
+        {
+          query: THREAD_QUERY,
+          variables: thread.queryVariables
+        }
+      )
+      const data = context.apolloClient.readFragment<any>({
+        id: action.payload.replyToId,
+        fragment: UIThread.fragments.comment,
+        fragmentName: "UICommentDataFragment"
+      })
+      context.apolloClient.writeFragment({
+        id: action.payload.replyToId,
+        fragment: UIThread.fragments.comment,
+        fragmentName: "UICommentDataFragment",
+        data: {
+          ...data,
+          commentConnection: {
+            ...data.commentConnection,
+            edges: [].concat(data.commentConnection.edges, [{
+              __typename: 'CommentEdge',
+              cursor: '',
+              node: {
+                _id: Actions.OPTIMISTIC_COMMENT_ID,
+                createdAt: new Date(),
+                threadId: queryResult.viewer.thread._id,
+                message: action.payload.message,
+                userId: commentInputData.user._id,
+                userReaction: null,
+                reactionSummary: null,
+                user: {
+                  ...commentInputData.user,
+                  __typename: 'User'
+                },
+                __typename: 'Comment'
+              }
+            }])
+          }
+        }
+      })
+      const mutationResult = yield call([context.apolloClient, context.apolloClient.mutate], {
+        variables: {
+          record: {
+            contentId: queryResult.viewer.thread.contentId,
+            message: action.payload.message,
+            userId: commentInputData.user._id,
+            replyToId: action.payload.replyToId
+          }
+        },
+        mutation: gql`
+          ${UIThread.fragments.comment}
+          mutation($record: CreateOneCommentInput!) {
+            reply(record: $record) {
+              record {
+                _id
+                ...UICommentDataFragment
+              }
+            }
+          }
+        `
+      })
+      context.apolloClient.writeFragment({
+        id: action.payload.replyToId,
+        fragment: UIThread.fragments.comment,
+        fragmentName: "UICommentDataFragment",
+        data: {
+          ...data,
+          commentConnection: {
+            ...data.commentConnection,
+            edges: [].concat(data.commentConnection.edges, [{
+              __typename: 'CommentEdge',
+              cursor: '',
+              node: {
+                _id: mutationResult.data.reply.record._id,
+                createdAt: new Date(),
+                threadId: queryResult.viewer.thread._id,
+                message: action.payload.message,
+                userId: commentInputData.user._id,
+                userReaction: null,
+                reactionSummary: null,
+                user: {
+                  ...commentInputData.user,
+                  __typename: 'User'
+                },
+                __typename: 'Comment'
+              }
+            }])
+          }
+        }
+      })
+    } catch(error) {
+      console.error(error)
+    } finally {
+      yield put({ type: 'global/loading-done' })
+    }
+  })
+  /** @Create new commment
   * reply/confirm-create-comment
   * reply comment to thread
   */
   yield takeEvery<{
-    payload: Actions.ConfirmCreateCommentPayload
+    payload: Actions.ReplyPayload
     type: string
-  }>(Actions.confirmCreateComment, function*(action) {
+  }>(Actions.reply, function*(action) {
     yield put({ type: 'global/loading-start' })
+    const message = action.payload.message
 
     const commentInputData = yield select<ApplicationState>(
       (state) => state.reply
     )
     const variables = thread.queryVariables
     try {
-      if (commentInputData.message.length > 300) {
+      if (message.length > 300) {
         alert('Limit 300 charactors')
         yield put({ type: 'global/loading-done' })
         return
@@ -82,10 +192,18 @@ export default function * saga(context: ApplicationSagaContext, thread: ThreadCo
                     _id: Actions.OPTIMISTIC_COMMENT_ID,
                     createdAt: new Date(),
                     threadId: queryResult.viewer.thread._id,
-                    message: commentInputData.message,
+                    message: message,
                     userId: commentInputData.user._id,
                     userReaction: null,
                     reactionSummary: null,
+                    commentConnection: {
+                      __typename: 'CommentConnection',
+                      pageInfo: {
+                        __typename: 'PageInfo',
+                        hasNextPage: false
+                      },
+                      edges: []
+                    },
                     user: {
                       ...commentInputData.user,
                       __typename: 'User'
@@ -107,7 +225,7 @@ export default function * saga(context: ApplicationSagaContext, thread: ThreadCo
         variables: {
           record: {
             contentId: queryResult.viewer.thread.contentId,
-            message: commentInputData.message,
+            message: message,
             userId: commentInputData.user._id
           }
         },
@@ -141,9 +259,17 @@ export default function * saga(context: ApplicationSagaContext, thread: ThreadCo
                       _id: mutationResult.data.reply.record._id,
                       createdAt: new Date(),
                       threadId: queryResult.viewer.thread._id,
-                      message: commentInputData.message,
+                      message: message,
                       userId: commentInputData.user._id,
                       userReaction: null,
+                      commentConnection: {
+                        __typename: 'CommentConnection',
+                        pageInfo: {
+                          __typename: 'PageInfo',
+                          hasNextPage: false
+                        },
+                        edges: []
+                      },
                       reactionSummary: null,
                       user: {
                         ...commentInputData.user,

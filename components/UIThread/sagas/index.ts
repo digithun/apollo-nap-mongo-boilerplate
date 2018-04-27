@@ -3,7 +3,8 @@ import { ObservableQuery } from 'apollo-client'
 import * as Actions from '../actions'
 import {
   THREAD_QUERY,
-  THREAD_REACTION_QUERY
+  THREAD_REACTION_QUERY,
+  LOAD_MORE_REPLY_COMMENT
 } from '../graphql'
 import gql from 'graphql-tag'
 import { request } from 'https'
@@ -13,6 +14,9 @@ import * as constants from './constants'
 import removeSaga from './remove'
 import replySaga from './reply'
 import reactionSaga from './reaction'
+import UIThread from '../components/UIThread';
+import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
+import { MAX_COMMENT_PER_REQUEST } from './constants';
 
 export { constants }
 
@@ -223,5 +227,39 @@ export function* saga(context: ApplicationSagaContext) {
       })
     )
     yield put({ type: 'global/loading-done' })
+  })
+
+  yield takeEvery<{ type: string, payload: string }>(Actions.loadMoreReplyComment, function*(action) {
+    try {
+      const data = context.apolloClient.readFragment<any>({
+        id: action.payload,
+        fragment: UIThread.fragments.comment,
+        fragmentName: 'UICommentDataFragment',
+      })
+      let before
+      if (data.commentConnection.edges.length) {
+        before = data.commentConnection.edges[0].cursor
+      }
+      const result = yield call([context.apolloClient, context.apolloClient.query], {
+        query: LOAD_MORE_REPLY_COMMENT,
+        variables: {
+          _id: action.payload,
+          last: MAX_COMMENT_PER_REQUEST,
+          before
+        }
+      })
+      const connectionResult = result.data.comment.loadCommentConnection
+      data.commentConnection.pageInfo = connectionResult.pageInfo
+      data.commentConnection.edges = [].concat(connectionResult.edges, data.commentConnection.edges)
+      yield call([context.apolloClient, context.apolloClient.writeFragment], {
+        id: action.payload,
+        fragment: UIThread.fragments.comment,
+        fragmentName: 'UICommentDataFragment',
+        data
+      })
+    } catch(error) {
+      console.error(error)
+    }
+    yield put(Actions.loadMoreReplyCommentDone(action.payload))
   })
 }

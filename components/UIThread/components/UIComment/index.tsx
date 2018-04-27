@@ -1,14 +1,16 @@
 import * as React from 'react'
 import { compose } from 'recompose'
+import { connect } from 'react-redux'
 import * as moment from 'moment'
 import gql from 'graphql-tag'
 import styled from 'styled-components'
 import withDict from '../../../../lib/with-dict'
 import { UIUserImageThumbnailCircle } from '../UIReplyInput/components/UIUserItem.component'
+import { InputTextSingle } from '../../../common/Input'
 import ReactionCompose from '../../../Reaction/ReactionCompose.component'
 import { UIText } from '../../../common/Text'
 import { UILabel } from '../../../common/Label'
-import { OPTIMISTIC_COMMENT_ID } from '../../actions';
+import { OPTIMISTIC_COMMENT_ID, loadMoreReplyComment } from '../../actions';
 const UserNameLabel = styled(UILabel) `
 `
 const CommentCreatedAtLabel = styled(UILabel) `
@@ -16,12 +18,23 @@ const CommentCreatedAtLabel = styled(UILabel) `
   color: ${(props: { theme?: UITheme }) => props.theme.darkGrey};
   font-size: 0.8rem;
 `
+const ReplyCommentContainer = styled.div`
+  margin-left: 56px;
+
+  .load-more {
+    display: inline-block;
+    margin-bottom: 5px;
+    cursor: pointer;
+    color: blue;
+  }
+`
 const CommentContainer = styled.div`
   border-bottom: 1px solid ${(props: { theme?: UITheme }) => props.theme.matteWhite};
   padding: 10px 0;
   min-height: 90px;
   &:nth-last-child(1){
     border-bottom: none;
+    margin-bottom: -8px;
   }
 
   .comment-item__delete-button {
@@ -29,6 +42,24 @@ const CommentContainer = styled.div`
     color: ${(props: any) => props.theme.darkGrey};
     margin-right: 8px;
     cursor: pointer;
+  }
+
+  .reply-comment {
+    border-top: 1px solid ${(props: { theme?: UITheme }) => props.theme.matteWhite};
+  }
+
+  .input-box {
+    display: flex;
+    align-items: center;
+    input {
+      flex: 1 1 100%;
+    }
+    img {
+      cursor: pointer;
+      margin: 0 10px;
+      width: 25px;
+      height: 25px;
+    }
   }
 `
 const UserInfoWrap = styled.div`
@@ -55,8 +86,15 @@ const TextContainer = styled.div`
   margin-top: 8px;
 `
 const ReactionContainer = styled.div`
+  display: flex;
   padding: 0 56px;
-  margin-top: 8px;
+  margin: 8px 0;
+  align-items: center;
+
+  .reply {
+    font-weight: bold;
+    cursor: pointer;
+  }
 `
 const ProfilePicture = styled(UIUserImageThumbnailCircle) `
 `
@@ -64,22 +102,18 @@ interface UICommentPropTypes extends GBCommentType {
   className?: string
   isRemovable?: boolean
   onRemove?: (id: string) => void
-  onAddReaction?: (type: string) => void
-  onRemoveReaction?: () => void
-  isAbleToReact?: boolean
+  onAddReaction?: (id: string, type: string) => void
+  onRemoveReaction?: (id: string) => void
+  isLoggedIn?: boolean
+  replyDisabled?: boolean
   userReaction?: {
     type: string
   }
   reactionSummary?: any
   t?: any
+  commentConnection?: { pageInfo: { hasPreviousPage: boolean }, edges: { cursor: string, node: UICommentPropTypes }[] }
 }
-interface UICommentComponent extends React.ComponentClass<UICommentPropTypes> {
-  fragments: {
-    comment: any
-  }
-}
-const UICommentComponent = compose<UICommentPropTypes, {}>(
-)((props: UICommentPropTypes) => !props.user ? <div onClick={console.log.bind(null, props)} >{'error'}</div> : (
+const _UICommentComponent = (props: UICommentPropTypes & { replyLoading?: boolean, onLoadMoreReplyComment?: () => void, onLoadMoreComment?: any, hasMoreComment?: boolean, comments?: UICommentPropTypes[], showReplyInput?: boolean, onReplyMessageChange?: any, onReply?: any, replyMessage?: string, onWillReply?: any }) => !props.user ? <div onClick={console.log.bind(null, props)} >{'error'}</div> : (
   <CommentContainer className={props.className}>
     <CommentHeader>
       <UserInfoWrap>
@@ -93,7 +127,7 @@ const UICommentComponent = compose<UICommentPropTypes, {}>(
       </UserInfoWrap>
       {
         props._id !== OPTIMISTIC_COMMENT_ID
-          ? (<UIText onClick={props.onRemove.bind(null, props._id)} className='comment-item__delete-button'>
+          ? (<UIText onClick={props.onRemove ? props.onRemove.bind(null, props._id) : null} className='comment-item__delete-button'>
             {props.isRemovable ? props.t('delete') : null}
           </UIText>) : null
       }
@@ -102,27 +136,114 @@ const UICommentComponent = compose<UICommentPropTypes, {}>(
       <UIText>{props.message}</UIText>
     </TextContainer>
     <ReactionContainer>
-      <ReactionCompose isAbleToReact={props.isAbleToReact} onAddReaction={props.onAddReaction} onRemoveReaction={props.onRemoveReaction} userReaction={props.userReaction} reactionSummary={props.reactionSummary}/>
-    </ReactionContainer>
-  </CommentContainer>
-)) as UICommentComponent
-
-const enchanceComponent = withDict<UICommentPropTypes, UICommentPropTypes>(UICommentComponent as any) as any
-enchanceComponent.fragments = {
-  comment: gql`
-    ${ReactionCompose.fragments.commentReaction}
-    fragment UICommentDataFragment on Comment {
-      message
-      _id
-      createdAt
-      userId
-      user {
-        name
-        _id
-        profilePicture
+      <ReactionCompose isAbleToReact={props.isLoggedIn} onAddReaction={(type) => props.onAddReaction && props.onAddReaction(props._id, type)} onRemoveReaction={() => props.onRemoveReaction && props.onRemoveReaction(props._id)} userReaction={props.userReaction} reactionSummary={props.reactionSummary}/>
+      {
+        props.isLoggedIn && !props.replyDisabled ? <div className='reply heavent' style={{ marginLeft: props.isLoggedIn ? 10 : 0 }} onClick={props.onWillReply}>{props.t('reply')}</div> : null
       }
-      ...CommentReaction
-    }
-  `
+    </ReactionContainer>
+    <ReplyCommentContainer key='reply'>
+      {
+        props.replyLoading
+        ? <div>loading</div>
+        : props.hasMoreComment
+        ? <div className='load-more heavent' onClick={props.onLoadMoreReplyComment}>
+          {props.t('comment/reply/load-more')}
+        </div>
+        : null
+      }
+      {
+        props.comments && props.comments.length > 0
+          ? <div className='reply-comment'>{
+            props.comments.map((comment) =>
+              <UICommentComponent key={comment._id} t={props.t} replyDisabled={true} isLoggedIn={props.isLoggedIn} onAddReaction={props.onAddReaction} onRemoveReaction={props.onRemoveReaction} {...comment}/>
+            )
+          }</div>
+          : null
+      }
+      {
+        props.showReplyInput
+          ? <div className='input-box'>
+            <InputTextSingle className='left' value={props.replyMessage} onChange={e => props.onReplyMessageChange(e.target.value)} />
+            <img className='right' src="/static/comment-images/reaction/reaction-like.png" onClick={props.onReply}/>
+          </div>
+          : null
+      }
+    </ReplyCommentContainer>
+  </CommentContainer>
+)
+
+const UICommentComponent = withDict<UICommentPropTypes, UICommentPropTypes>(_UICommentComponent as any) as any
+
+
+@(connect((state: ApplicationState, props: any) => ({
+  replyLoading: !!state.comment.replyLoading[props._id]
+}), (dispatch, ownProps) => ({
+  loadMoreReply: () => dispatch(loadMoreReplyComment(ownProps._id)),
+})) as any)
+export default class UICommentContainer extends React.Component<UICommentPropTypes & { onReply?: (string) => any, loadMoreReply?: any, replyLoading?: boolean }> {
+  state = {
+    showReplyInput: false,
+    replyMessage: "",
+  }
+  static fragments = {
+    comment: gql`
+      ${ReactionCompose.fragments.commentReaction}
+      fragment UICommentDataFragment on Comment {
+        message
+        _id
+        createdAt
+        userId
+        commentConnection(last: 3, sort: CREATEDAT_ASC) {
+          pageInfo {
+            hasPreviousPage
+          }
+          edges {
+            cursor
+            node {
+              _id
+              message
+              createdAt
+              ...CommentReaction
+              user {
+                name
+                _id
+                profilePicture
+              }
+            }
+          }
+        }
+        user {
+          name
+          _id
+          profilePicture
+        }
+        ...CommentReaction
+      }
+    `
+  }
+  showReplyInput = () => this.setState({ showReplyInput: !this.state.showReplyInput })
+  onReplyMessageChange = (message) => this.setState({ replyMessage: message })
+  onReply = () => {
+    this.props.onReply && this.props.onReply(this.state.replyMessage)
+    this.setState({ replyMessage: '' })
+  }
+  render() {
+    return (
+      <UICommentComponent
+        {...this.props}
+        comments={this.props.commentConnection.edges.map(e => e.node)}
+        hasMoreComment={this.props.commentConnection.pageInfo.hasPreviousPage}
+        showReplyInput={this.state.showReplyInput}
+        onWillReply={this.showReplyInput}
+        onReplyMessageChange={this.onReplyMessageChange}
+        onLoadMoreReplyComment={this.props.loadMoreReply}
+        replyMessage={this.state.replyMessage}
+        onReply={this.onReply}
+      />
+    )
+  }
 }
-export default enchanceComponent as any
+
+export {
+  UICommentComponent as Component
+}

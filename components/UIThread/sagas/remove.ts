@@ -38,6 +38,7 @@ export default function * removeSaga(context: ApplicationSagaContext, thread: Th
 
         data = Object.assign({}, data, {
           viewer: {
+            __typename: 'Viewer',
             thread: {
               ...data.viewer.thread,
               comments: {
