@@ -140,6 +140,9 @@ export function* saga(context: ApplicationSagaContext) {
     Actions.reload,
     function*(action) {
       const { query } = action.payload
+      if (thread.queryVariables.filter.contentId === query.contentId) {
+        return
+      }
       thread.queryVariables.filter.contentId = query.contentId
       thread.commentObservableQuery = yield call(
         initFetchQuery,
