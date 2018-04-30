@@ -1,5 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
+import { sortBy } from 'lodash'
 
 import { reactionMapping } from './reactions'
 
@@ -24,7 +25,7 @@ const Container = styled.div`
 
 export default class ReactionSummary extends React.Component<{reactions?: { type: string, count: number }[], style?: any}> {
   render() {
-    const reactions = (this.props.reactions || []).sort(r => r.count + reactionMapping[r.type].weight)
+    const reactions = sortBy(this.props.reactions || [], ['count', 'weight'])
     const count = reactions.reduce((prev, cur) => prev + cur.count, 0)
     return (
       <Container style={this.props.style}>
