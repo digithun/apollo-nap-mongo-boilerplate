@@ -54,7 +54,7 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
 
   public componentDidMount() {
     window.addEventListener('scroll', debounce(() => {
-      if (this.props.hasNextPage) {
+      if (this.props.hasNextPage && !this.props.loading) {
         let supportPageOffset = window.pageXOffset !== undefined
         let isCSS1Compat = ((document.compatMode || '') === 'CSS1Compat')
         let scrollMaxY = document.body.offsetHeight - document.documentElement.clientHeight;
@@ -66,12 +66,13 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
           this.props.requestLoadMoreComments()
         }
       }
-    }, 1000))
+    }, 100))
   }
 
   public componentDidUpdate() {
     setTimeout(() => {
-      if (document.body.scrollHeight < document.documentElement.clientHeight && this.props.hasNextPage) {
+      if (this.props.hasNextPage && !this.props.loading
+        && document.body.scrollHeight < document.documentElement.clientHeight) {
         this.props.requestLoadMoreComments()
       }
     })
