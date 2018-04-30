@@ -62,7 +62,7 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
           x: supportPageOffset ? window.pageXOffset : isCSS1Compat ? document.documentElement.scrollLeft : document.body.scrollLeft,
           y: supportPageOffset ? window.pageYOffset : isCSS1Compat ? document.documentElement.scrollTop : document.body.scrollTop,
         }
-        if (scroll.y > scrollMaxY) {
+        if (scroll.y >= scrollMaxY) {
           this.props.requestLoadMoreComments()
         }
       }
