@@ -102,8 +102,8 @@ storiesOf("Reaction/ReactionSummary", module)
       {story()}
     </Layout>
   ))
-  .add("summary reaction wow:4, like:4, lol: 20", () => (
-    <ReactionSummary reactions={[{ count: 4, type: "WOW" }, { count: 4, type: "LIKE" }, { count: 20, type: "LAUGH" }]}/>
+  .add("summary reaction", () => (
+    <ReactionSummary reactions={[{ count: 1, type: "SAD" },{ count: 4, type: "WOW" }, { count: 4, type: "LIKE" }, { count: 20, type: "LAUGH" }]}/>
   ))
   .add("empty", () => (
     <ReactionSummary reactions={[]}/>

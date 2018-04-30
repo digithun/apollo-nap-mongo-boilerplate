@@ -11,6 +11,9 @@ const Container = styled.div`
     height: 25px;
     display: inline-block;
     position: relative;
+    &:not(:first-child) {
+      margin-left: -5px;
+    }
     img {
       width: 25px;
       height: 25px;
@@ -31,7 +34,7 @@ export default class ReactionSummary extends React.Component<{reactions?: { type
       <Container style={this.props.style}>
         <span>
           {reactions.map((reaction, idx) => (
-            <div key={reaction.type} className="icon" style={{ zIndex: reactions.length - idx, marginLeft: idx * -5 }}>
+            <div key={reaction.type} className="icon" style={{ zIndex: reactions.length - idx }}>
               <img src={reactionMapping[reaction.type].image}/>
             </div>
           ))}
