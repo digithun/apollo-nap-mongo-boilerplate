@@ -14,9 +14,6 @@ const Container = styled.div`
       width: 25px;
       height: 25px;
     }
-    &:not(:last-child) {
-      right: -5px;
-    }
   }
   .count {
     margin-left: 10px;
@@ -27,12 +24,13 @@ const Container = styled.div`
 
 export default class ReactionSummary extends React.Component<{reactions?: { type: string, count: number }[], style?: any}> {
   render() {
-    const count = this.props.reactions ? this.props.reactions.reduce((prev, cur) => prev + cur.count, 0) : 0
+    const reactions = (this.props.reactions || []).sort(r => r.count + reactionMapping[r.type].weight)
+    const count = reactions.reduce((prev, cur) => prev + cur.count, 0)
     return (
       <Container style={this.props.style}>
         <span>
-          {(this.props.reactions || []).map((reaction, idx) => (
-            <div key={reaction.type} className="icon" style={{ zIndex: this.props.reactions.length - idx }}>
+          {reactions.map((reaction, idx) => (
+            <div key={reaction.type} className="icon" style={{ zIndex: reactions.length - idx, marginLeft: idx * -5 }}>
               <img src={reactionMapping[reaction.type].image}/>
             </div>
           ))}
