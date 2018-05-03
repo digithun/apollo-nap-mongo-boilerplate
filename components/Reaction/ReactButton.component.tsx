@@ -8,6 +8,7 @@ const Container = styled.div`
   display: block;
   height: 35px;
   width: 35px;
+  user-select: none;
 
   .list {
     display: flex;
@@ -42,22 +43,67 @@ const Reaction = styled.div`
   }
 ` as any
 
-export default class ReactButton extends React.Component<{ direction?: string, userReaction?: { type: string }, onClick?: any, onLeave?: any, onEnter?: any, style?: any, expand: boolean }> {
+function moveInDom(e, d) {
+  const divRect = d.getBoundingClientRect()
+  if (e.clientX >= divRect.left && e.clientX <= divRect.right &&
+    e.clientY >= divRect.top && e.clientY <= divRect.bottom) {
+    return true      
+  }
+  return false
+}
+
+export default class ReactButton extends React.Component<{ onCancel?: any, direction?: string, userReaction?: { type: string }, onClick?: any, onLeave?: any, onEnter?: any, style?: any, expand: boolean }> {
   reactions = {}
   state = {
     active: null
   }
+  componentWillReceiveProps(nextProps) {
+    if (!this.props.expand && nextProps.expand) {
+      document.addEventListener('touchstart', this.onTouchStart)
+      document.addEventListener('mousedown', this.onMouseDown)
+    } else if (this.props.expand && !nextProps.expand) {
+      document.removeEventListener('touchstart', this.onTouchStart)
+      document.removeEventListener('mousedown', this.onMouseDown)
+    }
+  }
+  componentWillUnmount() {
+    document.removeEventListener('touchstart', this.onTouchStart)
+    document.removeEventListener('mousedown', this.onMouseDown)
+  }
   onTouchMove = (e) => {
     let update = { active: null }
     for(const k in this.reactions) {
-      const divRect = this.reactions[k].getBoundingClientRect()
-      if (e.clientX >= divRect.left && e.clientX <= divRect.right &&
-        e.clientY >= divRect.top && e.clientY <= divRect.bottom) {
+      if (moveInDom(e, this.reactions[k])) {
           update = { active: k }
           break
       }
     }
     this.setState(update)
+  }
+  onMouseDown = e => {
+    let inBound = false
+    for(const k in this.reactions) {
+      if (moveInDom(e, this.reactions[k])) {
+          inBound = true
+          break
+      }
+    }
+    if (!inBound) {
+      this.props.onCancel && this.props.onCancel()
+    }
+  }
+  onTouchStart = (_e) => {
+    let inBound = false
+    const e = _e.touches[0]
+    for(const k in this.reactions) {
+      if (moveInDom(e, this.reactions[k])) {
+          inBound = true
+          break
+      }
+    }
+    if (!inBound) {
+      this.props.onCancel && this.props.onCancel()
+    }
   }
   render() {
     return (
@@ -94,11 +140,11 @@ export default class ReactButton extends React.Component<{ direction?: string, u
                     }
                     this.setState({ active: null })
                   }}
-                  onTouchMove={!isMobile.any ? null : (e) => {
-                    this.setState({ active: reaction.type })
-                    this.onTouchMove(e.nativeEvent.touches[0])
-                  }}
-                  onClick={() => {
+                  // onTouchMove={!isMobile.any ? null : (e) => {
+                  //   this.setState({ active: reaction.type })
+                  //   this.onTouchMove(e.nativeEvent.touches[0])
+                  // }}
+                  onClick={isMobile.any ? null : () => {
                     this.setState({ active: null })
                     this.props.onClick(reaction.type)
                   }}
@@ -106,29 +152,6 @@ export default class ReactButton extends React.Component<{ direction?: string, u
               </Reaction>
             })}
           </div>
-          // <Reaction>
-          //   <div
-          //     className={this.state.active ? `img active` : `img`}
-          //     onClick={() => {
-          //       this.setState({ active: null })
-          //       this.props.onClick()
-          //     }}
-          //     onMouseEnter={isMobile.any ? null : (e) => this.setState({ active: true })}
-          //     onMouseLeave={isMobile.any ? null : (e) => this.setState({ active: null })}
-          //     onTouchStart={!isMobile.any ? null : () => this.setState({ active: true })}
-          //     onTouchEnd={!isMobile.any ? null : () => {
-          //       if (this.state.active) {
-          //         this.props.onClick()
-          //       }
-          //       this.setState({ active: null })
-          //     }}
-          //     onTouchMove={!isMobile.any ? null : (e) => {
-          //       this.setState({ active: true })
-          //       this.onTouchMove(e.nativeEvent.touches[0])
-          //     }}
-          //     style={{ filter: "unset", backgroundImage: `url(${reactionMapping[this.props.userReaction.type].image})` }}
-          //   />
-          // </Reaction>
         }
       </Container>
     )
