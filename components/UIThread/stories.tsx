@@ -5,6 +5,10 @@ import { action } from '@storybook/addon-actions'
 import Layout from '../Layout'
 import CommentContainer, { Component as CommentComponent } from './components/UIComment'
 
+const selectedUser = {
+  profilePicture: null
+}
+
 storiesOf("UIThread/UIComment", module)
   .addDecorator(story => (
     <Layout>
@@ -14,7 +18,7 @@ storiesOf("UIThread/UIComment", module)
     </Layout>
   ))
   .add("container", () => (
-    <CommentContainer commentConnection={{ pageInfo: { hasPreviousPage: false }, edges: [] }} _id=" " isLoggedIn user={{ _id: "1", profilePicture: null, name: "test" }} message="test message\ntest message line 2" onReply={action('reply')} />
+    <CommentContainer commentConnection={{ pageInfo: { hasPreviousPage: false }, edges: [] }} _id=" " selectedUser={selectedUser} user={{ _id: "1", profilePicture: null, name: "test" }} message="test message\ntest message line 2" onReply={action('reply')} />
   ))
   .add("withoutData", () => (
     <CommentComponent _id=" " message="A" />
@@ -68,6 +72,7 @@ storiesOf("UIThread/UIComment", module)
       createdAt={"2017-04-27T07:28:33.657Z"}
       onReply={action('reply')}
       showReplyInput
+      selectedUser={selectedUser}
       replyMessage="test message reply"
     />
   ))
@@ -100,6 +105,7 @@ storiesOf("UIThread/UIComment", module)
           createdAt: (new Date()).toISOString()
         }]}
         showReplyInput
+        selectedUser={selectedUser}
         replyMessage="test message reply"
         onReply={action('reply')}
       />

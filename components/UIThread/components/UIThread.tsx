@@ -108,7 +108,6 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
               return (
                 <UIComment
                   onReply={(message) => this.onReply(comment._id, message)}
-                  isLoggedIn={!!this.props.userId}
                   onRemove={this.onRemove}
                   onAddReaction={this.onAddReaction}
                   onRemoveReaction={this.onRemoveReaction}
@@ -120,7 +119,6 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
             {this.props.loadMoreComments.map((comment) => {
               return (
                 <UIComment
-                  isLoggedIn={!!this.props.userId}
                   onRemove={this.onRemove}
                   onAddReaction={this.onAddReaction}
                   onRemoveReaction={this.onRemoveReaction}

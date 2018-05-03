@@ -106,6 +106,7 @@ function findUserListById(userList, _id) {
   }
 }
 function getIsRemovable(userList, comment) {
+  if (!userList) return false
   return !!findUserListById(userList, comment.userId)
 }
 interface UICommentPropTypes extends GBCommentType {
@@ -113,7 +114,7 @@ interface UICommentPropTypes extends GBCommentType {
   onRemove?: (id: string) => void
   onAddReaction?: (id: string, type: string) => void
   onRemoveReaction?: (id: string) => void
-  isLoggedIn?: boolean
+  selectedUser?: any
   replyDisabled?: boolean
   userReaction?: {
     type: string
@@ -146,9 +147,9 @@ const _UICommentComponent = (props: UICommentPropTypes & { replyLoading?: boolea
       <UIText>{props.message}</UIText>
     </TextContainer>
     <ReactionContainer>
-      <ReactionCompose isAbleToReact={props.isLoggedIn} onAddReaction={(type) => props.onAddReaction && props.onAddReaction(props._id, type)} onRemoveReaction={() => props.onRemoveReaction && props.onRemoveReaction(props._id)} userReaction={props.userReaction} reactionSummary={props.reactionSummary}/>
+      <ReactionCompose isAbleToReact={!!props.selectedUser} onAddReaction={(type) => props.onAddReaction && props.onAddReaction(props._id, type)} onRemoveReaction={() => props.onRemoveReaction && props.onRemoveReaction(props._id)} userReaction={props.userReaction} reactionSummary={props.reactionSummary}/>
       {
-        props.isLoggedIn && !props.replyDisabled ? <div className='reply heavent' style={{ marginLeft: props.isLoggedIn ? 10 : 0 }} onClick={props.onWillReply}>{props.t('reply')}</div> : null
+        props.selectedUser && !props.replyDisabled ? <div className='reply heavent' style={{ marginLeft: props.selectedUser ? 10 : 0 }} onClick={props.onWillReply}>{props.t('reply')}</div> : null
       }
     </ReactionContainer>
     <ReplyCommentContainer key='reply'>
@@ -169,7 +170,7 @@ const _UICommentComponent = (props: UICommentPropTypes & { replyLoading?: boolea
                 key={comment._id}
                 t={props.t}
                 replyDisabled={true}
-                isLoggedIn={props.isLoggedIn}
+                selectedUser={props.selectedUser}
                 onAddReaction={props.onAddReaction}
                 onRemoveReaction={props.onRemoveReaction}
                 onRemove={props.onRemove}
@@ -183,6 +184,9 @@ const _UICommentComponent = (props: UICommentPropTypes & { replyLoading?: boolea
       {
         props.showReplyInput
           ? <div className='input-box'>
+            <ProfilePictureContainer>
+              <ProfilePicture src={props.selectedUser.profilePicture} />
+            </ProfilePictureContainer>
             <InputTextSingle className='left' value={props.replyMessage} onChange={e => props.onReplyMessageChange(e.target.value)} />
             <img className='right' src="/static/comment-images/reaction/reaction-like.png" onClick={props.onReply}/>
           </div>
@@ -196,7 +200,8 @@ const UICommentComponent = withDict<UICommentPropTypes, UICommentPropTypes>(_UIC
 
 
 @(connect((state: ApplicationState, props: any) => ({
-  replyLoading: !!state.comment.replyLoading[props._id]
+  replyLoading: !!state.comment.replyLoading[props._id],
+  selectedUser: state.reply.user
 }), (dispatch, ownProps) => ({
   loadMoreReply: () => dispatch(loadMoreReplyComment(ownProps._id)),
 })) as any)
