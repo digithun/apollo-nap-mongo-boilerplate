@@ -111,13 +111,34 @@ export default class ReactionCompose extends React.Component<{ className?: strin
       this.tickerLeave = null
     }
   }
+  handleReactionClickV2 = (type) => {
+    if (this.state.showReactionList) {
+      this.props.onAddReaction && this.props.onAddReaction(type)
+      this.setState({
+        showReactionList: false,
+      })
+    } else if (this.props.userReaction) {
+      this.props.onRemoveReaction && this.props.onRemoveReaction()
+    } else {
+      this.setState({
+        showReactionList: true,
+      })
+    }
+  }
   render() {
     return (
       <Container className={this.props.className} style={this.props.style}>
-        {/* <ReactionList onClick={this.handleReactionClick} className="reaction-list" show={this.state.showReactionList} onMouseEnter={this.handleOnMouseEnter} onMouseLeave={this.handleOnMouseLeave}/> */}
         {
           this.props.isAbleToReact
-          ? <ReactButton direction={this.props.direction} onClick={this.handleReactionClick} userReaction={this.props.userReaction} onEnter={this.handleOnMouseEnter} onLeave={this.handleOnMouseLeave} expand={this.state.showReactionList}/>
+          ? <ReactButton
+            direction={this.props.direction}
+            onClick={this.handleReactionClickV2}
+            userReaction={this.props.userReaction}
+            onCancel={() => this.setState({ showReactionList: false })}
+            // onEnter={this.handleOnMouseEnter}
+            // onLeave={this.handleOnMouseLeave}
+            expand={this.state.showReactionList}
+          />
           : null
         }
         <ReactionSummary style={{ marginLeft: this.props.isAbleToReact ? 5 : 0 }} reactions={this.props.reactionSummary}/>
