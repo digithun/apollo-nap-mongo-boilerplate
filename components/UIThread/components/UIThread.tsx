@@ -81,13 +81,6 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
     })
   }
 
-  public findUserListById(_id) {
-    for (const user of this.props.userList) {
-      if (user._id === _id) {
-        return user
-      }
-    }
-  }
   public render() {
     console.log('this.props.hasNextPage==>', this.props.hasNextPage)
     const Loadmore = this.props.hasNextPage
@@ -120,7 +113,7 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
                   onAddReaction={this.onAddReaction}
                   onRemoveReaction={this.onRemoveReaction}
                   key={comment._id}
-                  isRemovable={!!this.findUserListById(comment.userId)}
+                  userList={this.props.userList}
                   {...comment}
                 />)
             })}
@@ -132,7 +125,7 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
                   onAddReaction={this.onAddReaction}
                   onRemoveReaction={this.onRemoveReaction}
                   className='loadmore'
-                  isRemovable={this.getIsRemovable(comment)}
+                  userList={this.props.userList}
                   key={comment._id}
                   onReply={(message) => this.onReply(comment._id, message)}
                   {...comment}
@@ -157,9 +150,6 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
 
   private onRemove = (id) => {
     this.props.dispatch(Actions.remove(id))
-  }
-  private getIsRemovable = (comment) => {
-    return !!this.findUserListById(comment.userId)
   }
 }
 

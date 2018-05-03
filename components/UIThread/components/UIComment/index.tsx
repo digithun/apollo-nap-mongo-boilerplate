@@ -98,9 +98,18 @@ const ReactionContainer = styled.div`
 `
 const ProfilePicture = styled(UIUserImageThumbnailCircle) `
 `
+function findUserListById(userList, _id) {
+  for (const user of userList) {
+    if (user._id === _id) {
+      return user
+    }
+  }
+}
+function getIsRemovable(userList, comment) {
+  return !!findUserListById(userList, comment.userId)
+}
 interface UICommentPropTypes extends GBCommentType {
   className?: string
-  isRemovable?: boolean
   onRemove?: (id: string) => void
   onAddReaction?: (id: string, type: string) => void
   onRemoveReaction?: (id: string) => void
@@ -109,6 +118,7 @@ interface UICommentPropTypes extends GBCommentType {
   userReaction?: {
     type: string
   }
+  userList?: any[]
   reactionSummary?: any
   t?: any
   commentConnection?: { pageInfo: { hasPreviousPage: boolean }, edges: { cursor: string, node: UICommentPropTypes }[] }
@@ -128,7 +138,7 @@ const _UICommentComponent = (props: UICommentPropTypes & { replyLoading?: boolea
       {
         props._id !== OPTIMISTIC_COMMENT_ID
           ? (<UIText onClick={props.onRemove ? props.onRemove.bind(null, props._id) : null} className='comment-item__delete-button'>
-            {props.isRemovable ? props.t('delete') : null}
+            {getIsRemovable(props.userList, props) ? props.t('delete') : null}
           </UIText>) : null
       }
     </CommentHeader>
@@ -155,7 +165,17 @@ const _UICommentComponent = (props: UICommentPropTypes & { replyLoading?: boolea
         props.comments && props.comments.length > 0
           ? <div className='reply-comment'>{
             props.comments.map((comment) =>
-              <UICommentComponent key={comment._id} t={props.t} replyDisabled={true} isLoggedIn={props.isLoggedIn} onAddReaction={props.onAddReaction} onRemoveReaction={props.onRemoveReaction} {...comment}/>
+              <UICommentComponent
+                key={comment._id}
+                t={props.t}
+                replyDisabled={true}
+                isLoggedIn={props.isLoggedIn}
+                onAddReaction={props.onAddReaction}
+                onRemoveReaction={props.onRemoveReaction}
+                onRemove={props.onRemove}
+                userList={props.userList}
+                {...comment}
+              />
             )
           }</div>
           : null
@@ -203,6 +223,7 @@ export default class UICommentContainer extends React.Component<UICommentPropTyp
               _id
               message
               createdAt
+              userId
               ...CommentReaction
               user {
                 name
