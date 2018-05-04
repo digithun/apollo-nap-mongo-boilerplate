@@ -113,6 +113,7 @@ export function* saga(context: ApplicationSagaContext) {
   yield takeEvery<{ payload: { user?: { _id: string } } }>(
     "reply/set-selected-user-index" as any,
     function*(action) {
+      yield put({ type: 'global/loading-start' })
       const commentInputData = yield select<ApplicationState>(
         (state) => state.reply
       )
@@ -128,6 +129,7 @@ export function* saga(context: ApplicationSagaContext) {
           hasNextPage: result.data.viewer.thread.comments.pageInfo.hasNextPage
         })
       )
+      yield put({ type: 'global/loading-done' })
     }
   )
 
