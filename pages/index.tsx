@@ -26,6 +26,7 @@ const SIGN_IN_WITH_EMAIL_MUTATION = `
     }
   }
 `
+const graphqlEndpoint = '/graphql'
 interface IndexPropTypes {
   config: ApplicationConfig
   url: any
@@ -175,7 +176,7 @@ export default class Index extends React.Component<
           <ThreadReaction
             style={{ marginLeft: 200 }}
             direction="left"
-            graphQLEndpoint={'/graphql'}
+            graphQLEndpoint={graphqlEndpoint}
             url={{
               ...this.props.url,
               query: {
@@ -188,7 +189,7 @@ export default class Index extends React.Component<
           />
           <br/>
           <Thread
-            graphQLEndpoint={'/graphql'}
+            graphQLEndpoint={graphqlEndpoint}
             url={{
               ...this.props.url,
               query: {

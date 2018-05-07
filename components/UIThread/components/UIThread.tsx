@@ -7,7 +7,7 @@ import * as Actions from '../actions'
 import * as Label from '../../common/Label'
 import UIComment from './UIComment'
 
-const debounce = require('lodash/debounce')
+const throttle = require('lodash/throttle')
 interface ThreadPropTypes {
   userId: string
   replyDisabled?: boolean
@@ -53,7 +53,7 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
   }
 
   public componentDidMount() {
-    window.addEventListener('scroll', debounce(() => {
+    window.addEventListener('scroll', () => {
       if (this.props.hasNextPage && !this.props.loading) {
         let supportPageOffset = window.pageXOffset !== undefined
         let isCSS1Compat = ((document.compatMode || '') === 'CSS1Compat')
@@ -62,11 +62,11 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
           x: supportPageOffset ? window.pageXOffset : isCSS1Compat ? document.documentElement.scrollLeft : document.body.scrollLeft,
           y: supportPageOffset ? window.pageYOffset : isCSS1Compat ? document.documentElement.scrollTop : document.body.scrollTop,
         }
-        if (scroll.y >= scrollMaxY) {
+        if (scroll.y >= scrollMaxY - 100) {
           this.props.requestLoadMoreComments()
         }
       }
-    }, 100))
+    })
   }
 
   public componentDidUpdate() {
