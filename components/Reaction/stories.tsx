@@ -45,13 +45,17 @@ storiesOf("Reaction/combine", module)
     </Layout>
   ))
   .add("compose", () => (
-    <div style={{ paddingTop: 90, paddingLeft: 40 }}>
+    <div style={{ paddingTop: 90, paddingLeft: 40, display: 'flex', flexDirection: 'column' }}>
       <ReactionCompose isAbleToReact={false} reactionSummary={[{ count: 4, type: "LIKE" }, { count: 4, type: "WOW" }]}/>
-      <br/>
       <ReactionCompose isAbleToReact onAddReaction={action('add')} onRemoveReaction={action('remove')} reactionSummary={[{ count: 4, type: "LIKE" }, { count: 4, type: "WOW" }]}/>
       <ReactionCompose isAbleToReact onAddReaction={action('add')} onRemoveReaction={action('remove')} reactionSummary={[]}/>
       <ReactionCompose isAbleToReact onAddReaction={action('add')} onRemoveReaction={action('remove')} userReaction={{ type: "LIKE" }} reactionSummary={[{ count: 4, type: "LIKE" }, { count: 4, type: "WOW" }]}/>
       <ReactionCompose isAbleToReact onAddReaction={action('add')} onRemoveReaction={action('remove')} userReaction={{ type: "WOW" }} reactionSummary={[]}/>
+    </div>
+  ))
+  .add("compose/center", () => (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 100 }}>
+      <ReactionCompose isAbleToReact reactionSummary={[{ count: 4, type: "LIKE" }, { count: 400000, type: "WOW" }]} isCenter/>
     </div>
   ))
 

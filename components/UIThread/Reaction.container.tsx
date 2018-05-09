@@ -53,4 +53,7 @@ export default compose(
     },
     dispatch,
   })),
+  withProps({
+    isCenter: true
+  })
 )(ReactionCompose) as React.ComponentClass<CommentServiceComponentProps> as any

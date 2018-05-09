@@ -3,5 +3,13 @@
   "your-authors": "แสดงความคิดเห็นด้วยชื่อนักเขียน",
   "comment-input-placeholder": "แสดงความคิดเห็น",
   "posting": "กำลังโพส",
-  "delete": "ลบ"
+  "delete": "ลบ",
+  "reacted": "แสดงความรู้สึก",
+  "reaction/LIKE": "ชอบ",
+  "reaction/WOW": "ว้าว",
+  "reaction/LAUGH": "ฮ่าๆ",
+  "reaction/LOVE": "หลงรัก",
+  "reaction/SHY": "เขิล",
+  "reaction/COOL": "เฟี้ยว",
+  "reaction/SAD": "เศร้า"
 }

@@ -12,7 +12,8 @@ const Container = styled.div`
     display: inline-block;
     position: relative;
     &:not(:first-child) {
-      margin-left: -5px;
+      // margin-left: -5px;
+      margin-left: 2px;
     }
     img {
       width: 25px;
@@ -20,6 +21,7 @@ const Container = styled.div`
     }
   }
   .count {
+    font-weight: 500;
     margin-left: 10px;
     line-height: 25px;
     vertical-align: top;
@@ -39,7 +41,7 @@ export default class ReactionSummary extends React.Component<{reactions?: { type
             </div>
           ))}
         </span>
-        {count ? <span className="count">{count}</span> : null}
+        {count ? <span className="count">{Number(count).toLocaleString('en')}</span> : null}
       </Container>
     )
   }

@@ -2,12 +2,15 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 import reactions, { reactionMapping } from './reactions'
+import { moveInDom } from './utils'
 const isMobile = require('ismobilejs')
 
 const Container = styled.div`
-  display: block;
-  height: 35px;
-  width: 35px;
+  display: blo1ck;
+  position: relative;
+  top: -2px;
+  height: 31px;
+  width: 31px;
   user-select: none;
 
   .list {
@@ -38,21 +41,14 @@ const Reaction = styled.div`
     &.active {
       opacity: 1 !important;
       background-size: 35px 35px;
-      filter: grayscale(0%);
     }
+  }
+  .expand .img {
+    filter: grayscale(0%);
   }
 ` as any
 
-function moveInDom(e, d) {
-  const divRect = d.getBoundingClientRect()
-  if (e.clientX >= divRect.left && e.clientX <= divRect.right &&
-    e.clientY >= divRect.top && e.clientY <= divRect.bottom) {
-    return true      
-  }
-  return false
-}
-
-export default class ReactButton extends React.Component<{ onCancel?: any, direction?: string, userReaction?: { type: string }, onClick?: any, onLeave?: any, onEnter?: any, style?: any, expand: boolean }> {
+export default class ReactButton extends React.Component<{ innerRef?: any, direction?: string, userReaction?: { type: string }, onClick?: any, style?: any, expand: boolean }> {
   reactions = {}
   state = {
     active: null
@@ -88,9 +84,6 @@ export default class ReactButton extends React.Component<{ onCancel?: any, direc
           break
       }
     }
-    if (!inBound) {
-      this.props.onCancel && this.props.onCancel()
-    }
   }
   onTouchStart = (_e) => {
     let inBound = false
@@ -101,13 +94,10 @@ export default class ReactButton extends React.Component<{ onCancel?: any, direc
           break
       }
     }
-    if (!inBound) {
-      this.props.onCancel && this.props.onCancel()
-    }
   }
   render() {
     return (
-      <Container style={this.props.style} onMouseEnter={this.props.onEnter} onMouseLeave={this.props.onLeave} onTouchStart={this.props.onEnter} onTouchEnd={this.props.onLeave}>
+      <Container innerRef={this.props.innerRef} style={this.props.style}>
         {this.props.children}
         {
           <div className={`list`}>
@@ -129,7 +119,7 @@ export default class ReactButton extends React.Component<{ onCancel?: any, direc
                 }}
               >
                 <div
-                  className={reaction.type === this.state.active ? `img active` : `img`}
+                  className={`img ${reaction.type === this.state.active ? 'active ' : ''} ${this.props.expand ? 'expand ' : ''}`}
                   style={Object.assign({ backgroundImage: `url(${reaction.image})` }, !hide && userReactionType !== null ? { filter: "grayscale(0%)" } : {})}
                   onMouseEnter={isMobile.any ? null : (e) => this.setState({ active: reaction.type })}
                   onMouseLeave={isMobile.any ? null : (e) => this.setState({ active: null })}
@@ -145,7 +135,7 @@ export default class ReactButton extends React.Component<{ onCancel?: any, direc
                   //   this.onTouchMove(e.nativeEvent.touches[0])
                   // }}
                   onClick={isMobile.any ? null : () => {
-                    this.setState({ active: null })
+                    // this.setState({ active: null })
                     this.props.onClick(reaction.type)
                   }}
                 />

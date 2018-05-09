@@ -151,7 +151,7 @@ export default class Index extends React.Component<
       ]
       const encodeUserList = JSON.stringify(userListForComment)
       return (
-        <div>
+        <div style={{ position: 'relative' }}>
           {this.state.user.email}
           <button onClick={() => this.setState({ threadId: '5a55b7e7ae592800134d12f6' })}>
             {'ซื้อแล้ว'}
@@ -174,7 +174,7 @@ export default class Index extends React.Component<
           {this.state.token}
           <br/>
           <ThreadReaction
-            style={{ marginLeft: 200 }}
+            style={{ marginTop: 80, marginBottom: 80 }}
             direction="left"
             graphQLEndpoint={graphqlEndpoint}
             url={{

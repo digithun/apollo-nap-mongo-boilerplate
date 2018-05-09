@@ -4,23 +4,45 @@ import styled from 'styled-components'
 import ReactButton from './ReactButton.component'
 import ReactionList from './ReactionList.component'
 import ReactionSummary from './ReactionSummary.component'
+import withDict from '../../lib/with-dict'
+import { moveInDom } from './utils'
+const isMobile = require('ismobilejs')
 
 const Container = styled.div`
-  position: relative;
   display: flex;
-  align-items: center;
-  * {
-    float: left;
+  flex-direction: ${props => (props as any).isCenter ? 'column' : 'row'};
+  align-items: ${props => (props as any).isCenter ? 'center' : 'flex-end'};
+  .action {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    .reaction-list {
+      z-index: 20;
+      position: absolute;
+      top: -85px;
+      @media only screen and (max-width: 600px) {
+        top: -75px;
+      }
+      ${props => (props as any).isCenter 
+      ? `
+        @media only screen and (min-width: 0px) {
+          top: -100px;
+        }
+        left: 50%;
+        transform: translateX(-50%);      
+      `
+      : `
+        left: -5px;
+        @media only screen and (max-width: 600px) {
+          left: -61px;
+        }
+      `}
+    }
   }
-  .reaction-list {
-    z-index: 20;
-    position: absolute;
-    top: -42px;
-    left: -5px;
-  }
-`
+` as any
 
-export default class ReactionCompose extends React.Component<{ className?: string, direction?: string, userReaction?: any, reactionSummary?: any, style?: any, onAddReaction?: any, onRemoveReaction?: any, isAbleToReact?: boolean}> {
+@(withDict as any)
+export default class ReactionCompose extends React.Component<{ className?: string, t?: any, isCenter?: boolean, direction?: string, userReaction?: any, reactionSummary?: any, style?: any, onAddReaction?: any, onRemoveReaction?: any, isAbleToReact?: boolean}> {
   static fragments = {
     threadReaction: gql`
       fragment ThreadReaction on Thread {
@@ -41,6 +63,8 @@ export default class ReactionCompose extends React.Component<{ className?: strin
   }
   ticker
   tickerLeave
+  reactionList: any
+  reactionButton: any
   state = {
     hoverStart: null,
     showReactionList: false,
@@ -50,6 +74,18 @@ export default class ReactionCompose extends React.Component<{ className?: strin
       this.props.onRemoveReaction && this.props.onRemoveReaction()
     } else {
       this.props.onAddReaction && this.props.onAddReaction("LIKE")
+    }
+  }
+  onTouchStart = (_e) => {
+    const e = _e.touches[0]
+    if (!moveInDom(e, this.reactionButton) && !moveInDom(e, this.reactionList)) {
+      this.setState({ showReactionList: false })      
+    }
+  }
+  onMouseDown = (e) => {
+    if (isMobile.any) return
+    if (!moveInDom(e, this.reactionButton) && !moveInDom(e, this.reactionList)) {
+      this.setState({ showReactionList: false })      
     }
   }
   handleAfterMouseEnter = () => {
@@ -125,24 +161,64 @@ export default class ReactionCompose extends React.Component<{ className?: strin
       })
     }
   }
+  componentWillUpdate(nextProps, nextState) {
+    if (!this.state.showReactionList && nextState.showReactionList) {
+      document.addEventListener('touchstart', this.onTouchStart)
+      document.addEventListener('mousedown', this.onMouseDown)
+    } else if (this.state.showReactionList && !nextState.showReactionList) {
+      document.removeEventListener('touchstart', this.onTouchStart)
+      document.removeEventListener('mousedown', this.onMouseDown)
+    }
+  }
+  componentWillUnmount() {
+    document.removeEventListener('touchstart', this.onTouchStart)
+    document.removeEventListener('mousedown', this.onMouseDown)
+  }
   render() {
     return (
-      <Container className={this.props.className} style={this.props.style}>
-        {
-          this.props.isAbleToReact
-          ? <ReactButton
-            direction={this.props.direction}
-            onClick={this.handleReactionClickV2}
-            userReaction={this.props.userReaction}
-            onCancel={() => this.setState({ showReactionList: false })}
-            // onEnter={this.handleOnMouseEnter}
-            // onLeave={this.handleOnMouseLeave}
-            expand={this.state.showReactionList}
+      <Container className={this.props.className} style={this.props.style} isCenter={this.props.isCenter}>
+        <div className="action">
+          <ReactionList innerRef={node => this.reactionList = node} className="reaction-list" show={this.state.showReactionList} onClick={this.handleReactionClickV2} onCancel={() => this.setState({ showReactionList: false })} />
+          {
+            this.props.isAbleToReact
+            ? <ReactButton
+              innerRef={node => this.reactionButton = node}
+              style={{ transform: this.props.isCenter ? 'scale(2.3)' : undefined }}
+              direction={this.props.direction}
+              userReaction={this.props.userReaction}
+              // onCancel={() => this.setState({ showReactionList: false })}
+              // onEnter={this.handleOnMouseEnter}
+              // onLeave={this.handleOnMouseLeave}
+              onClick={this.handleReactionClickV2}
+              // expand={this.state.showReactionList}
+              expand={false}
+            />
+            : null
+          }
+        </div>
+        <div
+          style={{
+            marginLeft: this.props.isAbleToReact && !this.props.isCenter ? 5 : 0,
+            marginTop: this.props.isCenter ? 40 : 0,
+            display: 'flex',
+          }}
+        >
+          <ReactionSummary
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+            reactions={this.props.reactionSummary}
           />
-          : null
-        }
-        <ReactionSummary style={{ marginLeft: this.props.isAbleToReact ? 5 : 0 }} reactions={this.props.reactionSummary}/>
-        <div style={{clear: "both"}}/>
+          {
+            this.props.isCenter
+            ? <div style={{ marginLeft: 10 }}>
+              {this.props.t('reacted')}
+            </div>
+            : null
+          }
+        </div>
       </Container>
     )
   }
