@@ -1,4 +1,8 @@
-const reactions = [
+const reactions: {
+  type: ReactionType
+  image: string
+  weight: number
+}[] = [
   {
     "type": "LIKE",
     "image": "/static/comment-images/reaction/reaction-like.png",
@@ -38,7 +42,7 @@ const reactions = [
 
 export const reactionMapping: {
   [key: string]: {
-    type: string
+    type: ReactionType
     image: string
     weight: number
   }
