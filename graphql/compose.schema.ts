@@ -101,8 +101,8 @@ export default function createSchema({ __connection, config }: SVContext) {
     comment: typeComposers.Comment.getResolver('findById')
   })
   GQC.rootMutation().addFields({
-    addReaction:typeComposers.Reaction.getResolver('add'),
-    removeReaction:typeComposers.Reaction.getResolver('remove'),
+    addReaction: typeComposers.Reaction.getResolver('add'),
+    removeReaction: typeComposers.Reaction.getResolver('remove'),
     createThread: typeComposers.Thread.getResolver('createOne'),
     ...wrapResolvers<any, { user: any }>({
       updateCommentById: typeComposers.Comment.getResolver('updateById'),
@@ -129,22 +129,29 @@ export default function createSchema({ __connection, config }: SVContext) {
 
         rp.projection.record.thread.contentId = {}
 
-        const eventResponse = await fetch(config.EVENT_SERVICE_URL, {
-          headers: {
-            'x-api-key': config.EVENT_SERVICE_SECRET
-          },
-          method: 'POST',
-          body: JSON.stringify({
-            sender: 'comment',
-            timestamp: Date.now(),
-            userId: rp.context.user.userId,
-            type: 'comment/comment-content',
-            payload: {
-              contentId: rp.args.record.contentId
-            }
+        const userId = rp.args.record.userId
+        const episode = rp.args.record.contentId
+        if (!(userId && episode)) {
+          throw "Parameter is not defined"
+        }
+        const episodeId = episode.split('.').pop()
+        if (!rp.args.record.replyToId) {
+          const eventResponse = await fetch(config.EVENT_SERVICE_URL, {
+            headers: {
+              'x-api-key': config.EVENT_SERVICE_SECRET
+            },
+            method: 'POST',
+            body: JSON.stringify({
+              sender: 'comment',
+              timestamp: Date.now(),
+              type: 'episode/comment',
+              payload: {
+                _id: episodeId,
+                commentById: userId,
+              }
+            })
           })
-        })
-        const json = await eventResponse.json()
+        }
         return result
       } catch (e) {
         console.error('[post-reply] cannot dispatch event message to event service...')
