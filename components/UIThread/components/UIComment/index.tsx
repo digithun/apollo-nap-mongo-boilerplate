@@ -241,7 +241,7 @@ const _UICommentComponent = (props: UICommentPropTypes & { remainingComment?: nu
               <ProfilePictureContainer>
                 <ProfilePicture src={props.selectedUser.profilePicture} />
               </ProfilePictureContainer>
-              <InputTextSingle id={`comment-input-box-${props._id}`} value={props.replyMessage} onChange={e => props.onReplyMessageChange(e.target.value)} />
+              <InputTextSingle id={`comment-input-box-${props._id}`} value={props.replyMessage} onChange={(e: any) => props.onReplyMessageChange(e.target.value)} />
             </div>
             <PrimaryButton className='reply-box__submit' onClick={props.onReply}>
               {props.t('confirm')}
