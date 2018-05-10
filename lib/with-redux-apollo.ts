@@ -109,7 +109,10 @@ export default function withReduxApollo(
             users: userList,
             threadId: '',
             hasNextPage: true
-          }
+          },
+          comment: {
+            replyLoading: {}
+          },
         } as ApplicationState
         if (typeof window !== 'undefined') {
           const globalWindow: any = window

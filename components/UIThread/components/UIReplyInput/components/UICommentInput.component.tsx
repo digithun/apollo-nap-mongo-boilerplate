@@ -23,6 +23,30 @@ const CommentInputContainer = styled.div`
   flex-direction: row;
   align-items: flex-start;
   font-size: 1em;
+
+  @media only screen and (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .input {
+    @media only screen and (max-width: 600px) {
+      min-width: 100%;
+    }
+    display: flex;
+    flex: 1 0 auto;
+    align-items: flex-start;
+    input {
+      flex: 1 0 auto;
+    }
+  }
+  .submit {
+    cursor: pointer;
+    margin: 0 10px;
+    @media only screen and (max-width: 600px) {
+      margin: 0px;
+      margin-top: 5px;
+    }
+  }
 `
 const ConfirmButton = styled(PrimaryButton) `
   margin-left: 8px;
@@ -42,17 +66,20 @@ class UICommentInput extends React.Component<UICommentInputPropTypes & enchanceP
     const props = this.props
     return (
       <CommentInputContainer>
-        {props.userList.length > 0 ? <UIUserSelector onChange={this.onUserChange} users={props.userList} value={props.currentSelectedUserIndex} /> : null}
-        <InputTextMultiline
-          disabled={props.isTextInputDisabled || props.disabled}
-          style={{ height: 60 }}
-          onChange={this.onInputTextChange}
-          value={props.value.message}
-          placeholder={props.disabled ? props.disabledPlaceholder : props.t('comment-input-placeholder')}
-        />
+        <div className="input">
+          {props.userList.length > 0 ? <UIUserSelector onChange={this.onUserChange} users={props.userList} value={props.currentSelectedUserIndex} /> : null}
+          <InputTextMultiline
+            disabled={props.isTextInputDisabled || props.disabled}
+            style={{ height: 60 }}
+            onChange={this.onInputTextChange}
+            value={props.value.message}
+            placeholder={props.disabled ? props.disabledPlaceholder : props.t('comment-input-placeholder')}
+          />
+        </div>
         <ConfirmButton
+          className="submit"
           disabled={this.props.isTextInputDisabled || this.props.value.message.length < 1 || props.disabled}
-          text={props.t(this.props.isTextInputDisabled ? 'posting' : 'confirm')}
+          text={props.t(this.props.isTextInputDisabled ? 'posting' : 'post')}
           onClick={props.onConfirm}
         />
       </CommentInputContainer>

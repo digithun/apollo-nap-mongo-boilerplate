@@ -17,19 +17,19 @@ export default compose(
     sessionToken: props.url.query.sessionToken,
   })),
 
-  /**
-   * Read First 5 comment from local cache
-   * by saga init
-   */
   connect((state: ApplicationState, props: any) => ({
     hasNextPage: state.thread.hasNextPage,
     userId: state.reply.user ? state.reply.user._id : null, 
-    loading: state.global.loading
+    loading: state.global.loading,
   }), (dispatch) => ({
     requestLoadMoreComments: () => dispatch(Actions.loadMoreReplyList()),
     dispatch,
   })),
 
+  /**
+   * Read First 5 comment from local cache
+   * by saga init
+   */
   graphql<any, { url: any, userId: any }>(THREAD_QUERY, {
     props: ({ data }) => {
       const viewer = data.viewer

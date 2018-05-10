@@ -12,12 +12,28 @@ import { CommentListQueryResult, ThreadResultType, ThreadContext } from './types
 import { MAX_COMMENT_PER_REQUEST } from './constants'
 import * as Actions from '../actions'
 
+function filterById(connection, commentId){
+  return {
+    ...connection,
+    pageInfo: connection.pageInfo,
+    edges: connection.edges.filter(edge => edge.node._id !== commentId)
+      .map(
+        edge => edge.node.commentConnection ? {
+          ...edge,
+          node: {
+            ...edge.node,
+            commentConnection: filterById(edge.node.commentConnection, commentId)
+          }
+         } : edge
+      )
+  }
+}
+
 /**
  * Remove comment saga handler
  * - will receive thread Id from payload
  * - mutate and wait for response to confirm delete
  */
-
 export default function * removeSaga(context: ApplicationSagaContext, thread: ThreadContext) {
   yield takeEvery<{ type: string, payload: string }>(Actions.remove, function*({ type, payload }) {
     // Confirm delete...
@@ -38,14 +54,10 @@ export default function * removeSaga(context: ApplicationSagaContext, thread: Th
 
         data = Object.assign({}, data, {
           viewer: {
+            __typename: 'Viewer',
             thread: {
               ...data.viewer.thread,
-              comments: {
-                ...data.viewer.thread.comments,
-                edges: data.viewer.thread.comments.edges.filter(
-                  (edge: any) => edge.node._id !== commentId
-                )
-              }
+              comments: filterById(data.viewer.thread.comments, commentId)
             }
           }
         })

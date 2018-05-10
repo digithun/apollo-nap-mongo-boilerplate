@@ -6,7 +6,17 @@ import { ObservableQuery } from 'apollo-client'
 */
 export type ThreadContext = { commentObservableQuery: ObservableQuery<CommentListQueryResult>, queryVariables: any }
 export interface ThreadResultType extends GBThreadType {
-  comments: GQConnectionResult<GBCommentType>
+  comments: GQConnectionResult<GBCommentType & {
+    commentConnection: {
+      pageInfo: {
+        hasPreviousPage: boolean
+      },
+      edges: {
+        cursor: string
+        node: GBCommentType
+      }[]
+    }
+  }>
 }
 
 export interface CommentListQueryResult {

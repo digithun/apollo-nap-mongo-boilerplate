@@ -2,8 +2,10 @@
   "confirm": "ยืนยัน"  ,
   "your-authors": "แสดงความคิดเห็นด้วยชื่อนักเขียน",
   "comment-input-placeholder": "แสดงความคิดเห็น",
+  "comment/reply/load-more": "$count ความคิดเห็นตอบกลับ",
   "posting": "กำลังโพส",
-  "delete": "ลบ",
+  "post": "โพส",
+  "loading": "กำลังโหลด",
   "reacted": "แสดงความรู้สึก",
   "reaction/LIKE": "ชอบ",
   "reaction/WOW": "ว้าว",
@@ -11,5 +13,7 @@
   "reaction/LOVE": "หลงรัก",
   "reaction/SHY": "เขิล",
   "reaction/COOL": "เฟี้ยว",
-  "reaction/SAD": "เศร้า"
+  "reaction/SAD": "เศร้า",
+  "reply": "ตอบกลับ",
+  "delete": "ลบ"
 }

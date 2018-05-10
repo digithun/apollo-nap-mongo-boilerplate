@@ -87,3 +87,23 @@ query ($filter: FilterFindOneThreadInput$userId: String) {
   }
 }
 `
+
+export const LOAD_MORE_REPLY_COMMENT = gql`
+${UIThread.fragments.comment}
+query ($_id: MongoID!, $last: Int!, $before: String){
+  comment(_id: $_id) {
+    ...UICommentDataFragment
+    loadCommentConnection: commentConnection(last: $last, before: $before, sort: CREATEDAT_ASC) {
+      pageInfo {
+        hasPreviousPage
+      }
+      edges {
+        cursor
+        node {
+          ...UICommentDataFragment
+        }
+      }
+    }
+  }
+}
+`
