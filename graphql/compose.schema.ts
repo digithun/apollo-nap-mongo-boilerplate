@@ -130,11 +130,7 @@ export default function createSchema({ __connection, config }: SVContext) {
         rp.projection.record.thread.contentId = {}
 
         const userId = rp.args.record.userId
-        const episode = rp.args.record.contentId
-        if (!(userId && episode)) {
-          throw "Parameter is not defined"
-        }
-        const episodeId = episode.split('.').pop()
+        const contentId = rp.args.record.contentId
         if (!rp.args.record.replyToId) {
           const eventResponse = await fetch(config.EVENT_SERVICE_URL, {
             headers: {
@@ -144,11 +140,10 @@ export default function createSchema({ __connection, config }: SVContext) {
             body: JSON.stringify({
               sender: 'comment',
               timestamp: Date.now(),
-              userId: rp.context.user.userId,
+              userId: userId,
               type: 'comment/comment-content',
               payload: {
-                contentId: rp.args.record.contentId,
-                _id: episodeId,
+                contentId: contentId,
                 commentById: userId,
               }
             })
