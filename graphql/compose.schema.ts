@@ -144,8 +144,10 @@ export default function createSchema({ __connection, config }: SVContext) {
             body: JSON.stringify({
               sender: 'comment',
               timestamp: Date.now(),
-              type: 'episode/comment',
+              userId: rp.context.user.userId,
+              type: 'comment/comment-content',
               payload: {
+                contentId: rp.args.record.contentId,
                 _id: episodeId,
                 commentById: userId,
               }
