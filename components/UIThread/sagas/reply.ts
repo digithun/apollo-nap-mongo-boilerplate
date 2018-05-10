@@ -47,6 +47,7 @@ export default function * saga(context: ApplicationSagaContext, thread: ThreadCo
           ...data,
           commentConnection: {
             ...data.commentConnection,
+            count: data.commentConnection.count + 1,
             edges: [].concat(data.commentConnection.edges, [{
               __typename: 'CommentEdge',
               cursor: '',
@@ -97,6 +98,7 @@ export default function * saga(context: ApplicationSagaContext, thread: ThreadCo
           ...data,
           commentConnection: {
             ...data.commentConnection,
+            count: data.commentConnection.count + 1,
             edges: [].concat(data.commentConnection.edges, [{
               __typename: 'CommentEdge',
               cursor: '',
@@ -198,9 +200,10 @@ export default function * saga(context: ApplicationSagaContext, thread: ThreadCo
                     reactionSummary: null,
                     commentConnection: {
                       __typename: 'CommentConnection',
+                      count: 0,
                       pageInfo: {
                         __typename: 'PageInfo',
-                        hasNextPage: false
+                        hasPreviousPage: false
                       },
                       edges: []
                     },
@@ -264,9 +267,10 @@ export default function * saga(context: ApplicationSagaContext, thread: ThreadCo
                       userReaction: null,
                       commentConnection: {
                         __typename: 'CommentConnection',
+                        count: 0,
                         pageInfo: {
                           __typename: 'PageInfo',
-                          hasNextPage: false
+                          hasPreviousPage: false
                         },
                         edges: []
                       },

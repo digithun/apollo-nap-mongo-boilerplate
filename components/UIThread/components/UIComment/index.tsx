@@ -10,7 +10,29 @@ import { InputTextSingle } from '../../../common/Input'
 import ReactionCompose from '../../../Reaction/ReactionCompose.component'
 import { UIText } from '../../../common/Text'
 import { UILabel } from '../../../common/Label'
+import { PrimaryButton } from '../../../common/Button'
 import { OPTIMISTIC_COMMENT_ID, loadMoreReplyComment } from '../../actions';
+function isScrolledIntoView (el, offset = 0) {
+  const elemTop = el.getBoundingClientRect().top
+  const elemBottom = el.getBoundingClientRect().bottom
+
+  const isVisible = (elemTop >= 0) && (elemBottom <= window.innerHeight + offset)
+  return isVisible
+}
+
+function tryScrollToComponent (doc) {
+  let scrolled = false
+  if (doc.scrollIntoView && !isScrolledIntoView(doc)) {
+    doc.scrollIntoView()
+    scrolled = true
+  }
+  if (scrolled && doc.getBoundingClientRect().top <= 300) {
+    window.scrollTo(0, window.pageYOffset - 300)
+  }
+  if (doc.focus) {
+    doc.focus()
+  }
+}
 const UserNameLabel = styled(UILabel) `
 `
 const CommentCreatedAtLabel = styled(UILabel) `
@@ -19,13 +41,31 @@ const CommentCreatedAtLabel = styled(UILabel) `
   font-size: 0.8rem;
 `
 const ReplyCommentContainer = styled.div`
-  margin-left: 56px;
+  margin-left: 48px;
 
   .load-more {
     display: inline-block;
     margin-bottom: 5px;
     cursor: pointer;
-    color: blue;
+    color: ${(props: { theme?: UITheme }) => props.theme.pumpkin};
+    font-size: 0.9rem;
+    .arrow {
+      margin-right: 5px;
+      background-image: url(/static/comment-images/right-curve-arrow.png);
+      background-position: center;
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+    img {
+      opacity: 0;
+      height: 0.9rem;
+    }
+  }
+
+  .action .reaction-list {
+    @media only screen and (max-width: 600px) {
+      left: -109px;
+    }
   }
 `
 const CommentContainer = styled.div`
@@ -48,17 +88,31 @@ const CommentContainer = styled.div`
     border-top: 1px solid ${(props: { theme?: UITheme }) => props.theme.matteWhite};
   }
 
-  .input-box {
+  .reply-box {
     display: flex;
     align-items: center;
-    input {
-      flex: 1 1 100%;
+    @media only screen and (max-width: 600px) {
+      flex-direction: column;
+      align-items: flex-end;
     }
-    img {
+    .reply-box__input {
+      @media only screen and (max-width: 600px) {
+        min-width: 100%;
+      }
+      display: flex;
+      flex: 1 0 auto;
+      align-items: center;
+      input {
+        flex: 1 0 auto;
+      }
+    }
+    .reply-box__submit {
       cursor: pointer;
       margin: 0 10px;
-      width: 25px;
-      height: 25px;
+      @media only screen and (max-width: 600px) {
+        margin: 0px;
+        margin-top: 5px;
+      }
     }
   }
 `
@@ -122,9 +176,9 @@ interface UICommentPropTypes extends GBCommentType {
   userList?: any[]
   reactionSummary?: any
   t?: any
-  commentConnection?: { pageInfo: { hasPreviousPage: boolean }, edges: { cursor: string, node: UICommentPropTypes }[] }
+  commentConnection?: { count: number, pageInfo: { hasPreviousPage: boolean }, edges: { cursor: string, node: UICommentPropTypes }[] }
 }
-const _UICommentComponent = (props: UICommentPropTypes & { replyLoading?: boolean, onLoadMoreReplyComment?: () => void, onLoadMoreComment?: any, hasMoreComment?: boolean, comments?: UICommentPropTypes[], showReplyInput?: boolean, onReplyMessageChange?: any, onReply?: any, replyMessage?: string, onWillReply?: any }) => !props.user ? <div onClick={console.log.bind(null, props)} >{'error'}</div> : (
+const _UICommentComponent = (props: UICommentPropTypes & { remainingComment?: number, replyLoading?: boolean, onLoadMoreReplyComment?: () => void, onLoadMoreComment?: any, hasMoreComment?: boolean, comments?: UICommentPropTypes[], showReplyInput?: boolean, onReplyMessageChange?: any, onReply?: any, replyMessage?: string, onWillReply?: any }) => !props.user ? <div onClick={console.log.bind(null, props)} >{'error'}</div> : (
   <CommentContainer className={props.className}>
     <CommentHeader>
       <UserInfoWrap>
@@ -154,11 +208,10 @@ const _UICommentComponent = (props: UICommentPropTypes & { replyLoading?: boolea
     </ReactionContainer>
     <ReplyCommentContainer key='reply'>
       {
-        props.replyLoading
-        ? <div>loading</div>
-        : props.hasMoreComment
+        props.hasMoreComment
         ? <div className='load-more heavent' onClick={props.onLoadMoreReplyComment}>
-          {props.t('comment/reply/load-more')}
+          <span className="arrow" style={{ marginRight: 5 }}><img src="/static/comment-images/right-curve-arrow.png"/></span>
+          <span>{props.replyLoading ? props.t('loading') : props.t('comment/reply/load-more', { count: props.remainingComment })}</span>
         </div>
         : null
       }
@@ -183,12 +236,16 @@ const _UICommentComponent = (props: UICommentPropTypes & { replyLoading?: boolea
       }
       {
         props.showReplyInput
-          ? <div className='input-box'>
-            <ProfilePictureContainer>
-              <ProfilePicture src={props.selectedUser.profilePicture} />
-            </ProfilePictureContainer>
-            <InputTextSingle className='left' value={props.replyMessage} onChange={e => props.onReplyMessageChange(e.target.value)} />
-            <img className='right' src="/static/comment-images/reaction/reaction-like.png" onClick={props.onReply}/>
+          ? <div className='reply-box'>
+            <div className='reply-box__input'>
+              <ProfilePictureContainer>
+                <ProfilePicture src={props.selectedUser.profilePicture} />
+              </ProfilePictureContainer>
+              <InputTextSingle id={`comment-input-box-${props._id}`} value={props.replyMessage} onChange={e => props.onReplyMessageChange(e.target.value)} />
+            </div>
+            <PrimaryButton className='reply-box__submit' onClick={props.onReply}>
+              {props.t('confirm')}
+            </PrimaryButton>
           </div>
           : null
       }
@@ -209,6 +266,7 @@ export default class UICommentContainer extends React.Component<UICommentPropTyp
   state = {
     showReplyInput: false,
     replyMessage: "",
+    showComment: false,
   }
   static fragments = {
     comment: gql`
@@ -219,6 +277,7 @@ export default class UICommentContainer extends React.Component<UICommentPropTyp
         createdAt
         userId
         commentConnection(last: 3, sort: CREATEDAT_ASC) {
+          count
           pageInfo {
             hasPreviousPage
           }
@@ -247,22 +306,39 @@ export default class UICommentContainer extends React.Component<UICommentPropTyp
       }
     `
   }
-  showReplyInput = () => this.setState({ showReplyInput: !this.state.showReplyInput })
+  showReplyInput = () => {
+    this.setState({ showReplyInput: !this.state.showReplyInput, showComment: true })
+    if (!this.state.showReplyInput) {
+      setTimeout(() => {
+        const doc = document.getElementById(`comment-input-box-${this.props._id}`)
+        tryScrollToComponent(doc)
+      })
+    }
+  }
   onReplyMessageChange = (message) => this.setState({ replyMessage: message })
   onReply = () => {
     this.props.onReply && this.props.onReply(this.state.replyMessage)
-    this.setState({ replyMessage: '' })
+    this.setState({ replyMessage: '', showReplyInput: false })
   }
   render() {
     return (
       <UICommentComponent
         {...this.props}
-        comments={this.props.commentConnection.edges.map(e => e.node)}
-        hasMoreComment={this.props.commentConnection.pageInfo.hasPreviousPage}
+        remainingComment={this.state.showComment ? this.props.commentConnection.count - this.props.commentConnection.edges.length : this.props.commentConnection.count}
+        comments={this.state.showComment ? this.props.commentConnection.edges.map(e => e.node) : []}
+        hasMoreComment={this.state.showComment ? this.props.commentConnection.pageInfo.hasPreviousPage : this.props.commentConnection.count > 0}
         showReplyInput={this.state.showReplyInput}
         onWillReply={this.showReplyInput}
         onReplyMessageChange={this.onReplyMessageChange}
-        onLoadMoreReplyComment={this.props.loadMoreReply}
+        onLoadMoreReplyComment={() => {
+          if (this.state.showComment) {
+            this.props.loadMoreReply && this.props.loadMoreReply()
+          } else {
+            this.setState({
+              showComment: true
+            })
+          }
+        }}
         replyMessage={this.state.replyMessage}
         onReply={this.onReply}
       />

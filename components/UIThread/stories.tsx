@@ -18,7 +18,7 @@ storiesOf("UIThread/UIComment", module)
     </Layout>
   ))
   .add("container", () => (
-    <CommentContainer commentConnection={{ pageInfo: { hasPreviousPage: false }, edges: [] }} _id=" " selectedUser={selectedUser} user={{ _id: "1", profilePicture: null, name: "test" }} message="test message\ntest message line 2" onReply={action('reply')} />
+    <CommentContainer commentConnection={{ count: 0, pageInfo: { hasPreviousPage: false }, edges: [] }} _id=" " selectedUser={selectedUser} user={{ _id: "1", profilePicture: null, name: "test" }} message="test message\ntest message line 2" onReply={action('reply')} />
   ))
   .add("withoutData", () => (
     <CommentComponent _id=" " message="A" />
