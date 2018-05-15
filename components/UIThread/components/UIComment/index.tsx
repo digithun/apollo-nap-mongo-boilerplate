@@ -244,7 +244,7 @@ const _UICommentComponent = (props: UICommentPropTypes & { remainingComment?: nu
               <InputTextSingle id={`comment-input-box-${props._id}`} value={props.replyMessage} onChange={(e: any) => props.onReplyMessageChange(e.target.value)} />
             </div>
             <PrimaryButton className='reply-box__submit' onClick={props.onReply}>
-              {props.t('confirm')}
+              {props.t('reply')}
             </PrimaryButton>
           </div>
           : null
