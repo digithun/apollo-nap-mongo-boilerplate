@@ -4,7 +4,6 @@ COPY . /usr/app
 WORKDIR /usr/app
 RUN yarn && \
   yarn global add typescript && \
-  yarn add styled-components && \
   tsc && \
   rm -rf .git
 
