@@ -1,4 +1,4 @@
-import { GraphQLObjectType, GraphQLString } from 'graphql'
+import { GraphQLObjectType, GraphQLString, GraphQLInt } from 'graphql'
 import { GQC, TypeComposer } from 'graphql-compose'
 import * as mongoose from 'mongoose'
 import thread from './Thread'
@@ -73,11 +73,11 @@ export default function createSchema({ __connection, config }: SVContext) {
 
   thread.createGraphQLRelation(typeComposers)
   comment.createGraphQLRelation(typeComposers)
-  const Viewer = TypeComposer.create("Viewer")
+  const Viewer = TypeComposer.create('Viewer')
   Viewer.addFields({
     threads: typeComposers.Thread.getResolver('findMany'),
     thread: typeComposers.Thread.getResolver('findAndUpdate'),
-    comment: typeComposers.Comment.getResolver('findById')
+    comment: typeComposers.Comment.getResolver('findById'),
   })
 
   GQC.rootQuery().addFields({
@@ -98,7 +98,7 @@ export default function createSchema({ __connection, config }: SVContext) {
     },
     threads: typeComposers.Thread.getResolver('findMany'),
     thread: typeComposers.Thread.getResolver('findAndUpdate'),
-    comment: typeComposers.Comment.getResolver('findById')
+    comment: typeComposers.Comment.getResolver('findById'),
   })
   GQC.rootMutation().addFields({
     addReaction: typeComposers.Reaction.getResolver('add'),
@@ -143,7 +143,7 @@ export default function createSchema({ __connection, config }: SVContext) {
               userId: rp.context.user.userId,
               type: 'comment/comment-content',
               payload: {
-                contentId: contentId,
+                contentId,
                 commentById: userId,
               }
             })

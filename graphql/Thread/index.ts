@@ -20,7 +20,7 @@ export default {
           if (!context.userId) {
             return null
           }
-          return context.models.Reaction.findOne({ userId: context.userId, contentId: source._id, contentType: "THREAD" }) 
+          return context.models.Reaction.findOne({ userId: context.userId, contentId: source._id, contentType: "THREAD" })
         }
       }
     })

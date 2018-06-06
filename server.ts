@@ -65,7 +65,7 @@ export default async function init(context: SVContext) {
       ...req,
       ...context,
       models,
-      connectors
+      connectors,
     }
   })))
 
