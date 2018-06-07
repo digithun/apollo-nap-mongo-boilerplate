@@ -3,8 +3,7 @@ FROM node:8.9.1 as builder
 COPY . /usr/app
 WORKDIR /usr/app
 RUN yarn && \
-  yarn global add typescript && \
-  tsc && \
+  yarn tsc && \
   rm -rf .git
 
 
