@@ -27,6 +27,20 @@ const UserListTitle = styled(UILabel) `
   white-space: nowrap;
 `
 
+const Arrow = styled.div`
+  margin: 5px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid #333333;
+`
+
+const CircleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
 type enchancePropType = {
   t?: UIi18nTranslator
   isToggleUserList: boolean
@@ -44,9 +58,12 @@ export default compose<enchancePropType & UIUserSelectorPropTypes, {}>(
   })
   return (
     <Container>
-      <UIUserSelectorButton onMouseDown={toggleUserList}>
-        <UIUserImageThumbnailCircle src={props.users[props.value].profilePicture} />
-      </UIUserSelectorButton>
+      <CircleContainer>
+        <UIUserSelectorButton onMouseDown={toggleUserList}>
+          <UIUserImageThumbnailCircle src={props.users[props.value].profilePicture} />
+        </UIUserSelectorButton>
+        <Arrow/>
+      </CircleContainer>
       <UIPopoverContainer onClose={onCloseUserList} visible={props.isToggleUserList} direction='down'>
         <UserListWrap>
           <UserListTitle>{props.t('your-authors')}</UserListTitle>
