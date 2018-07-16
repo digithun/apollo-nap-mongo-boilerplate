@@ -88,13 +88,9 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
         <Button.PrimaryButton onClick={this.props.requestLoadMoreComments} disabled={this.props.loading} >
           {this.props.loading ? 'กำลังโหลด' : 'โหลดเพิ่ม'}
         </Button.PrimaryButton>
-      ) :
-      (
-        <Label.UILabel style={{ fontSize: '0.8rem' }} >
-          {this.props.loadMoreComments.length > 20 ? 'สิ้นสุด... กันทีไม่ว่า ชาตินี้ ชาติไหน คอมเม้นหมดแล้วจ้า 👋🏼' : ''}
-        </Label.UILabel>
       )
-    
+      : null
+
     return (
       <Layout>
         <div style={{ minHeight: 300, marginBottom: 100 }} className={this.props.threadId}>
@@ -132,9 +128,9 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
           </div>
           <div style={{ color: '#bcbcbc', textAlign: 'center' }}>
             {
-              this.props.comments.length !== 0 
+              this.props.comments.length !== 0
               ? Loadmore
-              : this.props.loading 
+              : this.props.loading
               ? <Button.PrimaryButton disabled>
                 กำลังโหลด
               </Button.PrimaryButton>
