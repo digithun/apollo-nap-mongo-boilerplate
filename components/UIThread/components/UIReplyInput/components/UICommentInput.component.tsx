@@ -66,7 +66,7 @@ class UICommentInput extends React.Component<UICommentInputPropTypes & enchanceP
     const props = this.props
     return (
       <CommentInputContainer>
-        <div className="input">
+        <div className='input'>
           {props.userList.length > 0 ? <UIUserSelector onChange={this.onUserChange} users={props.userList} value={props.currentSelectedUserIndex} /> : null}
           <InputTextMultiline
             disabled={props.isTextInputDisabled || props.disabled}
@@ -77,7 +77,7 @@ class UICommentInput extends React.Component<UICommentInputPropTypes & enchanceP
           />
         </div>
         <ConfirmButton
-          className="submit"
+          className='submit'
           disabled={this.props.isTextInputDisabled || this.props.value.message.length < 1 || props.disabled}
           text={props.t(this.props.isTextInputDisabled ? 'posting' : 'post')}
           onClick={props.onConfirm}

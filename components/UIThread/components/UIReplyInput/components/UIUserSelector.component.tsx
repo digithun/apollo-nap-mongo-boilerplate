@@ -58,8 +58,8 @@ export default compose<enchancePropType & UIUserSelectorPropTypes, {}>(
   })
   return (
     <Container>
-      <CircleContainer>
-        <UIUserSelectorButton onMouseDown={toggleUserList}>
+      <CircleContainer onMouseDown={toggleUserList}>
+        <UIUserSelectorButton >
           <UIUserImageThumbnailCircle src={props.users[props.value].profilePicture} />
         </UIUserSelectorButton>
         <Arrow/>
