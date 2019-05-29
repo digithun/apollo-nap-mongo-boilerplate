@@ -107,6 +107,7 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
                   onRemove={this.onRemove}
                   onAddReaction={this.onAddReaction}
                   onRemoveReaction={this.onRemoveReaction}
+                  replyDisabled={this.props.replyDisabled}
                   key={comment._id}
                   userList={this.props.userList}
                   {...comment}
@@ -120,6 +121,7 @@ class UIThread extends React.Component<ThreadPropTypes, {}> {
                   onRemoveReaction={this.onRemoveReaction}
                   className='loadmore'
                   userList={this.props.userList}
+                  replyDisabled={this.props.replyDisabled}
                   key={comment._id}
                   onReply={(message) => this.onReply(comment._id, message)}
                   {...comment}
